@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 // ==================== BASE API CONFIGURATION ====================
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'https://lead-crm-backend-1cq8.onrender.com/api';
 
 // Base query with token handling
 const baseQuery = fetchBaseQuery({

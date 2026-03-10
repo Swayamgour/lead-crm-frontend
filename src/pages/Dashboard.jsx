@@ -27,6 +27,7 @@ import {
     Sidebar
 } from 'lucide-react';
 import NavSidebar from "./NavSidebar.jsx"
+import ProtectRoute from '../components/ProtectRoute.jsx';
 
 function App() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -54,6 +55,9 @@ function App() {
 
     return (
         <div className="min-h-screen bg-gray-50 flex">
+
+
+           
            
             <div className={` transition-all duration-300`}>
                 {/* Top Bar */}

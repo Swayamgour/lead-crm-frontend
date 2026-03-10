@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import NavSidebar from "../pages/NavSidebar.jsx";
+import { useGetProfileQuery } from "../redux/api.jsx";
 
 function MainLayout() {
 
     const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    
 
     // detect screen size
     useEffect(() => {
@@ -56,10 +59,10 @@ function MainLayout() {
 
                 {/* Page Content */}
                 {/* <main className="flex-1 overflow-y-auto sm:p-0 p-6 "> */}
-                    <main className="flex-1 overflow-y-auto p-0 sm:p-6">
+                <main className="flex-1 overflow-y-auto p-0 sm:p-6">
 
                     {/* </main> */}
- 
+
                     <Outlet />
 
                 </main>

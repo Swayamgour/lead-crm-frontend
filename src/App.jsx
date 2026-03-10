@@ -15,6 +15,7 @@ import Dashboard from "./pages/Leads/Dashboard";
 import LeadTimeline from "./pages/Leads/LeadTimeline";
 import { Toaster } from 'react-hot-toast';
 import AssignLeadView from "./pages/salesExcuting/AssignLeadView";
+import ProtectRoute from "./components/ProtectRoute";
 
 
 function App() {
@@ -25,23 +26,27 @@ function App() {
       <Routes>
 
         <Route path="/login" element={<Login />} />
-        <Route element={<MainLayout />}>
-
-          <Route path="/" element={<Dashboard />} />
-
-          <Route path="/Leads" element={<LeadView />} />
-          <Route path="/addLeads" element={<AddLead />} />
-
-          <Route path="/addExecutive" element={<AddExecutive />} />
-          <Route path="/ViewExecutives" element={<ViewExecutives />} />
-
-          <Route path="/LeadPipeline" element={<LeadPipeline />} />
-          <Route path="/followUps" element={<FollowUps />} />
-          <Route path="/Dashboard" element={<Dashboard />} />
-          <Route path="/LeadTimeline" element={<LeadTimeline />} />
-          <Route path="/AssignLeadView/:id" element={<AssignLeadView />} />
+        <Route element={<ProtectRoute />}>
+          <Route element={<MainLayout />}>
 
 
+
+
+            <Route path="/" element={<Dashboard />} />
+
+            <Route path="/Leads" element={<LeadView />} />
+            <Route path="/addLeads" element={<AddLead />} />
+
+            <Route path="/addExecutive" element={<AddExecutive />} />
+            <Route path="/ViewExecutives" element={<ViewExecutives />} />
+
+            <Route path="/LeadPipeline" element={<LeadPipeline />} />
+            <Route path="/followUps" element={<FollowUps />} />
+            <Route path="/Dashboard" element={<Dashboard />} />
+            <Route path="/LeadTimeline" element={<LeadTimeline />} />
+            <Route path="/AssignLeadView/:id" element={<AssignLeadView />} />
+
+          </Route>
 
         </Route>
 

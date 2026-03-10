@@ -27,6 +27,8 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+    // use2
+
     const validateForm = () => {
         const newErrors = {};
         if (!email) {
@@ -160,7 +162,7 @@ const Login = () => {
                             </div>
 
                             {/* Remember Me & Forgot Password */}
-                            <div className="flex items-center justify-between">
+                            {/* <div className="flex items-center justify-between">
                                 <label className="flex items-center">
                                     <input
                                         type="checkbox"
@@ -176,7 +178,7 @@ const Login = () => {
                                 >
                                     Forgot Password?
                                 </button>
-                            </div>
+                            </div> */}
 
                             {/* Login Button */}
                             <button

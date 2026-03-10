@@ -61,13 +61,13 @@ export const sidebarSections = [
         // ]
     },
 
-    {
-        title: "Lead Pipeline",
-        icon: GitBranch,
-        path: "/LeadPipeline",
-        color: "from-orange-500 to-orange-600",
-        badge: 5
-    },
+    // {
+    //     title: "Lead Pipeline",
+    //     icon: GitBranch,
+    //     path: "/LeadPipeline",
+    //     color: "from-orange-500 to-orange-600",
+    //     badge: 5
+    // },
     {
         title: "Follow Up",
         icon: Clock,
@@ -75,13 +75,13 @@ export const sidebarSections = [
         color: "from-yellow-500 to-yellow-600",
         badge: 3
     },
-    {
-        title: "Lead Timeline",
-        icon: Activity,
-        path: "/LeadTimeline",
-        color: "from-indigo-500 to-indigo-600",
-        badge: null
-    },
+    // {
+    //     title: "Lead Timeline",
+    //     icon: Activity,
+    //     path: "/LeadTimeline",
+    //     color: "from-indigo-500 to-indigo-600",
+    //     badge: null
+    // },
 
 ];
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Phone, MessageCircle, ChevronDown, ChevronUp, Calendar, User, Clock, Filter, Search, MoreVertical } from "lucide-react";
-import { useGetFollowUpsQuery } from "../../redux/api";
+import { useGetFollowUpsQuery, useGetProfileQuery } from "../../redux/api";
 
 function FollowUps() {
     const { data, isLoading } = useGetFollowUpsQuery();
@@ -8,6 +8,9 @@ function FollowUps() {
     const [expandedLead, setExpandedLead] = useState(null);
     const [filterStatus, setFilterStatus] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
+
+
+    const { data: profile } = useGetProfileQuery()
 
     // Get next follow-up
     const getNextFollowUp = (history) => {

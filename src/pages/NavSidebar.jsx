@@ -20,11 +20,18 @@ import {
 } from "lucide-react";
 
 import { sidebarSections } from "../components/data";
+import { useGetProfileQuery } from "../redux/api";
 
 const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
     const navigate = useNavigate();
     const location = useLocation();
+
+    const { data } = useGetProfileQuery()
+
+    console.log(data)
+
+
 
     const [expandedMenus, setExpandedMenus] = useState({
         leadSources: true,
@@ -146,13 +153,18 @@ const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <div className="flex items-center gap-2">
                             <div className="relative flex-shrink-0">
                                 <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-base">
-                                    JD
+                                    {data?.name
+                                        ?.split(" ")
+                                        .map(word => word[0])
+                                        .slice(0, 2)
+                                        .join("")
+                                        .toUpperCase()}
                                 </div>
                                 <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-xs font-semibold text-gray-800 truncate">John Doe</p>
-                                <p className="text-xs text-gray-500 truncate">Admin · Online</p>
+                                <p className="text-xs font-semibold text-gray-800 truncate">{data?.name}</p>
+                                <p className="text-xs text-gray-500 truncate">{data?.role} · Online</p>
                             </div>
                             <button className="p-1.5 hover:bg-white/50 rounded-lg transition-colors flex-shrink-0">
                                 <Bell size={16} className="text-gray-600" />
