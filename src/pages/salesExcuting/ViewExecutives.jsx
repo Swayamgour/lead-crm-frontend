@@ -25,7 +25,7 @@ import {
     BarChart3
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useGetExecutiveByIdQuery, useGetExecutivesQuery, useUpdateExecutiveMutation } from "../../redux/api";
+import { useGetUsersQuery } from "../../redux/api";
 
 function ViewExecutives() {
     const navigate = useNavigate();
@@ -34,26 +34,32 @@ function ViewExecutives() {
     const [selectedExecutives, setSelectedExecutives] = useState([]);
     const [viewMode, setViewMode] = useState("table"); // table or grid
 
-    const { data } = useGetExecutivesQuery()
-    const { data: Executive } = useGetExecutiveByIdQuery('69aacb0eb201e62a9eb6cf3d')
+    const { data } = useGetUsersQuery()
+    // const { data: Executive } = useGetExecutiveByIdQuery('69aacb0eb201e62a9eb6cf3d')
 
 
-    const [updateExecutive] = useUpdateExecutiveMutation()
+    // const [updateExecutive] = useUpdateExecutiveMutation()
+
+    const updateExecutive = () => {
+
+    }
 
 
-    const executives = data?.executives || []
+    const executives = data || []
 
     const getInitials = (name) => {
         return name.split(' ').map(n => n[0]).join('').toUpperCase();
     };
 
-    const filteredExecutives = executives.filter(exec => {
+    const filteredExecutives = executives?.filter(exec => {
         const matchesSearch = exec.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             exec.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
             exec.phone.includes(searchTerm);
         const matchesStatus = filterStatus === "all" || exec.status === filterStatus;
         return matchesSearch && matchesStatus;
     });
+
+    console.log(filteredExecutives)
 
     const stats = {
         total: executives.length,
@@ -244,9 +250,9 @@ function ViewExecutives() {
                                         Status
                                     </th>
 
-                                    <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    {/* <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                         Assign Lead
-                                    </th>
+                                    </th> */}
 
                                     <th className="px-4 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                                         Actions
@@ -334,7 +340,7 @@ function ViewExecutives() {
 
 
                                         {/* Status */}
-                                        <td className="px-4 md:px-6 py-4">
+                                        {/* <td className="px-4 md:px-6 py-4">
 
                                             <span
                                                 className={`px-3 py-1 rounded-full text-xs font-medium ${exec.status === "active"
@@ -345,7 +351,7 @@ function ViewExecutives() {
                                                 {exec?.stats?.totalLeads}
                                             </span>
 
-                                        </td>
+                                        </td> */}
 
                                         {/* Actions */}
                                         <td className="px-4 md:px-6 py-4">

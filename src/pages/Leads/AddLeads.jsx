@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import RemarkEditor from "../../components/RemarkEditor";
-import { useGetExecutivesQuery, useCreateLeadMutation } from "../../redux/api";
+import { useGetUsersQuery, useCreateLeadMutation } from "../../redux/api";
 import { leadStatus } from "../../components/data";
 
 const leadSources = [
@@ -44,10 +44,10 @@ function AddLead() {
 
     // priority: "Medium",
 
-    const { data } = useGetExecutivesQuery()
+    const { data } = useGetUsersQuery()
     const [CreateLead] = useCreateLeadMutation()
 
-    const salesTeam = data?.executives || []
+    const salesTeam = data || []
 
 
 
@@ -106,6 +106,8 @@ function AddLead() {
 
         // Show success message
         setShowSuccess(true);
+        navigate(-1)
+
         setTimeout(() => setShowSuccess(false), 3000);
 
         // Reset form after successful submission

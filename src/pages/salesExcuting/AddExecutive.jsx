@@ -48,7 +48,7 @@ import {
     ArrowLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useCreateExecutiveMutation } from "../../redux/api";
+import { useCreateUserMutation } from "../../redux/api";
 
 function AddExecutive() {
     const [executive, setExecutive] = useState({
@@ -57,37 +57,13 @@ function AddExecutive() {
         email: "",
         password: "",
         confirmPassword: "",
-        // role: "Sales Executive",
-        // department: "Sales",
-        // employeeId: "",
-        // joiningDate: "",
-        // designation: "",
-        // experience: "",
-        // qualification: "",
-        // address: "",
-        // city: "",
-        // state: "",
-        // pincode: "",
-        // emergencyContact: "",
-        // bloodGroup: "",
-        // dateOfBirth: "",
-        // panNumber: "",
-        // aadharNumber: "",
-        // bankAccount: "",
-        // ifscCode: "",
-        // salary: "",
-        // target: "",
-        // commission: "",
-        // reportingManager: "",
-        // team: "",
-        // skills: [],
-        // languages: [],
-        // certifications: [],
-        // documents: []
+
     });
 
+    const navigate = useNavigate()
 
-    const [addExecutive] = useCreateExecutiveMutation()
+
+    const [addExecutive] = useCreateUserMutation()
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -170,6 +146,8 @@ function AddExecutive() {
             console.log(res);
 
             setShowSuccess(true);
+            navigate(-1)
+
 
             setTimeout(() => setShowSuccess(false), 3000);
 
@@ -228,7 +206,7 @@ function AddExecutive() {
         setErrors({});
     };
 
-    const navigate = useNavigate()
+
 
 
 

@@ -51,7 +51,7 @@ export const sidebarSections = [
         icon: Wifi,
         key: "leadSources",
         color: "from-purple-500 to-purple-600",
-        badge: 12,
+        badge: null,
         path: "/Leads",
 
         // items: [
@@ -73,15 +73,15 @@ export const sidebarSections = [
         icon: Clock,
         path: "/followUps",
         color: "from-yellow-500 to-yellow-600",
-        badge: 3
+        badge: null
     },
-    // {
-    //     title: "Lead Timeline",
-    //     icon: Activity,
-    //     path: "/LeadTimeline",
-    //     color: "from-indigo-500 to-indigo-600",
-    //     badge: null
-    // },
+    {
+        title: "Lead Timeline",
+        icon: Activity,
+        path: "/LeadTimeline",
+        color: "from-indigo-500 to-indigo-600",
+        badge: null
+    },
 
 ];
 

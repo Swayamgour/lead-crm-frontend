@@ -24,7 +24,7 @@ import {
     Flag
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useGetExecutivesQuery, useGetLeadsQuery, useUpdateLeadMutation } from "../../redux/api";
+import {  useGetLeadsQuery, useUpdateLeadMutation } from "../../redux/api";
 import toast from "react-hot-toast";
 import { leadStatus } from "../../components/data";
 
@@ -33,9 +33,9 @@ import { leadStatus } from "../../components/data";
 function LeadView() {
     const { data } = useGetLeadsQuery();
     const [updateLead] = useUpdateLeadMutation();
-    const { data: execData } = useGetExecutivesQuery();
-    const executives = execData?.executives || [];
-    const leads = data?.leads || [];
+    // const { data: execData } = useGetExecutivesQuery();
+    const executives =  [];
+    const leads = data || [];
 
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState("");
