@@ -8,11 +8,14 @@ import {
     User
 } from "lucide-react";
 
-import { useGetTimelineQuery } from "../../redux/api";
+import { useGetTimelineQuery, useGetTimelineGroupedQuery } from "../../redux/api";
 
 function LeadTimeline() {
 
     const { data, isLoading } = useGetTimelineQuery();
+    const { data: grouped } = useGetTimelineGroupedQuery();
+
+    // console.log(first)
 
     const timeline = data || [];
 
