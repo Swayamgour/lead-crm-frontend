@@ -21,69 +21,9 @@ import {
 
 
 } from "lucide-react";
-import { Menu } from "lucide-react"; 2
+import { Menu } from "lucide-react"; 
 
-export const sidebarSections = [
-    // {
-    //     title: "Dashboard",
-    //     icon: Layout,
-    //     path: "/Dashboard",
-    //     badge: null,
-    //     color: "from-blue-500 to-blue-600"
-    // },
 
-    {
-        title: "Sales Executives",
-        icon: Users,
-        key: "salesExecutives",
-        color: "from-green-500 to-green-600",
-        badge: null,
-        path: "/ViewExecutives",
-
-        // items: [
-        //     { name: "Add Executive", path: "/addExecutive", icon: UserPlus, shortcut: "⌘E" },
-        //     { name: "View Executives", path: "/ViewExecutives", icon: Users, shortcut: "⌘S" },
-        //     // { name: "Performance", path: "/executivePerformance", icon: TrendingUp }
-        // ]
-    },
-    {
-        title: "Lead Sources",
-        icon: Wifi,
-        key: "leadSources",
-        color: "from-purple-500 to-purple-600",
-        badge: null,
-        path: "/Leads",
-
-        // items: [
-        //     { name: "Add Manually", path: "/addLeads", icon: Plus, shortcut: "⌘N" },
-        //     { name: "View Leads", path: "/Leads", icon: Eye, shortcut: "⌘V" },
-
-        // ]
-    },
-
-    // {
-    //     title: "Lead Pipeline",
-    //     icon: GitBranch,
-    //     path: "/LeadPipeline",
-    //     color: "from-orange-500 to-orange-600",
-    //     badge: 5
-    // },
-    {
-        title: "Follow Up",
-        icon: Clock,
-        path: "/followUps",
-        color: "from-yellow-500 to-yellow-600",
-        badge: null
-    },
-    {
-        title: "Lead Timeline",
-        icon: Activity,
-        path: "/LeadTimeline",
-        color: "from-indigo-500 to-indigo-600",
-        badge: null
-    },
-
-];
 
 
 

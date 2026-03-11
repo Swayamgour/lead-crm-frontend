@@ -38,7 +38,7 @@ function FollowUps() {
     ----------------------------*/
     const groupedFollowups = Object.values(
         followups.reduce((acc, item) => {
-            const leadId = item.leadId._id;
+            const leadId = item?.leadId?._id;
             if (!acc[leadId]) {
                 acc[leadId] = {
                     lead: item.leadId,
@@ -115,9 +115,9 @@ function FollowUps() {
     ----------------------------*/
     const filteredFollowups = groupedFollowups.filter(item => {
         const matchesSearch =
-            item.lead.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.lead.phone?.includes(searchTerm) ||
-            item.lead.email?.toLowerCase().includes(searchTerm.toLowerCase());
+            item.lead?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.lead?.phone?.includes(searchTerm) ||
+            item.lead?.email?.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesStatus =
             filterStatus === "all" ||

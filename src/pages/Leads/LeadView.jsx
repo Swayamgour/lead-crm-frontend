@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
     User,
     Phone,
@@ -8,23 +8,16 @@ import {
     Clock,
     MessageCircle,
     FileText,
-    Edit,
+    // Edit,
     Plus,
     Filter,
     Calendar,
     ChevronDown,
-    MoreVertical,
-    Star,
-    TrendingUp,
-    DollarSign,
-    Shield,
     X,
-    MoreVerticalIcon,
-    Circle,
-    Flag
+
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {  useGetLeadsQuery, useUpdateLeadMutation } from "../../redux/api";
+import { useGetLeadsQuery, useUpdateLeadMutation, useGetUsersQuery, useGetProfileQuery } from "../../redux/api";
 import toast from "react-hot-toast";
 import { leadStatus } from "../../components/data";
 
@@ -32,10 +25,13 @@ import { leadStatus } from "../../components/data";
 
 function LeadView() {
     const { data } = useGetLeadsQuery();
+    const { data: Executive } = useGetUsersQuery();
     const [updateLead] = useUpdateLeadMutation();
-    // const { data: execData } = useGetExecutivesQuery();
-    const executives =  [];
+    const { data: profile } = useGetProfileQuery();
+    const executives = [];
     const leads = data || [];
+
+    // console.log()
 
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState("");
@@ -56,21 +52,9 @@ function LeadView() {
     const [showReassignModal, setShowReassignModal] = useState(false);
     const [selectedExecutive, setSelectedExecutive] = useState("");
 
-    const statusColors = {
-        "new": "bg-blue-50 text-blue-700 border-blue-200",
-        "contacted": "bg-purple-50 text-purple-700 border-purple-200",
-        "qualified": "bg-green-50 text-green-700 border-green-200",
-        "proposal": "bg-yellow-50 text-yellow-700 border-yellow-200",
-        "negotiation": "bg-orange-50 text-orange-700 border-orange-200",
-        "closed-won": "bg-emerald-50 text-emerald-700 border-emerald-200",
-        "closed-lost": "bg-red-50 text-red-700 border-red-200"
-    };
 
-    const priorityColors = {
-        high: "priority-high bg-red-50 text-red-700",
-        medium: "priority-medium bg-yellow-50 text-yellow-700",
-        low: "priority-low bg-green-50 text-green-700"
-    };
+
+
 
 
     // {leadStatus}
@@ -92,13 +76,7 @@ function LeadView() {
         return statusMatch && dateMatch && searchMatch;
     });
 
-    const getStatusBadge = (status) => {
-        return (
-            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${statusColors[status] || statusColors["new"]}`}>
-                {status?.replace('-', ' ') || 'new'}
-            </span>
-        );
-    };
+
 
     const handleStatusChange = async (id, newStatus) => {
         try {
@@ -137,7 +115,7 @@ function LeadView() {
         try {
             const res = await updateLead({
                 id: viewLead._id,
-                remark: newRemark
+                remarks: newRemark
             });
             if (res?.data?.success) {
                 setViewLead(prev => ({
@@ -249,13 +227,13 @@ function LeadView() {
                             </button>
 
                             {/* Add Lead Button */}
-                            <button
+                            {profile?.role === 'admin' && <button
                                 onClick={() => navigate("/addLeads")}
                                 className="flex items-center gap-2 bg-[#4f46e5] text-white px-6 py-2 rounded-lg hover:bg-[#4338ca] transition-all shadow-md hover:shadow-lg text-sm font-semibold"
                             >
                                 <Plus size={18} />
                                 Add New Lead
-                            </button>
+                            </button>}
                         </div>
 
                         {/* Advanced Filters */}
@@ -400,6 +378,7 @@ function LeadView() {
                                         </td> */}
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
+                                                {console.log(lead)}
                                                 {lead.assignedTo ? (
                                                     <>
                                                         <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#8b5cf6] to-[#4f46e5] flex items-center justify-center text-white text-xs font-bold">
@@ -452,13 +431,13 @@ function LeadView() {
                                 <Users size={48} className="text-[#9ca3af] mx-auto mb-4" />
                                 <h3 className="text-lg font-medium text-[#1a1a2e] mb-2">No leads found</h3>
                                 <p className="text-sm text-[#9ca3af] mb-6">Try adjusting your filters or add a new lead</p>
-                                <button
+                                {profile?.role === 'admin' && <button
                                     onClick={() => navigate("/addLeads")}
                                     className="inline-flex items-center gap-2 bg-[#4f46e5] text-white px-6 py-2 rounded-lg hover:bg-[#4338ca] transition-colors text-sm font-semibold"
                                 >
                                     <Plus size={18} />
                                     Add New Lead
-                                </button>
+                                </button>}
                             </div>
                         </div>
                     )}
@@ -550,7 +529,7 @@ function LeadView() {
                                     </span>
                                     <div className="modal-edit-row flex items-center gap-3 flex-wrap">
                                         <div className="assignee-grid modal-assignee-grid flex flex-wrap gap-2">
-                                            {executives.map(exec => (
+                                            {Executive?.map(exec => (
                                                 <button
                                                     key={exec._id}
                                                     type="button"

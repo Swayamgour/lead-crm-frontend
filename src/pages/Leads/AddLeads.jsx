@@ -36,7 +36,7 @@ function AddLead() {
         email: "",
         status: "",
         assignedTo: "",
-        remark: "",
+        remarks: "",
         followUpDate: "",
         expectedValue: "",
         tags: []
@@ -119,7 +119,7 @@ function AddLead() {
                 email: "",
                 status: "",
                 assignedTo: "",
-                remark: "",
+                remarks: "",
                 followUpDate: "",
                 expectedValue: "",
                 // priority: "Medium",
@@ -138,7 +138,7 @@ function AddLead() {
             email: "",
             status: "",
             assignedTo: "",
-            remark: "",
+            remarks: "",
             followUpDate: "",
             expectedValue: "",
             // priority: "Medium",
@@ -450,8 +450,8 @@ function AddLead() {
                                     Remarks / Notes
                                 </label>
                                 <RemarkEditor
-                                    value={lead.remark}
-                                    onChange={(val) => setLead({ ...lead, remark: val })}
+                                    value={lead.remarks}
+                                    onChange={(val) => setLead({ ...lead, remarks: val })}
                                 />
                             </div>
                         </div>

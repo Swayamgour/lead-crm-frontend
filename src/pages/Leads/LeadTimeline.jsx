@@ -2,22 +2,18 @@ import React, { useState } from "react";
 import {
     Clock,
     Search,
-    Filter,
     ChevronDown,
     ChevronUp,
     User
 } from "lucide-react";
 
-import { useGetTimelineQuery, useGetTimelineGroupedQuery } from "../../redux/api";
+import { useGetTimelineGroupedQuery } from "../../redux/api";
 
 function LeadTimeline() {
 
-    const { data, isLoading } = useGetTimelineQuery();
-    const { data: grouped } = useGetTimelineGroupedQuery();
+    const { data, isLoading } = useGetTimelineGroupedQuery();
 
-    // console.log(first)
-
-    const timeline = data || [];
+    const leadsTimeline = data || [];
 
     const [searchTerm, setSearchTerm] = useState("");
     const [expandedItems, setExpandedItems] = useState([]);
@@ -43,7 +39,6 @@ function LeadTimeline() {
                 month: "short",
                 day: "numeric"
             }),
-
             time: d.toLocaleTimeString("en-US", {
                 hour: "2-digit",
                 minute: "2-digit"
@@ -53,48 +48,39 @@ function LeadTimeline() {
     };
 
     /* -----------------------
-       FILTER
+       FILTER DATA
     ----------------------- */
 
-    const filteredTimeline = timeline.filter(item => {
+    const filteredLeads = leadsTimeline?.map((leadBlock) => {
 
-        if (filterType !== "all" && item.type !== filterType) {
-            return false;
-        }
+        const filteredTimeline = leadBlock.timeline.filter(item => {
 
-        if (searchTerm) {
+            if (filterType !== "all" && item.type !== filterType) {
+                return false;
+            }
 
-            const text = searchTerm.toLowerCase();
+            if (searchTerm) {
 
-            return (
-                item.title.toLowerCase().includes(text) ||
-                item.description.toLowerCase().includes(text) ||
-                item.createdBy?.name?.toLowerCase().includes(text)
-            );
+                const text = searchTerm.toLowerCase();
 
-        }
+                return (
+                    item.title.toLowerCase().includes(text) ||
+                    item.description.toLowerCase().includes(text) ||
+                    item.createdBy?.toLowerCase().includes(text)
+                );
 
-        return true;
+            }
 
-    });
+            return true;
 
-    /* -----------------------
-       GROUP BY DATE
-    ----------------------- */
+        });
 
-    const groupedByDate = filteredTimeline.reduce((acc, item) => {
+        return {
+            ...leadBlock,
+            timeline: filteredTimeline
+        };
 
-        const { date } = formatDateTime(item.date);
-
-        if (!acc[date]) {
-            acc[date] = [];
-        }
-
-        acc[date].push(item);
-
-        return acc;
-
-    }, {});
+    }).filter(lead => lead.timeline.length > 0);
 
     /* -----------------------
        STATS
@@ -102,11 +88,19 @@ function LeadTimeline() {
 
     const stats = {
 
-        total: timeline.length,
+        total: leadsTimeline.reduce((acc, lead) => acc + lead.timeline.length, 0),
 
-        leads: timeline.filter(i => i.type === "lead_created").length,
+        leads: leadsTimeline.reduce(
+            (acc, lead) =>
+                acc + lead.timeline.filter(i => i.type === "lead_created").length,
+            0
+        ),
 
-        updates: timeline.filter(i => i.type === "lead_updated").length
+        updates: leadsTimeline.reduce(
+            (acc, lead) =>
+                acc + lead.timeline.filter(i => i.type === "lead_updated").length,
+            0
+        )
 
     };
 
@@ -116,7 +110,8 @@ function LeadTimeline() {
 
     if (isLoading) {
         return (
-            <div className="flex justify-center items-center h-96">
+            <div className="flex justify-center items-center h-64 text-gray-500">
+                <Clock className="animate-spin mr-2" size={18} />
                 Loading timeline...
             </div>
         );
@@ -128,56 +123,59 @@ function LeadTimeline() {
 
     return (
 
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-lg shadow border">
 
             {/* HEADER */}
 
-            <div className="p-6 border-b">
+            <div className="p-4 border-b">
 
                 <div className="flex justify-between items-center">
 
-                    <h2 className="text-xl font-semibold flex items-center gap-2">
-                        <Clock className="text-blue-600" size={22} />
-                        Timeline
+                    <h2 className="text-lg font-semibold flex items-center gap-1.5">
+                        <Clock className="text-blue-600" size={18} />
+                        Lead Timeline
                     </h2>
 
                 </div>
 
-                {/* STATS */}
+                {/* STATS - Compact */}
 
-                <div className="grid grid-cols-3 gap-3 mt-4">
+                <div className="grid grid-cols-3 gap-2 mt-3">
 
-                    <div className="bg-blue-50 p-3 rounded">
+                    <div className="bg-blue-50 p-2 rounded text-center">
                         <p className="text-xs text-blue-600">Total</p>
-                        <p className="text-lg font-bold">{stats.total}</p>
+                        <p className="text-base font-bold">{stats.total}</p>
                     </div>
 
-                    <div className="bg-green-50 p-3 rounded">
+                    <div className="bg-green-50 p-2 rounded text-center">
                         <p className="text-xs text-green-600">Leads</p>
-                        <p className="text-lg font-bold">{stats.leads}</p>
+                        <p className="text-base font-bold">{stats.leads}</p>
                     </div>
 
-                    <div className="bg-yellow-50 p-3 rounded">
+                    <div className="bg-yellow-50 p-2 rounded text-center">
                         <p className="text-xs text-yellow-600">Updates</p>
-                        <p className="text-lg font-bold">{stats.updates}</p>
+                        <p className="text-base font-bold">{stats.updates}</p>
                     </div>
 
                 </div>
 
-                {/* SEARCH */}
+                {/* SEARCH - Compact */}
 
-                <div className="flex gap-3 mt-4">
+                <div className="flex gap-2 mt-3">
 
                     <div className="flex-1 relative">
 
-                        <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
+                        <Search
+                            className="absolute left-2.5 top-2 text-gray-400"
+                            size={14}
+                        />
 
                         <input
                             type="text"
-                            placeholder="Search timeline..."
+                            placeholder="Search..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-3 py-2 border rounded-lg"
+                            className="w-full pl-8 pr-2 py-1.5 text-sm border rounded"
                         />
 
                     </div>
@@ -185,104 +183,103 @@ function LeadTimeline() {
                     <select
                         value={filterType}
                         onChange={(e) => setFilterType(e.target.value)}
-                        className="border px-3 py-2 rounded-lg"
+                        className="border px-2 py-1.5 text-sm rounded w-32"
                     >
                         <option value="all">All</option>
-                        <option value="lead_created">Lead Created</option>
-                        <option value="lead_updated">Lead Updated</option>
+                        <option value="lead_created">Lead</option>
+                        <option value="lead_updated">Lead Update</option>
+                        <option value="followup_created">FollowUp</option>
+                        <option value="followup_updated">F/Up Update</option>
                     </select>
 
                 </div>
 
             </div>
 
-            {/* TIMELINE */}
+            {/* TIMELINE - Reduced height and spacing */}
 
-            <div className="p-6 max-h-[600px] overflow-y-auto">
+            <div className="p-4 max-h-[500px] overflow-y-auto">
 
-                {Object.entries(groupedByDate).map(([date, items]) => (
+                {filteredLeads.map((leadBlock) => (
 
-                    <div key={date} className="mb-6">
+                    <div key={leadBlock._id} className="mb-4 last:mb-0">
 
-                        {/* DATE HEADER */}
+                        {/* LEAD HEADER - More compact */}
 
-                        <div className="flex items-center gap-3 mb-4">
+                        <div className="bg-gray-50 p-3 rounded mb-3 border-l-4 border-blue-400">
 
-                            <div className="w-10 h-10 bg-blue-600 text-white flex items-center justify-center rounded-lg text-sm font-bold">
-                                {new Date(date).getDate()}
-                            </div>
+                            <h3 className="font-medium text-base">
+                                {leadBlock.lead.name}
+                            </h3>
 
-                            <div>
-
-                                <h3 className="font-semibold">{date}</h3>
-
-                                <p className="text-xs text-gray-500">
-                                    {items.length} activities
-                                </p>
-
-                            </div>
+                            <p className="text-xs text-gray-500">
+                                {leadBlock.lead.phone}
+                            </p>
 
                         </div>
 
-                        {/* ITEMS */}
+                        {/* TIMELINE ITEMS - Compact */}
 
-                        <div className="space-y-3">
+                        <div className="space-y-2">
 
-                            {items.map(item => {
+                            {leadBlock.timeline.map((item, index) => {
 
-                                const { time } = formatDateTime(item.date);
+                                const { time } = formatDateTime(item.createdAt);
+
+                                const uniqueId = leadBlock._id + index;
 
                                 return (
 
                                     <div
-                                        key={item._id}
-                                        className="border rounded-lg p-4 hover:shadow transition"
+                                        key={uniqueId}
+                                        className="border rounded p-3 hover:bg-gray-50 transition"
                                     >
 
                                         <div
                                             className="flex justify-between cursor-pointer"
-                                            onClick={() => toggleExpand(item._id)}
+                                            onClick={() => toggleExpand(uniqueId)}
                                         >
 
-                                            <div>
+                                            <div className="flex-1">
 
-                                                <h4 className="font-semibold text-gray-800">
+                                                <h4 className="font-medium text-sm text-gray-800">
                                                     {item.title}
                                                 </h4>
 
-                                                <p className="text-sm text-gray-600">
+                                                <p className="text-xs text-gray-600 line-clamp-1">
                                                     {item.description}
                                                 </p>
 
-                                                <div className="flex gap-4 text-xs text-gray-500 mt-2">
+                                                <div className="flex gap-3 text-xs text-gray-500 mt-1.5">
 
-                                                    <span className="flex items-center gap-1">
-                                                        <Clock size={12} />
+                                                    <span className="flex items-center gap-0.5">
+                                                        <Clock size={10} />
                                                         {time}
                                                     </span>
 
-                                                    <span className="flex items-center gap-1">
-                                                        <User size={12} />
-                                                        {item.createdBy?.name || "System"}
+                                                    <span className="flex items-center gap-0.5">
+                                                        <User size={10} />
+                                                        {item.createdBy || "System"}
                                                     </span>
 
                                                 </div>
 
                                             </div>
 
-                                            {expandedItems.includes(item._id)
-                                                ? <ChevronUp size={18} />
-                                                : <ChevronDown size={18} />
+                                            {expandedItems.includes(uniqueId)
+                                                ? <ChevronUp size={16} className="text-gray-400" />
+                                                : <ChevronDown size={16} className="text-gray-400" />
                                             }
 
                                         </div>
 
-                                        {expandedItems.includes(item._id) && (
+                                        {expandedItems.includes(uniqueId) && (
 
-                                            <div className="mt-4 pt-3 border-t text-sm text-gray-600">
+                                            <div className="mt-2 pt-2 border-t text-xs text-gray-600">
 
-                                                <p><b>Status:</b> {item.status}</p>
-                                                <p><b>Priority:</b> {item.priority}</p>
+                                                <span className="bg-gray-100 px-2 py-0.5 rounded">
+                                                    Type: {item.type.replace('_', ' ')}
+                                                </span>
 
                                             </div>
 
@@ -300,9 +297,9 @@ function LeadTimeline() {
 
                 ))}
 
-                {filteredTimeline.length === 0 && (
+                {filteredLeads.length === 0 && (
 
-                    <div className="text-center py-12 text-gray-500">
+                    <div className="text-center py-8 text-sm text-gray-500">
                         No timeline data found
                     </div>
 
@@ -310,13 +307,19 @@ function LeadTimeline() {
 
             </div>
 
-            {/* FOOTER */}
+            {/* FOOTER - Compact */}
 
-            <div className="p-4 border-t text-sm text-gray-500 flex justify-between">
+            <div className="px-4 py-2 border-t text-xs text-gray-500 bg-gray-50 flex justify-between items-center">
 
                 <span>
-                    Showing {filteredTimeline.length} of {timeline.length}
+                    {stats.total} activities
                 </span>
+
+                {searchTerm && (
+                    <span className="text-blue-600">
+                        Filtered: {filteredLeads.reduce((acc, lead) => acc + lead.timeline.length, 0)} results
+                    </span>
+                )}
 
             </div>
 

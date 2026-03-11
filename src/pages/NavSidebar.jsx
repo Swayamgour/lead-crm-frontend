@@ -19,8 +19,10 @@ import {
     X
 } from "lucide-react";
 
-import { sidebarSections } from "../components/data";
+// import { sidebarSections } from "../components/data";
 import { useGetProfileQuery } from "../redux/api";
+
+
 
 const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
@@ -29,7 +31,61 @@ const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
     const { data } = useGetProfileQuery()
 
-    console.log(data)
+    // console.log()
+
+
+    const sidebarSections = [
+
+
+        {
+            title: "Sales Executives",
+            icon: Users,
+            key: "salesExecutives",
+            color: "from-green-500 to-green-600",
+            badge: null,
+            path: "/ViewExecutives",
+            role: ['admin']
+
+        },
+        {
+            title: "Lead Sources",
+            icon: Wifi,
+            key: "leadSources",
+            color: "from-purple-500 to-purple-600",
+            badge: null,
+            path: "/Leads",
+            role: ['admin', "executive"]
+
+
+        },
+
+        // {
+        //     title: "Lead Pipeline",
+        //     icon: GitBranch,
+        //     path: "/LeadPipeline",
+        //     color: "from-orange-500 to-orange-600",
+        //     badge: 5
+        // },
+        {
+            title: "Follow Up",
+            icon: Clock,
+            path: "/followUps",
+            color: "from-yellow-500 to-yellow-600",
+            badge: null,
+            role: ['admin', "executive"]
+
+        },
+        {
+            title: "Lead Timeline",
+            icon: Activity,
+            path: "/LeadTimeline",
+            color: "from-indigo-500 to-indigo-600",
+            badge: null,
+            role: ['admin', "executive"]
+
+        },
+
+    ];
 
 
 
@@ -175,158 +231,160 @@ const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
                 {/* Navigation */}
                 <nav className={`p-2 ${sidebarOpen ? 'px-2' : 'px-1'} overflow-y-auto`}>
-                    {sidebarSections.map((section, idx) => {
-                        const hasItems = section.items && section.items.length > 0;
-                        const isActive = isParentActive(section);
-                        const isExpanded = expandedMenus[section.key];
+                    {sidebarSections
+                        ?.filter(section => section.role?.includes(data?.role))
+                        ?.map((section, idx) => {
+                            const hasItems = section.items && section.items.length > 0;
+                            const isActive = isParentActive(section);
+                            const isExpanded = expandedMenus[section.key];
 
-                        return (
-                            <div
-                                key={section.key || idx}
-                                className="mb-1 relative group"
-                            >
-                                {/* Section Header */}
+                            return (
                                 <div
-                                    onMouseEnter={() => setHoveredItem(section.key)}
-                                    onMouseLeave={() => setHoveredItem(null)}
-                                    className={`
+                                    key={section.key || idx}
+                                    className="mb-1 relative group"
+                                >
+                                    {/* Section Header */}
+                                    <div
+                                        onMouseEnter={() => setHoveredItem(section.key)}
+                                        onMouseLeave={() => setHoveredItem(null)}
+                                        className={`
                                         flex items-center rounded-lg transition-all duration-300 cursor-pointer
                                         ${sidebarOpen ? 'justify-between px-3' : 'justify-center px-2'}
                                         ${isActive
-                                            ? 'bg-gradient-to-r ' + section.color + ' text-white shadow-md'
-                                            : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                                        }
+                                                ? 'bg-gradient-to-r ' + section.color + ' text-white shadow-md'
+                                                : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
+                                            }
                                         ${hasItems ? 'py-1.5' : 'py-2'}
                                         relative overflow-hidden group
                                     `}
-                                    onClick={() => {
-                                        if (hasItems) {
-                                            toggleMenu(section.key);
-                                        } else if (section.path) {
-                                            navigate(section.path);
-                                            if (isMobile || isTablet) setSidebarOpen(false);
-                                        }
-                                    }}
-                                >
-                                    {/* Hover Gradient */}
-                                    <div
-                                        className={`absolute inset-0 bg-gradient-to-r ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-                                    />
-
-                                    <div className={`flex items-center ${!sidebarOpen && 'justify-center w-full'}`}>
+                                        onClick={() => {
+                                            if (hasItems) {
+                                                toggleMenu(section.key);
+                                            } else if (section.path) {
+                                                navigate(section.path);
+                                                if (isMobile || isTablet) setSidebarOpen(false);
+                                            }
+                                        }}
+                                    >
+                                        {/* Hover Gradient */}
                                         <div
-                                            className={`
+                                            className={`absolute inset-0 bg-gradient-to-r ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+                                        />
+
+                                        <div className={`flex items-center ${!sidebarOpen && 'justify-center w-full'}`}>
+                                            <div
+                                                className={`
                                                 p-1.5 rounded-lg transition-all duration-300 flex-shrink-0
                                                 ${isActive ? 'bg-white/20' : ''}
                                             `}
-                                        >
-                                            <section.icon
-                                                size={sidebarOpen ? 16 : 18}
-                                                className={`transition-all duration-300
+                                            >
+                                                <section.icon
+                                                    size={sidebarOpen ? 16 : 18}
+                                                    className={`transition-all duration-300
                                                     ${isActive ? 'text-white' : 'text-gray-500'}
                                                 `}
-                                            />
+                                                />
+                                            </div>
+
+                                            {sidebarOpen && (
+                                                <span className="ml-2 text-xs font-medium flex-1 whitespace-nowrap">
+                                                    {section.title}
+                                                </span>
+                                            )}
                                         </div>
 
                                         {sidebarOpen && (
-                                            <span className="ml-2 text-xs font-medium flex-1 whitespace-nowrap">
-                                                {section.title}
-                                            </span>
+                                            <div className="flex items-center gap-1">
+                                                {section.badge && (
+                                                    <span
+                                                        className={`px-1.5 py-0.5 text-xs rounded-full
+                                                        ${isActive
+                                                                ? 'bg-white/20 text-white'
+                                                                : 'bg-red-100 text-red-600'
+                                                            }
+                                                    `}
+                                                    >
+                                                        {section.badge}
+                                                    </span>
+                                                )}
+
+                                                {hasItems && (
+                                                    <div
+                                                        className={`transition-transform duration-300 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                                                    >
+                                                        {isExpanded ? (
+                                                            <ChevronDown size={14} />
+                                                        ) : (
+                                                            <ChevronRight size={14} />
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
                                         )}
                                     </div>
 
-                                    {sidebarOpen && (
-                                        <div className="flex items-center gap-1">
-                                            {section.badge && (
-                                                <span
-                                                    className={`px-1.5 py-0.5 text-xs rounded-full
-                                                        ${isActive
-                                                            ? 'bg-white/20 text-white'
-                                                            : 'bg-red-100 text-red-600'
+                                    {/* Submenu */}
+                                    {hasItems && sidebarOpen && isExpanded && (
+                                        <div className="mt-1 ml-8 space-y-0.5 animate-slideDown">
+                                            {section.items.map((item) => (
+                                                <NavLink
+                                                    key={item.name}
+                                                    to={item.path}
+                                                    onClick={() => (isMobile || isTablet) && setSidebarOpen(false)}
+                                                    className={({ isActive }) => `
+                                                    flex items-center justify-between px-3 py-1.5 rounded-lg transition-all duration-200 text-xs
+                                                    ${isActive
+                                                            ? 'bg-blue-50 text-blue-600'
+                                                            : item.danger
+                                                                ? 'text-red-600 hover:bg-red-50'
+                                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                                         }
-                                                    `}
+                                                    group relative overflow-hidden
+                                                `}
                                                 >
+                                                    <div className="flex items-center min-w-0">
+                                                        <div
+                                                            className={`
+                                                            p-1 rounded-md mr-2 transition-all duration-200 flex-shrink-0
+                                                            ${isActive ? 'bg-blue-100' : 'bg-gray-100 group-hover:scale-110'}
+                                                        `}
+                                                        >
+                                                            <item.icon
+                                                                size={12}
+                                                                className={isActive ? 'text-blue-600' : 'text-gray-500'}
+                                                            />
+                                                        </div>
+                                                        <span className="truncate">{item.name}</span>
+                                                    </div>
+
+                                                    {item.shortcut && !isMobile && (
+                                                        <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 flex-shrink-0">
+                                                            {item.shortcut}
+                                                        </span>
+                                                    )}
+
+                                                    {isActive && (
+                                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-blue-600 rounded-r-full"></div>
+                                                    )}
+                                                </NavLink>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Tooltip when collapsed - only on desktop */}
+                                    {!sidebarOpen && !isMobile && !isTablet && section.title && (
+                                        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                                            {section.title}
+                                            {section.badge && (
+                                                <span className="ml-2 px-1.5 py-0.5 bg-red-500 text-white rounded-full text-xs">
                                                     {section.badge}
                                                 </span>
-                                            )}
-
-                                            {hasItems && (
-                                                <div
-                                                    className={`transition-transform duration-300 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
-                                                >
-                                                    {isExpanded ? (
-                                                        <ChevronDown size={14} />
-                                                    ) : (
-                                                        <ChevronRight size={14} />
-                                                    )}
-                                                </div>
                                             )}
                                         </div>
                                     )}
                                 </div>
-
-                                {/* Submenu */}
-                                {hasItems && sidebarOpen && isExpanded && (
-                                    <div className="mt-1 ml-8 space-y-0.5 animate-slideDown">
-                                        {section.items.map((item) => (
-                                            <NavLink
-                                                key={item.name}
-                                                to={item.path}
-                                                onClick={() => (isMobile || isTablet) && setSidebarOpen(false)}
-                                                className={({ isActive }) => `
-                                                    flex items-center justify-between px-3 py-1.5 rounded-lg transition-all duration-200 text-xs
-                                                    ${isActive
-                                                        ? 'bg-blue-50 text-blue-600'
-                                                        : item.danger
-                                                            ? 'text-red-600 hover:bg-red-50'
-                                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                                    }
-                                                    group relative overflow-hidden
-                                                `}
-                                            >
-                                                <div className="flex items-center min-w-0">
-                                                    <div
-                                                        className={`
-                                                            p-1 rounded-md mr-2 transition-all duration-200 flex-shrink-0
-                                                            ${isActive ? 'bg-blue-100' : 'bg-gray-100 group-hover:scale-110'}
-                                                        `}
-                                                    >
-                                                        <item.icon
-                                                            size={12}
-                                                            className={isActive ? 'text-blue-600' : 'text-gray-500'}
-                                                        />
-                                                    </div>
-                                                    <span className="truncate">{item.name}</span>
-                                                </div>
-
-                                                {item.shortcut && !isMobile && (
-                                                    <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 flex-shrink-0">
-                                                        {item.shortcut}
-                                                    </span>
-                                                )}
-
-                                                {isActive && (
-                                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-blue-600 rounded-r-full"></div>
-                                                )}
-                                            </NavLink>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Tooltip when collapsed - only on desktop */}
-                                {!sidebarOpen && !isMobile && !isTablet && section.title && (
-                                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
-                                        {section.title}
-                                        {section.badge && (
-                                            <span className="ml-2 px-1.5 py-0.5 bg-red-500 text-white rounded-full text-xs">
-                                                {section.badge}
-                                            </span>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
                 </nav>
 
                 {/* Footer for mobile/tablet when sidebar is open */}

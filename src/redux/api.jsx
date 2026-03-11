@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const BASE_URL = "https://lead-crm-backend-1cq8.onrender.com/api";
+// const BASE_URL = "https://lead-crm-backend-1cq8.onrender.com/api";
+const BASE_URL = "http://localhost:5000/api";
 
 const baseQuery = fetchBaseQuery({
     baseUrl: BASE_URL,
@@ -143,7 +144,7 @@ export const api = createApi({
 
         getFollowUps: builder.query({
             query: () => "/followups",
-            providesTags: ["Followups"],
+            providesTags: ["Followups" , "Leads"],
         }),
 
         getTodayFollowUps: builder.query({
@@ -299,7 +300,7 @@ export const api = createApi({
         }),
         getTimelineGrouped: builder.query({
             query: () => `/TimeLine/Grouped`,
-            providesTags: ["Timeline"],
+            providesTags: ["Timeline" , "Leads"],
         }),
 
     }),
