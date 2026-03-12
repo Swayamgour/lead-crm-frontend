@@ -406,7 +406,7 @@ function LeadView() {
                                                 >
                                                     <FileText size={16} />
                                                 </button>
-                                                <button
+                                                {/* <button
                                                     onClick={() => {
                                                         setSelectedLead(lead);
                                                         setShowReassignModal(true);
@@ -415,7 +415,7 @@ function LeadView() {
                                                     title="Reassign"
                                                 >
                                                     <Users size={16} />
-                                                </button>
+                                                </button> */}
                                             </div>
                                         </td>
                                     </tr>

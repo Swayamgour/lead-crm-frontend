@@ -43,7 +43,7 @@ const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
             key: "salesExecutives",
             color: "from-green-500 to-green-600",
             badge: null,
-            path: "/ViewExecutives",
+            path: "/",
             role: ['admin']
 
         },
@@ -80,6 +80,16 @@ const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
             icon: Activity,
             path: "/LeadTimeline",
             color: "from-indigo-500 to-indigo-600",
+            badge: null,
+            role: ['admin', "executive"]
+
+        },
+
+        {
+            title: "Report",
+            icon: Activity,
+            path: "/Report",
+            color: "from-indigo-400 to-indigo-900",
             badge: null,
             role: ['admin', "executive"]
 

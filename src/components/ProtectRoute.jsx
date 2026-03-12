@@ -4,19 +4,25 @@ import { useGetProfileQuery } from "../redux/api";
 
 function ProtectRoute() {
 
-    const { data, isLoading, isError } = useGetProfileQuery();
+    const token = localStorage.getItem("token")
+
+    const { data, isLoading } = useGetProfileQuery(undefined, {
+        skip: !token
+    })
+
+    if (!token) {
+        return <Navigate to="/login" replace />
+    }
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <div>Loading...</div>
     }
 
-    // agar profile nahi mili
-    if (isError || !data) {
-        return <Navigate to="/login" replace />;
+    if (!data) {
+        return <Navigate to="/login" replace />
     }
 
-    // agar profile mil gayi
-    return <Outlet />;
+    return <Outlet />
 }
 
-export default ProtectRoute;
+export default ProtectRoute

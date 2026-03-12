@@ -300,7 +300,7 @@ const Login = () => {
                             </div>
 
                             {/* Stats */}
-                            <div className="grid grid-cols-3 gap-4 mt-12">
+                            {/* <div className="grid grid-cols-3 gap-4 mt-12">
                                 <div className="text-center">
                                     <div className="text-3xl font-bold">10k+</div>
                                     <div className="text-sm text-white/80">Active Users</div>
@@ -313,7 +313,7 @@ const Login = () => {
                                     <div className="text-3xl font-bold">95%</div>
                                     <div className="text-sm text-white/80">Satisfaction</div>
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Testimonial */}
 

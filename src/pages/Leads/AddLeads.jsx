@@ -451,13 +451,20 @@ function AddLead() {
                                 </label>
                                 <RemarkEditor
                                     value={lead.remarks}
-                                    onChange={(val) => setLead({ ...lead, remarks: val })}
+                                    // onChange={(val) => setLead({ ...lead, remarks: val })}
+
+                                    onChange={(val) =>
+                                        setLead((prev) => ({
+                                            ...prev,
+                                            remarks: val
+                                        }))
+                                    }
                                 />
                             </div>
                         </div>
 
                         {/* Form Actions */}
-                        <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
+                        <div className="mt-12 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
                             <button
                                 type="button"
                                 onClick={handleReset}

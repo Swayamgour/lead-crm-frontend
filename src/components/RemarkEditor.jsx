@@ -39,10 +39,23 @@ function RemarkEditor({ value, onChange }) {
             const currentHTML = quillInstance.current.root.innerHTML;
 
             if (currentHTML !== value) {
-                quillInstance.current.root.innerHTML = value || "";
+                // quillInstance.current.root.innerHTML = value || "";2
+                quillInstance.current.clipboard.dangerouslyPasteHTML(value || "");
             }
         }
     }, [value]);
+
+    // useEffect(() => {
+    //     if (quillInstance.current && value !== undefined) {
+
+    //         const currentHTML = quillInstance.current.root.innerHTML;
+
+    //         if (currentHTML !== value) {
+    //             quillInstance.current.clipboard.dangerouslyPasteHTML(value || "");
+    //         }
+
+    //     }
+    // }, [value]);
 
     return (
         <div

@@ -68,6 +68,11 @@ export const api = createApi({
             providesTags: ["Users"],
         }),
 
+        getUserById: builder.query({
+            query: (id) => `/users/${id}`,
+            providesTags: ["Users"],
+        }),
+
         createUser: builder.mutation({
             query: (data) => ({
                 url: "/users",
@@ -144,7 +149,7 @@ export const api = createApi({
 
         getFollowUps: builder.query({
             query: () => "/followups",
-            providesTags: ["Followups" , "Leads"],
+            providesTags: ["Followups", "Leads"],
         }),
 
         getTodayFollowUps: builder.query({
@@ -300,7 +305,20 @@ export const api = createApi({
         }),
         getTimelineGrouped: builder.query({
             query: () => `/TimeLine/Grouped`,
-            providesTags: ["Timeline" , "Leads"],
+            providesTags: ["Timeline", "Leads"],
+        }),
+
+
+        // report 
+
+        getLeadReport: builder.query({
+            query: () => `/reports/leads`,
+            providesTags: ["Timeline"],
+        }),
+
+        getSalesReport: builder.query({
+            query: () => `/reports/sales`,
+            providesTags: ["Timeline", "Leads"],
         }),
 
     }),
@@ -315,6 +333,7 @@ export const {
 
     // USERS
     useGetUsersQuery,
+    useGetUserByIdQuery,
     useCreateUserMutation,
     useUpdateUserMutation,
     useDeleteUserMutation,
@@ -359,6 +378,10 @@ export const {
 
     // TIMELINE
     useGetTimelineQuery,
-    useGetTimelineGroupedQuery
+    useGetTimelineGroupedQuery,
+
+    // report
+    useGetLeadReportQuery,
+    useGetSalesReportQuery,
 
 } = api;
