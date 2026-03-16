@@ -1,489 +1,510 @@
 import React, { useState } from "react";
-import { useGetLeadReportQuery } from "../redux/api";
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-    PieChart,
-    Pie,
-    Cell,
-    LineChart,
-    Line,
-    CartesianGrid,
-    Legend
-} from "recharts";
 import {
     TrendingUp,
+    TrendingDown,
     Users,
+    DollarSign,
     Target,
     Award,
     Calendar,
     Download,
     RefreshCw,
-    Filter,
     ChevronDown,
+    ChevronUp,
+    PieChart,
     BarChart3,
-    PieChart as PieChartIcon,
-    Table as TableIcon,
+    LineChart,
+    Activity,
     Eye,
-    EyeOff,
-    Loader,
-    AlertCircle,
+    Star,
+    Zap,
+    Clock,
     CheckCircle,
     XCircle,
-    Clock,
-    Zap,
-    Activity
+    AlertCircle,
+    Filter,
+    Search,
+    Mail,
+    Phone,
+    User,
+    Trophy,
+    Medal,
+    Crown,
+    Sparkles,
+    Rocket,
+    ArrowUpRight,
+    ArrowDownRight,
+    MoreVertical,
+    Printer,
+    Share2,
+    Maximize2,
+    Minimize2,
+    FileText
 } from "lucide-react";
+import { useGetConversionReportQuery, useGetExecutiveSalesReportQuery, useGetLeadReportQuery, useGetSalesPerformanceQuery, useGetSalesReportQuery } from "../redux/api";
 
-const COLORS = ["#3b82f6", "#10b981", "#f97316", "#ef4444", "#8b5cf6", "#ec4899", "#6366f1"];
+const ReportPage = () => {
+    const [timeframe, setTimeframe] = useState("monthly");
+    const [expandedSections, setExpandedSections] = useState({});
+    const [selectedChart, setSelectedChart] = useState("bar");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [showFilters, setShowFilters] = useState(false);
+    const [fullscreenSection, setFullscreenSection] = useState(null);
 
-function ReportPage() {
-    const [dateRange, setDateRange] = useState("month");
-    const [chartType, setChartType] = useState("bar");
-    const [showTable, setShowTable] = useState(true);
-    const [selectedMetric, setSelectedMetric] = useState("count");
+    // Mock data - replace with your actual API data
+    const { data: leadReport } = useGetLeadReportQuery();
+    const { data: salesReport } = useGetSalesReportQuery();
+    const { data: conversionReport } = useGetConversionReportQuery();
+    const { data: performanceReport } = useGetSalesPerformanceQuery();
+    const { data: executiveReport } = useGetExecutiveSalesReportQuery();
 
-    const { data, isLoading, error, refetch } = useGetLeadReportQuery();
+    console.log(conversionReport)
 
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="relative">
-                        <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <Activity className="w-8 h-8 text-blue-600 animate-pulse" />
-                        </div>
-                    </div>
-                    <p className="mt-4 text-gray-600 font-medium">Loading your reports...</p>
-                    <p className="text-sm text-gray-400 mt-1">Please wait while we fetch the data</p>
-                </div>
-            </div>
-        );
-    }
+    const toggleSection = (section) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [section]: !prev[section]
+        }));
+    };
 
-    if (error) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center border border-red-100">
-                    <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <AlertCircle className="w-10 h-10 text-red-600" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">Failed to Load Report</h3>
-                    <p className="text-gray-500 mb-6">There was an error loading the report data. Please try again.</p>
-                    <button
-                        onClick={() => refetch()}
-                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
-                    >
-                        Try Again
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    const toggleFullscreen = (section) => {
+        setFullscreenSection(fullscreenSection === section ? null : section);
+    };
 
-    const totalLeads = data?.totalLeads || 0;
-    const statusData = data?.statusReport || [];
-    const sourceData = data?.sourceReport || [];
+    // Format currency
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount || 0);
+    };
 
-    // Calculate additional metrics
-    const convertedLeads = statusData.find(s => s._id?.toLowerCase() === 'won' || s._id?.toLowerCase() === 'closed')?.count || 0;
-    const pendingLeads = statusData.find(s => s._id?.toLowerCase() === 'pending' || s._id?.toLowerCase() === 'new')?.count || 0;
-    const lostLeads = statusData.find(s => s._id?.toLowerCase() === 'lost')?.count || 0;
+    // Get status color
+    const getStatusColor = (status) => {
+        const colors = {
+            'won': 'bg-green-100 text-green-800 border-green-200',
+            'lost': 'bg-red-100 text-red-800 border-red-200',
+            'pending': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+            'converted': 'bg-emerald-100 text-emerald-800 border-emerald-200'
+        };
+        return colors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800 border-gray-200';
+    };
 
-    const conversionRate = totalLeads ? Math.round((convertedLeads / totalLeads) * 100) : 0;
-
-    const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }) => (
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-2">
-                <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center shadow-lg`}>
-                    <Icon className="text-white" size={24} />
-                </div>
-                {trend && (
-                    <span className="text-xs font-medium px-2 py-1 bg-green-100 text-green-700 rounded-full flex items-center gap-1">
-                        <TrendingUp size={12} />
-                        {trend}
-                    </span>
-                )}
-            </div>
-            <p className="text-3xl font-bold text-gray-800 mt-2">{value}</p>
-            <p className="text-sm font-medium text-gray-500 mt-1">{title}</p>
-            {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
-        </div>
-    );
-
-    const CustomTooltip = ({ active, payload, label }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-white p-4 rounded-xl shadow-xl border border-gray-100">
-                    <p className="font-semibold text-gray-800">{label}</p>
-                    <p className="text-sm text-blue-600 mt-1">
-                        {payload[0].value} leads
-                    </p>
-                </div>
-            );
-        }
-        return null;
+    // Get random gradient
+    const getGradient = (index) => {
+        const gradients = [
+            'from-blue-500 to-indigo-600',
+            'from-emerald-500 to-teal-600',
+            'from-orange-500 to-amber-600',
+            'from-purple-500 to-pink-600',
+            'from-rose-500 to-red-600',
+            'from-cyan-500 to-sky-600'
+        ];
+        return gradients[index % gradients.length];
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-            {/* Header with Gradient */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-blue-50/30">
+            {/* Header Section */}
+            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white  shadow-lg">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                            <h1 className="text-3xl md:text-4xl font-bold flex items-center gap-3">
-                                <BarChart3 size={32} />
-                                CRM Reports & Analytics
-                            </h1>
-                            <p className="text-blue-100 mt-2">
-                                Track your lead generation performance and conversion metrics
-                            </p>
+                        <div className="flex items-center gap-4">
+                            <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
+                                <BarChart3 size={28} className="text-white" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
+                                    Analytics Dashboard
+                                    <Sparkles size={24} className="text-yellow-300 animate-pulse" />
+                                </h1>
+                                <p className="text-blue-100 text-sm mt-1">
+                                    Comprehensive insights into your sales performance
+                                </p>
+                            </div>
                         </div>
 
-                        {/* <div className="flex items-center gap-3">
-                            <button
-                                onClick={() => refetch()}
-                                className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
-                                title="Refresh Data"
+                        <div className="flex items-center gap-3">
+                            {/* Timeframe Selector */}
+                            <select
+                                value={timeframe}
+                                onChange={(e) => setTimeframe(e.target.value)}
+                                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                             >
-                                <RefreshCw size={20} />
-                            </button>
-                            <button className="flex items-center gap-2 px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl">
+                                <option value="daily" className="text-gray-800">📅 Daily</option>
+                                <option value="weekly" className="text-gray-800">📊 Weekly</option>
+                                <option value="monthly" className="text-gray-800">📈 Monthly</option>
+                                <option value="quarterly" className="text-gray-800">📉 Quarterly</option>
+                                <option value="yearly" className="text-gray-800">🎯 Yearly</option>
+                            </select>
+
+                            <button className="p-2.5 bg-white/10 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-all">
                                 <Download size={18} />
-                                <span className="font-medium">Export</span>
                             </button>
-                        </div> */}
+                            <button className="p-2.5 bg-white/10 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-all">
+                                <RefreshCw size={18} />
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Date Range Selector */}
-                  
+                    {/* Quick Stats Row */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <p className="text-blue-100 text-xs">Total Revenue</p>
+                            <p className="text-xl font-bold">{formatCurrency(salesReport?.revenue)}</p>
+                            <p className="text-xs text-green-300 mt-1 flex items-center gap-1">
+                                <ArrowUpRight size={12} />
+                                +12.5% vs last month
+                            </p>
+                        </div>
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <p className="text-blue-100 text-xs">Conversion Rate</p>
+                            <p className="text-xl font-bold">{salesReport?.conversionRate || '0%'}</p>
+                            <p className="text-xs text-green-300 mt-1 flex items-center gap-1">
+                                <ArrowUpRight size={12} />
+                                +5.2% vs last month
+                            </p>
+                        </div>
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <p className="text-blue-100 text-xs">Active Deals</p>
+                            <p className="text-xl font-bold">{salesReport?.activeDeals || 0}</p>
+                            <p className="text-xs text-yellow-300 mt-1 flex items-center gap-1">
+                                <Clock size={12} />
+                                23 closing this week
+                            </p>
+                        </div>
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <p className="text-blue-100 text-xs">Team Performance</p>
+                            <p className="text-xl font-bold">94%</p>
+                            <p className="text-xs text-green-300 mt-1 flex items-center gap-1">
+                                <Target size={12} />
+                                Above target
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <StatCard
-                        title="Total Leads"
-                        value={totalLeads}
-                        icon={Users}
-                        color="bg-gradient-to-br from-blue-500 to-blue-600"
-                        trend="+12.5%"
-                        subtitle="vs last month"
-                    />
-                    <StatCard
-                        title="Converted"
-                        value={convertedLeads}
-                        icon={CheckCircle}
-                        color="bg-gradient-to-br from-green-500 to-green-600"
-                        trend="+8.2%"
-                        subtitle="vs last month"
-                    />
-                    <StatCard
-                        title="Conversion Rate"
-                        value={`${conversionRate}%`}
-                        icon={Target}
-                        color="bg-gradient-to-br from-purple-500 to-purple-600"
-                        trend="+5.1%"
-                        subtitle="vs last month"
-                    />
-                    <StatCard
-                        title="Pending"
-                        value={pendingLeads}
-                        icon={Clock}
-                        color="bg-gradient-to-br from-orange-500 to-orange-600"
-                        trend="-3.2%"
-                        subtitle="vs last month"
-                    />
-                </div>
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-                {/* Charts Control Bar */}
-                <div className="bg-white rounded-2xl shadow-lg p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-700">View:</span>
-                        <button
-                            onClick={() => setChartType("bar")}
-                            className={`p-2 rounded-lg transition-colors ${chartType === "bar"
-                                    ? "bg-blue-100 text-blue-600"
-                                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                                }`}
-                        >
-                            <BarChart3 size={20} />
-                        </button>
-                        <button
-                            onClick={() => setChartType("line")}
-                            className={`p-2 rounded-lg transition-colors ${chartType === "line"
-                                    ? "bg-blue-100 text-blue-600"
-                                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                                }`}
-                        >
-                            <Activity size={20} />
-                        </button>
-                        <button
-                            onClick={() => setChartType("pie")}
-                            className={`p-2 rounded-lg transition-colors ${chartType === "pie"
-                                    ? "bg-blue-100 text-blue-600"
-                                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                                }`}
-                        >
-                            <PieChartIcon size={20} />
-                        </button>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500">Show Table</span>
-                            <button
-                                onClick={() => setShowTable(!showTable)}
-                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${showTable ? "bg-blue-600" : "bg-gray-300"
-                                    }`}
+                {/* Summary Cards with Enhanced Design */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {[
+                        {
+                            title: 'Total Leads',
+                            value: salesReport?.totalLeads || 0,
+                            icon: Users,
+                            change: '+15%',
+                            color: 'blue',
+                            subtext: 'vs last month'
+                        },
+                        {
+                            title: 'Converted Leads',
+                            value: salesReport?.convertedLeads || 0,
+                            icon: CheckCircle,
+                            change: '+8%',
+                            color: 'green',
+                            subtext: 'vs last month'
+                        },
+                        {
+                            title: 'Conversion Rate',
+                            value: salesReport?.conversionRate || '0%',
+                            icon: Target,
+                            change: '+5.2%',
+                            color: 'purple',
+                            subtext: 'improvement'
+                        },
+                        {
+                            title: 'Revenue',
+                            value: formatCurrency(salesReport?.revenue),
+                            icon: DollarSign,
+                            change: '+23%',
+                            color: 'orange',
+                            subtext: 'vs last month'
+                        }
+                    ].map((card, idx) => {
+                        const Icon = card.icon;
+                        const gradients = {
+                            blue: 'from-blue-500 to-blue-600',
+                            green: 'from-emerald-500 to-green-600',
+                            purple: 'from-purple-500 to-purple-600',
+                            orange: 'from-orange-500 to-amber-600'
+                        };
+                        return (
+                            <div
+                                key={idx}
+                                className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
                             >
-                                <span
-                                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${showTable ? "translate-x-5" : "translate-x-1"
-                                        }`}
-                                />
-                            </button>
-                        </div>
-
-                        <select className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option>All Sources</option>
-                            <option>Website</option>
-                            <option>Referral</option>
-                            <option>Social Media</option>
-                            <option>Direct</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Charts Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    {/* Leads by Status */}
-                    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <h2 className="text-xl font-bold text-gray-800">Leads by Status</h2>
-                                <p className="text-sm text-gray-500 mt-1">Distribution of leads across stages</p>
-                            </div>
-                            <div className="flex gap-2">
-                                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                                    {statusData.length} statuses
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="h-80">
-                            <ResponsiveContainer width="100%" height="100%">
-                                {chartType === "bar" ? (
-                                    <BarChart data={statusData}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                        <XAxis
-                                            dataKey="_id"
-                                            tick={{ fill: '#6b7280', fontSize: 12 }}
-                                            axisLine={{ stroke: '#e5e7eb' }}
-                                        />
-                                        <YAxis
-                                            tick={{ fill: '#6b7280', fontSize: 12 }}
-                                            axisLine={{ stroke: '#e5e7eb' }}
-                                        />
-                                        <Tooltip content={<CustomTooltip />} />
-                                        <Bar
-                                            dataKey="count"
-                                            fill="#3b82f6"
-                                            radius={[4, 4, 0, 0]}
-                                            barSize={40}
-                                        />
-                                    </BarChart>
-                                ) : chartType === "line" ? (
-                                    <LineChart data={statusData}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                        <XAxis dataKey="_id" />
-                                        <YAxis />
-                                        <Tooltip content={<CustomTooltip />} />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="count"
-                                            stroke="#3b82f6"
-                                            strokeWidth={3}
-                                            dot={{ fill: '#3b82f6', r: 6 }}
-                                            activeDot={{ r: 8 }}
-                                        />
-                                    </LineChart>
-                                ) : (
-                                    <PieChart>
-                                        <Pie
-                                            data={statusData}
-                                            dataKey="count"
-                                            nameKey="_id"
-                                            cx="50%"
-                                            cy="50%"
-                                            outerRadius={100}
-                                            innerRadius={60}
-                                            paddingAngle={2}
-                                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                                        >
-                                            {statusData.map((entry, index) => (
-                                                <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip />
-                                    </PieChart>
-                                )}
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-
-                    {/* Leads by Source */}
-                    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <h2 className="text-xl font-bold text-gray-800">Leads by Source</h2>
-                                <p className="text-sm text-gray-500 mt-1">Lead generation channels performance</p>
-                            </div>
-                            <div className="flex gap-2">
-                                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-                                    {sourceData.length} sources
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="h-80">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={sourceData}
-                                        dataKey="count"
-                                        nameKey="_id"
-                                        cx="50%"
-                                        cy="50%"
-                                        outerRadius={120}
-                                        innerRadius={60}
-                                        paddingAngle={2}
-                                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                                    >
-                                        {sourceData.map((entry, index) => (
-                                            <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip />
-                                    <Legend
-                                        verticalAlign="bottom"
-                                        height={36}
-                                        formatter={(value) => <span className="text-sm text-gray-600">{value}</span>}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Table Section */}
-                {showTable && (
-                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-                        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <TableIcon size={16} className="text-blue-600" />
+                                <div className="flex items-start justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-500 mb-1">{card.title}</p>
+                                        <p className="text-3xl font-bold text-gray-800">{card.value}</p>
+                                        <div className="flex items-center gap-2 mt-2">
+                                            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full flex items-center gap-1">
+                                                <ArrowUpRight size={12} />
+                                                {card.change}
+                                            </span>
+                                            <span className="text-xs text-gray-400">{card.subtext}</span>
+                                        </div>
+                                    </div>
+                                    <div className={`p-4 bg-gradient-to-br ${gradients[card.color]} rounded-xl shadow-lg transform group-hover:scale-110 transition-transform`}>
+                                        <Icon className="text-white" size={24} />
+                                    </div>
                                 </div>
-                                <h2 className="text-lg font-semibold text-gray-800">Lead Status Summary</h2>
+                                <div className="mt-4 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                                    <div className={`h-full bg-gradient-to-r ${gradients[card.color]} rounded-full`} style={{ width: '75%' }}></div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Charts Row */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Lead Status Chart */}
+                    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-all">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-blue-100 rounded-lg">
+                                    <PieChart size={20} className="text-blue-600" />
+                                </div>
+                                <h2 className="text-lg font-semibold text-gray-800">Lead Status Distribution</h2>
                             </div>
                             <div className="flex items-center gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                <button className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors">
-                                    <Filter size={16} className="text-gray-500" />
+                                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                    <MoreVertical size={16} className="text-gray-500" />
                                 </button>
                             </div>
                         </div>
+                        <div className="space-y-4">
+                            {leadReport?.statusReport?.map((item, idx) => (
+                                <div key={item._id} className="group hover:bg-gray-50 p-3 rounded-xl transition-all">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-3 h-3 rounded-full ${idx === 0 ? 'bg-blue-500' :
+                                                idx === 1 ? 'bg-green-500' :
+                                                    idx === 2 ? 'bg-yellow-500' : 'bg-purple-500'
+                                                }`}></div>
+                                            <span className="font-medium text-gray-700 capitalize">{item._id}</span>
+                                        </div>
+                                        <span className="font-bold text-gray-900">{item.count}</span>
+                                    </div>
+                                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full rounded-full transition-all duration-500 ${idx === 0 ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
+                                                idx === 1 ? 'bg-gradient-to-r from-green-500 to-green-600' :
+                                                    idx === 2 ? 'bg-gradient-to-r from-yellow-500 to-amber-600' : 'bg-gradient-to-r from-purple-500 to-purple-600'
+                                                }`}
+                                            style={{
+                                                width: `${(item.count / leadReport?.statusReport?.reduce((acc, curr) => acc + curr.count, 0)) * 100}%`
+                                            }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
+                    {/* Lead Source Chart */}
+                    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-all">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-purple-100 rounded-lg">
+                                    <BarChart3 size={20} className="text-purple-600" />
+                                </div>
+                                <h2 className="text-lg font-semibold text-gray-800">Lead Sources</h2>
+                            </div>
+                            <select className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option>This Month</option>
+                                <option>Last Month</option>
+                                <option>This Quarter</option>
+                            </select>
+                        </div>
+                        <div className="space-y-4">
+                            {leadReport?.sourceReport?.map((item, idx) => (
+                                <div key={item._id} className="flex items-center gap-4 group hover:bg-gray-50 p-2 rounded-lg transition-all">
+                                    <div className="w-24 text-sm font-medium text-gray-600 capitalize">{item._id}</div>
+                                    <div className="flex-1">
+                                        <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                                            <div
+                                                className={`h-full bg-gradient-to-r ${idx === 0 ? 'from-blue-500 to-indigo-600' :
+                                                    idx === 1 ? 'from-green-500 to-emerald-600' :
+                                                        idx === 2 ? 'from-yellow-500 to-amber-600' : 'from-purple-500 to-pink-600'
+                                                    } rounded-full transition-all duration-500`}
+                                                style={{
+                                                    width: `${(item.count / leadReport?.sourceReport?.reduce((acc, curr) => acc + curr.count, 0)) * 100}%`
+                                                }}
+                                            ></div>
+                                        </div>
+                                    </div>
+                                    <div className="w-16 text-right font-bold text-gray-800">{item.count}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Performance Tables Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Sales Performance Table */}
+                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all">
+                        <div className="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-amber-100 rounded-lg">
+                                        <Trophy size={20} className="text-amber-600" />
+                                    </div>
+                                    <h2 className="text-lg font-semibold text-gray-800">Executive Performance</h2>
+                                </div>
+                                <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                    View All →
+                                </button>
+                            </div>
+                        </div>
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                            Count
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                            Percentage
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                            Trend
-                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Executive</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Leads</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Closed</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Pending</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Conversion</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                    {statusData.map((item, index) => {
-                                        const percentage = totalLeads ? ((item.count / totalLeads) * 100).toFixed(1) : 0;
-                                        return (
-                                            <tr key={index} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                                                        <span className="font-medium text-gray-800">{item._id}</span>
+                                    {performanceReport?.report?.map((exec, idx) => (
+                                        <tr key={exec.executiveId} className="hover:bg-gray-50 transition-colors group">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getGradient(idx)} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
+                                                        {exec.name?.charAt(0).toUpperCase()}
                                                     </div>
-                                                </td>
-                                                <td className="px-6 py-4 text-gray-600">{item.count}</td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-gray-600">{percentage}%</span>
-                                                        <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                                            <div
-                                                                className="h-full bg-blue-600 rounded-full"
-                                                                style={{ width: `${percentage}%` }}
-                                                            ></div>
-                                                        </div>
+                                                    <div>
+                                                        <p className="font-medium text-gray-800">{exec.name}</p>
+                                                        <p className="text-xs text-gray-500">ID: {exec.executiveId?.slice(-6)}</p>
                                                     </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span className="text-xs font-medium px-2 py-1 bg-green-100 text-green-700 rounded-full">
-                                                        +{Math.floor(Math.random() * 20)}%
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-center font-medium">{exec.totalLeads}</td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                                                    <CheckCircle size={12} />
+                                                    {exec.closedLeads}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                                                    <Clock size={12} />
+                                                    {exec.pendingLeads}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className={`font-semibold ${parseFloat(exec.conversionRate) >= 50 ? 'text-green-600' : 'text-orange-600'
+                                                    }`}>
+                                                    {exec.conversionRate}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
-                                <tfoot className="bg-gray-50 border-t border-gray-200">
-                                    <tr>
-                                        <td className="px-6 py-4 font-semibold text-gray-800">Total</td>
-                                        <td className="px-6 py-4 font-semibold text-gray-800">{totalLeads}</td>
-                                        <td className="px-6 py-4 font-semibold text-gray-800">100%</td>
-                                        <td className="px-6 py-4"></td>
-                                    </tr>
-                                </tfoot>
                             </table>
                         </div>
                     </div>
-                )}
 
-                {/* Empty State */}
-                {totalLeads === 0 && (
-                    <div className="text-center py-16 bg-white rounded-2xl shadow-lg mt-8">
-                        <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <BarChart3 size={40} className="text-blue-600" />
+                    {/* Executive Leaderboard */}
+                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all">
+                        <div className="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-emerald-100 rounded-lg">
+                                        <Medal size={20} className="text-emerald-600" />
+                                    </div>
+                                    <h2 className="text-lg font-semibold text-gray-800">Revenue Leaderboard</h2>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-500">Top Performers</span>
+                                </div>
+                            </div>
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">No Data Available</h3>
-                        <p className="text-gray-500 mb-6">There are no leads to display in the report yet.</p>
-                        <button className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl">
-                            <RefreshCw size={18} />
-                            Refresh Data
-                        </button>
+                        <div className="divide-y divide-gray-200">
+                            {executiveReport?.report?.map((exec, idx) => (
+                                <div key={exec._id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center justify-center w-8 h-8">
+                                            {idx === 0 ? (
+                                                <Crown size={24} className="text-yellow-500" />
+                                            ) : idx === 1 ? (
+                                                <Medal size={20} className="text-gray-400" />
+                                            ) : idx === 2 ? (
+                                                <Medal size={20} className="text-amber-600" />
+                                            ) : (
+                                                <span className="text-sm font-medium text-gray-400">#{idx + 1}</span>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-gray-800">{exec.executive?.name}</p>
+                                            <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
+                                                <span>{exec.totalLeads} leads</span>
+                                                <span>•</span>
+                                                <span>{exec.converted} converted</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="font-bold text-gray-900">{formatCurrency(exec.revenue)}</p>
+                                        <p className="text-xs text-green-600 flex items-center gap-1 justify-end">
+                                            <ArrowUpRight size={12} />
+                                            +{Math.floor(Math.random() * 30)}%
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                )}
+                </div>
+
+                {/* Conversion Trends */}
+              
+
+                {/* Export Section */}
+                <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 border border-gray-200">
+                    <div className="flex items-center justify-between flex-wrap gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 bg-blue-100 rounded-xl">
+                                <Download size={24} className="text-blue-600" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-gray-800">Export Reports</h3>
+                                <p className="text-sm text-gray-500">Download data in various formats</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm">
+                                <FileText size={16} />
+                                PDF
+                            </button>
+                            <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm">
+                                <BarChart3 size={16} />
+                                Excel
+                            </button>
+                            <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm">
+                                <Printer size={16} />
+                                Print
+                            </button>
+                            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm">
+                                <Download size={16} />
+                                Export All
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
-}
+};
 
 export default ReportPage;

@@ -314,13 +314,41 @@ export const api = createApi({
 
         getLeadReport: builder.query({
             query: () => `/reports/leads`,
-            providesTags: ["Timeline"],
+            providesTags: ["Leads"],
         }),
+
+        // ================= SALES REPORT =================
 
         getSalesReport: builder.query({
             query: () => `/reports/sales`,
-            providesTags: ["Timeline", "Leads"],
+            providesTags: ["Leads", "Timeline"],
         }),
+
+        // ================= CONVERSION REPORT =================
+
+        getConversionReport: builder.query({
+            query: () => `/reports/conversion`,
+            providesTags: ["Leads"],
+        }),
+
+        // ================= SALES PERFORMANCE =================
+
+        getSalesPerformance: builder.query({
+            query: () => `/reports/sales-performance`,
+            providesTags: ["Leads", "Users"],
+        }),
+
+        // ================= EXECUTIVE SALES REPORT =================
+
+        getExecutiveSalesReport: builder.query({
+            query: () => `/reports/executive-sales`,
+            providesTags: ["Leads", "Users"],
+        }),
+
+        // getWhSalesReport: builder.query({
+        //     query: () => `/reports/sales`,
+        //     providesTags: ["Timeline", "Leads"],
+        // }),
 
 
         // Remark
@@ -341,7 +369,7 @@ export const api = createApi({
             ],
         }),
 
-       
+
 
         addRemark: builder.mutation({
             query: ({ leadId, text }) => {
@@ -444,6 +472,9 @@ export const {
     // report
     useGetLeadReportQuery,
     useGetSalesReportQuery,
+    useGetConversionReportQuery,
+    useGetSalesPerformanceQuery,
+    useGetExecutiveSalesReportQuery,
 
 
 
