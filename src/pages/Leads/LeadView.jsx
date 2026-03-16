@@ -8,30 +8,45 @@ import {
     Clock,
     MessageCircle,
     FileText,
-    // Edit,
     Plus,
     Filter,
     Calendar,
     ChevronDown,
     X,
+    Edit2,
+    Trash2,
+    History,
+    Check,
+    AlertCircle
 
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useGetLeadsQuery, useUpdateLeadMutation, useGetUsersQuery, useGetProfileQuery } from "../../redux/api";
+import {
+    useGetLeadsQuery,
+    useUpdateLeadMutation,
+    useGetUsersQuery,
+    useGetProfileQuery,
+    useAddRemarkMutation,
+    useEditRemarkMutation,
+    useDeleteRemarkMutation,
+    useGetLeadRemarksQuery
+} from "../../redux/api";
 import toast from "react-hot-toast";
 import { leadStatus } from "../../components/data";
 
-
-
 function LeadView() {
-    const { data } = useGetLeadsQuery();
+    const { data: leadsData } = useGetLeadsQuery();
     const { data: Executive } = useGetUsersQuery();
-    const [updateLead] = useUpdateLeadMutation();
     const { data: profile } = useGetProfileQuery();
-    const executives = [];
-    const leads = data || [];
+    const [updateLead] = useUpdateLeadMutation();
 
-    // console.log()
+    // New remark mutations
+    const [addRemark] = useAddRemarkMutation();
+    const [editRemark] = useEditRemarkMutation();
+    const [deleteRemark] = useDeleteRemarkMutation();
+
+    const leads = leadsData || [];
+    const executives = Executive || [];
 
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState("");
@@ -45,19 +60,18 @@ function LeadView() {
     const [viewLead, setViewLead] = useState(null);
     const [showAddRemark, setShowAddRemark] = useState(false);
     const [newRemark, setNewRemark] = useState("");
-    const [remarkBold, setRemarkBold] = useState(false);
-    const [remarkItalic, setRemarkItalic] = useState(false);
-    const [remarkUnderline, setRemarkUnderline] = useState(false);
+    const [editingRemark, setEditingRemark] = useState(null);
+    const [editRemarkText, setEditRemarkText] = useState("");
     const [modalSaving, setModalSaving] = useState(false);
     const [showReassignModal, setShowReassignModal] = useState(false);
     const [selectedExecutive, setSelectedExecutive] = useState("");
+    const [activeTab, setActiveTab] = useState("remarks"); // 'remarks' or 'history'
+    const [selectedRemarkForHistory, setSelectedRemarkForHistory] = useState(null);
 
-
-
-
-
-
-    // {leadStatus}
+    // Fetch remarks for selected lead
+    const { data: remarksData, refetch: refetchRemarks } = useGetLeadRemarksQuery(viewLead?._id, {
+        skip: !viewLead?._id
+    });
 
     const filteredLeads = leads.filter((lead) => {
         const leadDate = new Date(lead.createdAt);
@@ -75,8 +89,6 @@ function LeadView() {
 
         return statusMatch && dateMatch && searchMatch;
     });
-
-
 
     const handleStatusChange = async (id, newStatus) => {
         try {
@@ -112,52 +124,81 @@ function LeadView() {
     const handleAddRemark = async () => {
         if (!newRemark.trim() || !viewLead) return;
         setModalSaving(true);
+
         try {
-            const res = await updateLead({
-                id: viewLead._id,
-                remarks: newRemark
+            console.log("Adding remark for lead:", viewLead._id); // Debug log
+            console.log("Remark text:", newRemark.trim()); // Debug log
+
+            const response = await addRemark({
+                leadId: viewLead._id,
+                text: newRemark.trim()
             });
-            if (res?.data?.success) {
-                setViewLead(prev => ({
-                    ...prev,
-                    remarks: prev.remarks
-                        ? prev.remarks + '\n\n' + newRemark
-                        : newRemark
-                }));
+
+            console.log("Add remark response:", response); // Debug log
+
+            // Check if the response has data and success
+            if (response?.data?.success) {
                 setNewRemark("");
                 setShowAddRemark(false);
-                setRemarkBold(false);
-                setRemarkItalic(false);
-                setRemarkUnderline(false);
+                // Refetch remarks to update the list
+                refetchRemarks();
                 toast.success("Remark added successfully");
             } else {
-                toast.error("Failed to add remark");
+                // Handle error response
+                const errorMessage = response?.error?.data?.message || "Failed to add remark";
+                toast.error(errorMessage);
+                console.error("Add remark error details:", response?.error);
             }
         } catch (error) {
-            toast.error("Error adding remark");
+            console.error("Exception in handleAddRemark:", error);
+            toast.error(error?.data?.message || "Error adding remark");
         } finally {
             setModalSaving(false);
         }
     };
 
-    const handleReassign = async () => {
-        if (!selectedExecutive || !selectedLead) {
-            toast.error("Select executive first");
-            return;
+    const handleEditRemark = async () => {
+        if (!editRemarkText.trim() || !viewLead || !editingRemark) return;
+        setModalSaving(true);
+        try {
+            const res = await editRemark({
+                leadId: viewLead._id,
+                remarkId: editingRemark._id,
+                text: editRemarkText.trim()
+            }).unwrap();
+
+            if (res?.success) {
+                setEditingRemark(null);
+                setEditRemarkText("");
+                refetchRemarks(); // Refresh remarks
+                toast.success("Remark updated successfully");
+            } else {
+                toast.error("Failed to update remark");
+            }
+        } catch (error) {
+            toast.error("Error updating remark");
+        } finally {
+            setModalSaving(false);
         }
+    };
 
-        const res = await updateLead({
-            id: selectedLead._id,
-            assignedTo: selectedExecutive
-        });
+    const handleDeleteRemark = async (remarkId) => {
+        if (!viewLead || !window.confirm("Are you sure you want to delete this remark?")) return;
 
-        if (res?.data?.success) {
-            toast.success("Lead reassigned successfully");
-            setShowReassignModal(false);
-            setSelectedExecutive("");
-            setSelectedLead(null);
-        } else {
-            toast.error("Failed to reassign");
+        try {
+            const res = await deleteRemark({
+                leadId: viewLead._id,
+                remarkId
+            }).unwrap();
+
+            if (res?.success) {
+                refetchRemarks(); // Refresh remarks
+                toast.success("Remark deleted successfully");
+            } else {
+                toast.error("Failed to delete remark");
+            }
+        } catch (error) {
+            toast.error("Error deleting remark");
         }
     };
 
@@ -166,8 +207,24 @@ function LeadView() {
         return new Date(date).toLocaleDateString('en-IN', {
             day: 'numeric',
             month: 'short',
-            year: 'numeric'
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
         });
+    };
+
+    const getStatusColor = (status) => {
+        const colors = {
+            'incoming': 'bg-blue-100 text-blue-800',
+            'contacted': 'bg-yellow-100 text-yellow-800',
+            'follow-up': 'bg-purple-100 text-purple-800',
+            'qualified': 'bg-green-100 text-green-800',
+            'proposal': 'bg-indigo-100 text-indigo-800',
+            'negotiation': 'bg-orange-100 text-orange-800',
+            'closed-won': 'bg-emerald-100 text-emerald-800',
+            'closed-lost': 'bg-red-100 text-red-800'
+        };
+        return colors[status] || 'bg-gray-100 text-gray-800';
     };
 
     return (
@@ -265,14 +322,12 @@ function LeadView() {
                                         onChange={(e) => setStatusFilter(e.target.value)}
                                         className="px-4 py-2 border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4f46e5] text-sm"
                                     >
-                                        {leadStatus?.map((e) => {
-                                            return (
-                                                <option value={e?.value}>{e?.value}</option>
-
-                                            )
-                                        })}
-
-
+                                        <option value="">All Status</option>
+                                        {leadStatus?.map((status) => (
+                                            <option key={status.value} value={status.value}>
+                                                {status.label || status.value}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
 
@@ -315,9 +370,9 @@ function LeadView() {
                                     <th className="text-left text-xs font-semibold text-[#9ca3af] uppercase tracking-wider px-4 py-3">Lead</th>
                                     <th className="text-left text-xs font-semibold text-[#9ca3af] uppercase tracking-wider px-4 py-3">Contact</th>
                                     <th className="text-left text-xs font-semibold text-[#9ca3af] uppercase tracking-wider px-4 py-3">Status</th>
-                                    {/* <th className="text-left text-xs font-semibold text-[#9ca3af] uppercase tracking-wider px-4 py-3">Priority</th> */}
                                     <th className="text-left text-xs font-semibold text-[#9ca3af] uppercase tracking-wider px-4 py-3">Assigned To</th>
                                     <th className="text-left text-xs font-semibold text-[#9ca3af] uppercase tracking-wider px-4 py-3">Follow Up</th>
+                                    <th className="text-left text-xs font-semibold text-[#9ca3af] uppercase tracking-wider px-4 py-3">Remarks</th>
                                     <th className="text-left text-xs font-semibold text-[#9ca3af] uppercase tracking-wider px-4 py-3">Actions</th>
                                 </tr>
                             </thead>
@@ -336,7 +391,6 @@ function LeadView() {
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-[#1a1a2e] text-sm">{lead.name}</div>
-                                                    {/* <div className="text-xs text-[#9ca3af]">{lead.product || 'No product'}</div> */}
                                                 </div>
                                             </div>
                                         </td>
@@ -354,31 +408,22 @@ function LeadView() {
                                         </td>
                                         <td className="px-4 py-3">
                                             <select
-                                                className={`status-select status-${lead.status} border border-[#e5e7eb] rounded-full px-3 py-1 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#4f46e5]`}
+                                                className={`status-select ${getStatusColor(lead.status)} border border-[#e5e7eb] rounded-full px-3 py-1 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#4f46e5]`}
                                                 value={lead.status}
                                                 onChange={async (e) => {
                                                     const newStatus = e.target.value;
                                                     await handleStatusChange(lead._id, newStatus);
                                                 }}
                                             >
-                                                {leadStatus?.map((e) => {
-                                                    return (
-                                                        <option value={e?.value}>{e?.value}</option>
-
-                                                    )
-                                                })}
+                                                {leadStatus?.map((status) => (
+                                                    <option key={status.value} value={status.value}>
+                                                        {status.label || status.value}
+                                                    </option>
+                                                ))}
                                             </select>
-
-
                                         </td>
-                                        {/* <td className="px-4 py-3">
-                                            <span className={`priority-badge ${priorityColors[lead.priority || 'medium']} px-3 py-1 rounded-full text-xs font-medium inline-block`}>
-                                                {lead.priority || 'medium'}
-                                            </span>
-                                        </td> */}
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
-                                                {console.log(lead)}
                                                 {lead.assignedTo ? (
                                                     <>
                                                         <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#8b5cf6] to-[#4f46e5] flex items-center justify-center text-white text-xs font-bold">
@@ -398,6 +443,14 @@ function LeadView() {
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
+                                            <div className="flex items-center gap-1">
+                                                <MessageCircle size={12} className="text-[#9ca3af]" />
+                                                <span className="text-xs text-[#374151]">
+                                                    {lead.remarksCount || 0} remarks
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
                                                 <button
                                                     onClick={() => setViewLead(lead)}
@@ -406,16 +459,6 @@ function LeadView() {
                                                 >
                                                     <FileText size={16} />
                                                 </button>
-                                                {/* <button
-                                                    onClick={() => {
-                                                        setSelectedLead(lead);
-                                                        setShowReassignModal(true);
-                                                    }}
-                                                    className="action-btn w-8 h-8 rounded-md bg-gray-50 text-gray-600 hover:bg-gray-100 flex items-center justify-center transition-colors"
-                                                    title="Reassign"
-                                                >
-                                                    <Users size={16} />
-                                                </button> */}
                                             </div>
                                         </td>
                                     </tr>
@@ -443,10 +486,16 @@ function LeadView() {
                     )}
                 </div>
 
-                {/* Lead Detail Modal */}
+                {/* Lead Detail Modal with Enhanced Remarks */}
                 {viewLead && (
-                    <div className="modal-overlay fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-5" onClick={() => { setViewLead(null); setShowAddRemark(false); setNewRemark(''); }}>
-                        <div className="modal-card bg-white rounded-xl w-full max-w-[520px] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+                    <div className="modal-overlay fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-5" onClick={() => {
+                        setViewLead(null);
+                        setShowAddRemark(false);
+                        setNewRemark('');
+                        setEditingRemark(null);
+                        setActiveTab('remarks');
+                    }}>
+                        <div className="modal-card bg-white rounded-xl w-full max-w-[600px] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
                             {/* Header */}
                             <div className="modal-header flex items-center justify-between p-6 pb-4 border-b border-[#f0f2f5]">
                                 <div className="modal-title-group flex items-center gap-3.5">
@@ -458,7 +507,12 @@ function LeadView() {
                                         <p className="modal-lead-sub text-xs text-[#9ca3af]">{viewLead.email || 'No email provided'}</p>
                                     </div>
                                 </div>
-                                <button className="modal-close w-8 h-8 border-none bg-gray-100 rounded-lg cursor-pointer text-gray-500 hover:bg-red-100 hover:text-red-500 flex items-center justify-center transition-colors" onClick={() => { setViewLead(null); setShowAddRemark(false); setNewRemark(''); }}>
+                                <button className="modal-close w-8 h-8 border-none bg-gray-100 rounded-lg cursor-pointer text-gray-500 hover:bg-red-100 hover:text-red-500 flex items-center justify-center transition-colors" onClick={() => {
+                                    setViewLead(null);
+                                    setShowAddRemark(false);
+                                    setNewRemark('');
+                                    setEditingRemark(null);
+                                }}>
                                     <X size={18} />
                                 </button>
                             </div>
@@ -467,7 +521,7 @@ function LeadView() {
                             <div className="modal-status-bar flex items-center gap-3 px-6 py-3.5 bg-gray-50 border-b border-[#f0f2f5]">
                                 <span className="modal-status-label text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</span>
                                 <select
-                                    className={`status-select status-${viewLead.status} border border-[#e5e7eb] rounded-full px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#4f46e5]`}
+                                    className={`status-select ${getStatusColor(viewLead.status)} border border-[#e5e7eb] rounded-full px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#4f46e5]`}
                                     value={viewLead.status}
                                     onChange={async e => {
                                         const newStatus = e.target.value;
@@ -475,19 +529,44 @@ function LeadView() {
                                         setViewLead(prev => ({ ...prev, status: newStatus }));
                                     }}
                                 >
-                                    {leadStatus?.map((e) => {
-                                        return (
-                                            <option value={e?.value}>{e?.value}</option>
-
-                                        )
-                                    })}
+                                    {leadStatus?.map((status) => (
+                                        <option key={status.value} value={status.value}>
+                                            {status.label || status.value}
+                                        </option>
+                                    ))}
                                 </select>
                                 {modalSaving && <span className="modal-saving-badge text-xs text-[#4f46e5] font-medium ml-2 animate-pulse">Saving…</span>}
                             </div>
 
+                            {/* Tabs */}
+                            <div className="flex border-b border-[#f0f2f5] px-6">
+                                <button
+                                    className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'remarks'
+                                        ? 'border-[#4f46e5] text-[#4f46e5]'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                                    onClick={() => setActiveTab('remarks')}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <MessageCircle size={16} />
+                                        Remarks ({remarksData?.remarks?.length || 0})
+                                    </div>
+                                </button>
+                                <button
+                                    className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'history'
+                                        ? 'border-[#4f46e5] text-[#4f46e5]'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                                    onClick={() => setActiveTab('history')}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <History size={16} />
+                                        History
+                                    </div>
+                                </button>
+                            </div>
+
                             {/* Scrollable Body */}
                             <div className="modal-body overflow-y-auto flex-1 pb-1">
-                                {/* Detail Grid */}
+                                {/* Basic Info Grid - Always Visible */}
                                 <div className="modal-detail-grid grid grid-cols-2 gap-0 py-2">
                                     <div className="modal-detail-item flex flex-col gap-1 p-4 border-b border-[#f9fafb] border-r border-[#f9fafb]">
                                         <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
@@ -510,18 +589,16 @@ function LeadView() {
                                         </span>
                                         <span className="modal-detail-value text-sm font-medium text-[#1a1a2e]">{formatDate(viewLead.createdAt)}</span>
                                     </div>
-                                    {/* <div className="modal-detail-item flex flex-col gap-1 p-4 border-b border-[#f9fafb]">
+                                    <div className="modal-detail-item flex flex-col gap-1 p-4 border-b border-[#f9fafb]">
                                         <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
-                                            <Flag size={12} />
-                                            Priority
+                                            <Calendar size={12} />
+                                            Follow Up
                                         </span>
-                                        <span className={`modal-detail-value priority-badge ${priorityColors[viewLead.priority || 'medium']} px-3 py-1 rounded-full text-xs font-medium inline-block w-fit`}>
-                                            {viewLead.priority || 'medium'}
-                                        </span>
-                                    </div> */}
+                                        <span className="modal-detail-value text-sm font-medium text-[#1a1a2e]">{formatDate(viewLead.followUpDate)}</span>
+                                    </div>
                                 </div>
 
-                                {/* Assigned To */}
+                                {/* Assigned To Section */}
                                 <div className="modal-edit-section p-6 border-b border-[#f0f2f5] flex flex-col gap-2.5">
                                     <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
                                         <Users size={12} />
@@ -529,7 +606,7 @@ function LeadView() {
                                     </span>
                                     <div className="modal-edit-row flex items-center gap-3 flex-wrap">
                                         <div className="assignee-grid modal-assignee-grid flex flex-wrap gap-2">
-                                            {Executive?.map(exec => (
+                                            {executives?.map(exec => (
                                                 <button
                                                     key={exec._id}
                                                     type="button"
@@ -548,11 +625,11 @@ function LeadView() {
                                     </div>
                                 </div>
 
-                                {/* Follow Up Date */}
+                                {/* Follow Up Date Edit */}
                                 <div className="modal-edit-section p-6 border-b border-[#f0f2f5] flex flex-col gap-2.5">
                                     <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
                                         <Calendar size={12} />
-                                        Follow Up Date
+                                        Update Follow Up Date
                                     </span>
                                     <div className="modal-edit-row flex items-center gap-3 flex-wrap">
                                         <div className="input-wrapper modal-date-input flex items-center gap-2.5 border border-[#e5e7eb] rounded-lg px-3.5 bg-white h-10 max-w-[220px] focus-within:border-[#4f46e5] focus-within:ring-3 focus-within:ring-[#4f46e5]/20 transition-all">
@@ -563,131 +640,287 @@ function LeadView() {
                                                 onBlur={e => {
                                                     if (e.target.value) handleModalFieldSave('followUpDate', e.target.value);
                                                 }}
-                                                onChange={e => {
-                                                    if (e.target.value) handleModalFieldSave('followUpDate', e.target.value);
-                                                }}
                                                 className="flex-1 border-none outline-none text-sm text-[#1a1a2e] bg-transparent"
                                             />
                                         </div>
-                                        {viewLead.followUpDate && (
-                                            <span className="modal-date-display text-xs text-gray-500 italic">
-                                                {formatDate(viewLead.followUpDate)}
-                                            </span>
-                                        )}
                                     </div>
                                 </div>
 
-                                {/* Existing Remarks */}
-                                {viewLead.remarks && (
-                                    <div className="modal-edit-section p-6 border-b border-[#f0f2f5] flex flex-col gap-2.5">
-                                        <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
-                                            <MessageCircle size={12} />
-                                            Remarks / Notes
-                                        </span>
-                                        <p className="modal-remarks-text text-sm text-[#374151] leading-relaxed bg-gray-50 rounded-lg p-3 border border-[#f0f2f5] whitespace-pre-wrap">
-                                            {viewLead.remarks}
-                                        </p>
-                                    </div>
-                                )}
+                                {/* Tab Content */}
+                                {activeTab === 'remarks' ? (
+                                    /* Remarks Tab */
+                                    <div className="remarks-tab p-6">
+                                        {/* Add Remark Button */}
+                                        {!showAddRemark && !editingRemark && (
+                                            <button
+                                                className="btn-add-remark w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-[#c4b5fd] rounded-lg bg-[#f5f3ff] text-[#4f46e5] text-sm font-semibold cursor-pointer hover:bg-[#ede9fe] hover:border-[#a78bfa] transition-all mb-4"
+                                                onClick={() => setShowAddRemark(true)}
+                                            >
+                                                <Plus size={18} />
+                                                Add New Remark
+                                            </button>
+                                        )}
 
-                                {/* Add Remark Section */}
-                                <div className="modal-edit-section p-6 flex flex-col gap-2.5">
-                                    {!showAddRemark ? (
-                                        <button className="btn-add-remark inline-flex items-center gap-1.5 px-4 py-2 border-2 border-dashed border-[#c4b5fd] rounded-lg bg-[#f5f3ff] text-[#4f46e5] text-xs font-semibold cursor-pointer hover:bg-[#ede9fe] hover:border-[#a78bfa] transition-all w-fit" onClick={() => setShowAddRemark(true)}>
-                                            <Plus size={14} />
-                                            Add Remark
-                                        </button>
-                                    ) : (
-                                        <div className="modal-remark-form flex flex-col gap-2.5">
-                                            <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
-                                                <MessageCircle size={12} />
-                                                New Remark
-                                            </span>
-                                            <div className="rich-text-editor border border-[#e5e7eb] rounded-lg overflow-hidden focus-within:border-[#4f46e5] focus-within:ring-3 focus-within:ring-[#4f46e5]/20 transition-all">
-                                                <div className="rich-text-toolbar flex items-center gap-0.5 p-2 border-b border-[#f0f2f5] bg-gray-50">
+                                        {/* Add Remark Form */}
+                                        {showAddRemark && (
+                                            <div className="modal-remark-form bg-gray-50 rounded-lg p-4 mb-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-xs font-semibold text-[#4f46e5] uppercase tracking-wider">New Remark</span>
                                                     <button
-                                                        type="button"
-                                                        className={`toolbar-btn w-7 h-7 rounded-md hover:bg-[#ede9fe] hover:text-[#4f46e5] transition-colors ${remarkBold ? 'bg-[#ede9fe] text-[#4f46e5]' : ''}`}
-                                                        onClick={() => setRemarkBold(v => !v)}
+                                                        onClick={() => setShowAddRemark(false)}
+                                                        className="text-gray-400 hover:text-gray-600"
                                                     >
-                                                        <b className="text-sm">B</b>
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className={`toolbar-btn w-7 h-7 rounded-md hover:bg-[#ede9fe] hover:text-[#4f46e5] transition-colors ${remarkItalic ? 'bg-[#ede9fe] text-[#4f46e5]' : ''}`}
-                                                        onClick={() => setRemarkItalic(v => !v)}
-                                                    >
-                                                        <i className="text-sm">I</i>
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className={`toolbar-btn w-7 h-7 rounded-md hover:bg-[#ede9fe] hover:text-[#4f46e5] transition-colors ${remarkUnderline ? 'bg-[#ede9fe] text-[#4f46e5]' : ''}`}
-                                                        onClick={() => setRemarkUnderline(v => !v)}
-                                                    >
-                                                        <u className="text-sm">U</u>
-                                                    </button>
-                                                    <div className="toolbar-divider w-px h-5 bg-[#e5e7eb] mx-1" />
-                                                    <button
-                                                        type="button"
-                                                        className="toolbar-btn w-7 h-7 rounded-md hover:bg-[#ede9fe] hover:text-[#4f46e5] transition-colors"
-                                                        onClick={() => setNewRemark(v => v + '\n• ')}
-                                                    >
-                                                        <div className="flex flex-col gap-0.5">
-                                                            <div className="w-3 h-0.5 bg-current"></div>
-                                                            <div className="w-3 h-0.5 bg-current"></div>
-                                                            <div className="w-3 h-0.5 bg-current"></div>
-                                                        </div>
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className="toolbar-btn w-7 h-7 rounded-md hover:bg-[#ede9fe] hover:text-[#4f46e5] transition-colors"
-                                                        onClick={() => setNewRemark('')}
-                                                    >
-                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                            <polyline points="1 4 1 10 7 10" />
-                                                            <path d="M3.51 15a9 9 0 1 0 .49-4.95" />
-                                                        </svg>
+                                                        <X size={16} />
                                                     </button>
                                                 </div>
                                                 <textarea
-                                                    className="rich-text-area w-full min-h-[120px] p-4 border-none outline-none text-sm font-normal text-[#1a1a2e] resize-y"
-                                                    placeholder="Write your remark or note..."
+                                                    className="w-full p-3 border border-[#e5e7eb] rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:ring-2 focus:ring-[#4f46e5] focus:border-transparent resize-none"
+                                                    placeholder="Write your remark..."
                                                     value={newRemark}
                                                     onChange={e => setNewRemark(e.target.value)}
-                                                    style={{
-                                                        fontWeight: remarkBold ? 'bold' : 'normal',
-                                                        fontStyle: remarkItalic ? 'italic' : 'normal',
-                                                        textDecoration: remarkUnderline ? 'underline' : 'none',
-                                                    }}
-                                                    rows={4}
+                                                    rows={3}
+                                                    autoFocus
                                                 />
+                                                <div className="flex justify-end gap-2 mt-2">
+                                                    <button
+                                                        className="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-200 rounded-md transition-colors"
+                                                        onClick={() => {
+                                                            setShowAddRemark(false);
+                                                            setNewRemark('');
+                                                        }}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        className="px-3 py-1.5 text-xs bg-[#4f46e5] text-white rounded-md hover:bg-[#4338ca] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                                        onClick={handleAddRemark}
+                                                        disabled={modalSaving || !newRemark.trim()}
+                                                    >
+                                                        {modalSaving ? (
+                                                            <>
+                                                                <span className="spinner inline-block w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                                                                Saving...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Check size={14} />
+                                                                Save Remark
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="modal-remark-actions flex justify-end gap-2.5 mt-1">
-                                                <button className="btn-reset px-4 py-2 border border-[#e5e7eb] rounded-lg text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-colors" onClick={() => { setShowAddRemark(false); setNewRemark(''); }}>
-                                                    Cancel
-                                                </button>
-                                                <button className="btn-primary px-4 py-2 bg-[#4f46e5] text-white rounded-lg text-sm font-semibold hover:bg-[#4338ca] transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2" onClick={handleAddRemark} disabled={modalSaving}>
-                                                    {modalSaving ? (
-                                                        <>
-                                                            <span className="spinner inline-block w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                                                            Saving...
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <FileText size={14} />
-                                                            Save Remark
-                                                        </>
-                                                    )}
-                                                </button>
+                                        )}
+
+                                        {/* Edit Remark Form */}
+                                        {editingRemark && (
+                                            <div className="modal-remark-form bg-yellow-50 rounded-lg p-4 mb-4 border border-yellow-200">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-xs font-semibold text-yellow-600 uppercase tracking-wider">Edit Remark</span>
+                                                    <button
+                                                        onClick={() => setEditingRemark(null)}
+                                                        className="text-gray-400 hover:text-gray-600"
+                                                    >
+                                                        <X size={16} />
+                                                    </button>
+                                                </div>
+                                                <textarea
+                                                    className="w-full p-3 border border-yellow-300 rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
+                                                    value={editRemarkText}
+                                                    onChange={e => setEditRemarkText(e.target.value)}
+                                                    rows={3}
+                                                    autoFocus
+                                                />
+                                                <div className="flex justify-end gap-2 mt-2">
+                                                    <button
+                                                        className="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-200 rounded-md transition-colors"
+                                                        onClick={() => setEditingRemark(null)}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        className="px-3 py-1.5 text-xs bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                                        onClick={handleEditRemark}
+                                                        disabled={modalSaving || !editRemarkText.trim()}
+                                                    >
+                                                        {modalSaving ? (
+                                                            <>
+                                                                <span className="spinner inline-block w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                                                                Updating...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Check size={14} />
+                                                                Update Remark
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
                                             </div>
+                                        )}
+
+                                        {/* Remarks List */}
+                                        <div className="remarks-list space-y-3">
+                                            {remarksData?.remarks?.length > 0 ? (
+                                                remarksData.remarks.map((remark) => (
+                                                    <div key={remark._id} className="remark-item bg-white border border-[#f0f2f5] rounded-lg p-4 hover:shadow-sm transition-shadow">
+                                                        <div className="flex items-start justify-between gap-2">
+                                                            <div className="remark-content flex-1">
+                                                                <p className="text-sm text-[#1a1a2e] whitespace-pre-wrap">{remark.text}</p>
+                                                                <div className="flex items-center gap-2 mt-2">
+                                                                    <span className="text-xs text-[#7a8394]">
+                                                                        By: <span className="font-medium text-[#4f46e5]">{remark.createdByName}</span>
+                                                                    </span>
+                                                                    <span className="text-xs text-[#7a8394]">•</span>
+                                                                    <span className="text-xs text-[#7a8394]">
+                                                                        {formatDate(remark.createdAt)}
+                                                                    </span>
+                                                                    {remark.isEdited && (
+                                                                        <>
+                                                                            <span className="text-xs text-[#7a8394]">•</span>
+                                                                            <span className="text-xs text-yellow-600 flex items-center gap-1">
+                                                                                <Edit2 size={10} />
+                                                                                Edited
+                                                                            </span>
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="remark-actions flex items-center gap-1">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setEditingRemark(remark);
+                                                                        setEditRemarkText(remark.text);
+                                                                        setShowAddRemark(false);
+                                                                    }}
+                                                                    className="p-1.5 text-gray-400 hover:text-[#4f46e5] hover:bg-[#ede9fe] rounded-md transition-colors"
+                                                                    title="Edit remark"
+                                                                >
+                                                                    <Edit2 size={14} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteRemark(remark._id)}
+                                                                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                                                    title="Delete remark"
+                                                                >
+                                                                    <Trash2 size={14} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setSelectedRemarkForHistory(remark)}
+                                                                    className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-colors"
+                                                                    title="View history"
+                                                                >
+                                                                    <History size={14} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="empty-remarks text-center py-8">
+                                                    <MessageCircle size={32} className="text-[#9ca3af] mx-auto mb-2" />
+                                                    <p className="text-sm text-[#7a8394]">No remarks yet</p>
+                                                    <p className="text-xs text-[#9ca3af] mt-1">Click "Add New Remark" to add your first note</p>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
+                                    </div>
+                                ) : (
+                                    /* History Tab */
+                                    <div className="history-tab p-6">
+                                        {selectedRemarkForHistory ? (
+                                            /* Single Remark History View */
+                                            <div>
+                                                <button
+                                                    onClick={() => setSelectedRemarkForHistory(null)}
+                                                    className="flex items-center gap-1 text-xs text-[#4f46e5] mb-4 hover:underline"
+                                                >
+                                                    ← Back to all history
+                                                </button>
+                                                <div className="history-timeline space-y-3">
+                                                    <div className="timeline-item bg-gray-50 rounded-lg p-3">
+                                                        <div className="flex items-start gap-2">
+                                                            <div className="timeline-bullet w-2 h-2 rounded-full bg-[#4f46e5] mt-1.5"></div>
+                                                            <div className="flex-1">
+                                                                <p className="text-xs font-medium text-[#1a1a2e]">Current Version</p>
+                                                                <p className="text-sm text-[#374151] mt-1">{selectedRemarkForHistory.text}</p>
+                                                                <p className="text-xs text-[#7a8394] mt-1">
+                                                                    Last updated: {formatDate(selectedRemarkForHistory.updatedAt || selectedRemarkForHistory.createdAt)}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {/* You can add more history items here from your API */}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            /* All History View */
+                                            <div className="history-timeline space-y-4">
+                                                <h4 className="text-xs font-semibold text-[#9ca3af] uppercase tracking-wider mb-3">Recent Activity</h4>
+
+                                                {/* Status Changes */}
+                                                {viewLead.history?.status?.length > 0 && (
+                                                    <div className="history-group">
+                                                        <h5 className="text-xs font-medium text-[#4f46e5] mb-2">Status Changes</h5>
+                                                        {viewLead.history.status.map((item, idx) => (
+                                                            <div key={idx} className="timeline-item flex items-start gap-2 mb-2">
+                                                                <div className="timeline-bullet w-2 h-2 rounded-full bg-blue-500 mt-1.5"></div>
+                                                                <div className="flex-1">
+                                                                    <p className="text-xs text-[#374151]">
+                                                                        Changed from <span className="font-medium">{item.oldValue}</span> to{' '}
+                                                                        <span className="font-medium">{item.newValue}</span>
+                                                                    </p>
+                                                                    <p className="text-xs text-[#7a8394]">
+                                                                        By {item.changedByName} • {formatDate(item.createdAt)}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* Assignment Changes */}
+                                                {viewLead.history?.assignment?.length > 0 && (
+                                                    <div className="history-group">
+                                                        <h5 className="text-xs font-medium text-[#4f46e5] mb-2">Assignment Changes</h5>
+                                                        {viewLead.history.assignment.map((item, idx) => (
+                                                            <div key={idx} className="timeline-item flex items-start gap-2 mb-2">
+                                                                <div className="timeline-bullet w-2 h-2 rounded-full bg-green-500 mt-1.5"></div>
+                                                                <div className="flex-1">
+                                                                    <p className="text-xs text-[#374151]">
+                                                                        Assigned to new executive
+                                                                    </p>
+                                                                    <p className="text-xs text-[#7a8394]">
+                                                                        By {item.changedByName} • {formatDate(item.createdAt)}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* No History */}
+                                                {(!viewLead.history?.status?.length && !viewLead.history?.assignment?.length) && (
+                                                    <div className="empty-history text-center py-8">
+                                                        <History size={32} className="text-[#9ca3af] mx-auto mb-2" />
+                                                        <p className="text-sm text-[#7a8394]">No history available</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Footer */}
                             <div className="modal-footer p-6 border-t border-[#f0f2f5] flex justify-end">
-                                <button className="btn-reset px-5 py-2 border border-[#e5e7eb] rounded-lg text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-colors" onClick={() => { setViewLead(null); setShowAddRemark(false); setNewRemark(''); }}>
+                                <button className="btn-reset px-5 py-2 border border-[#e5e7eb] rounded-lg text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-colors" onClick={() => {
+                                    setViewLead(null);
+                                    setShowAddRemark(false);
+                                    setNewRemark('');
+                                    setEditingRemark(null);
+                                    setActiveTab('remarks');
+                                }}>
                                     Close
                                 </button>
                             </div>

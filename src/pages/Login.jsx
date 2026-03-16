@@ -50,30 +50,45 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         const newErrors = validateForm();
 
         if (Object.keys(newErrors).length === 0) {
 
-            console.log(Object.keys)
+            setIsLoading(true);
 
-            let body = {
-                email: email,
-                password: password
+            try {
+
+                const body = {
+                    email: email,
+                    password: password
+                };
+
+                const res = await login(body);
+
+                console.log(res?.data?.user?.role);
+
+                if (res?.data?.token) {
+
+                    localStorage.setItem("token", res.data.token);
+                    if (res?.data?.user?.role === "admin") {
+                        navigate('/');
+
+                    } else {
+                        navigate('/Leads');
+                    }
+
+
+                } else {
+                    console.log("Login failed");
+                }
+
+            } catch (error) {
+                console.log("Login error:", error);
             }
 
-            let res = await login(body)
-            console.log(res?.data?.token)
-            localStorage.setItem("token", res?.data?.token)
-            navigate('/')
+            setIsLoading(false);
 
-
-
-            setIsLoading(true);
-            // Simulate API call
-            setTimeout(() => {
-                setIsLoading(false);
-                // onLogin(); // Call the onLogin prop to navigate to dashboard
-            }, 1500);
         } else {
             setErrors(newErrors);
         }

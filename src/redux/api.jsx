@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const BASE_URL = "https://lead-crm-backend-1cq8.onrender.com/api";
-// const BASE_URL = "http://localhost:5000/api";
+// const BASE_URL = "https://lead-crm-backend-1cq8.onrender.com/api";
+const BASE_URL = "http://localhost:5000/api";
 
 const baseQuery = fetchBaseQuery({
     baseUrl: BASE_URL,
@@ -34,6 +34,7 @@ export const api = createApi({
         "Quotations",
         "Dashboard",
         "Timeline",
+        "Remarks"
     ],
 
     endpoints: (builder) => ({
@@ -321,6 +322,66 @@ export const api = createApi({
             providesTags: ["Timeline", "Leads"],
         }),
 
+
+        // Remark
+
+        // getQuotations: builder.query({
+        //     query: () => "/quotations",
+        //     providesTags: ["Quotations"],
+        // }),
+
+        // Correct way to write RTK Query endpoints for remarks
+
+        // If you have multiple remark endpoints
+        getLeadRemarks: builder.query({
+            query: (leadId) => `/leads/${leadId}/remarks`,
+            providesTags: (result, error, leadId) => [
+                { type: "Remarks", id: leadId },
+                ...(result?.remarks?.map(({ _id }) => ({ type: "Remarks", id: _id })) || [])
+            ],
+        }),
+
+       
+
+        addRemark: builder.mutation({
+            query: ({ leadId, text }) => {
+                console.log("Sending remark:", { leadId, text }); // Debug log
+                return {
+                    url: `/leads/${leadId}/remarks`,
+                    method: "POST",
+                    body: { text }, // Send only text, backend adds createdBy
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                };
+            },
+            invalidatesTags: (result, error, { leadId }) => [
+                { type: "Remarks", id: leadId },
+                "Leads"
+            ],
+        }),
+
+        editRemark: builder.mutation({
+            query: ({ leadId, remarkId, text }) => ({
+                url: `/leads/${leadId}/remarks/${remarkId}`,
+                method: "PUT",
+                body: { text },
+            }),
+            invalidatesTags: (result, error, { leadId, remarkId }) => [
+                { type: "Remarks", id: leadId },
+                { type: "Remarks", id: remarkId }
+            ],
+        }),
+
+        deleteRemark: builder.mutation({
+            query: ({ leadId, remarkId }) => ({
+                url: `/leads/${leadId}/remarks/${remarkId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: (result, error, { leadId }) => [
+                { type: "Remarks", id: leadId }
+            ],
+        }),
     }),
 });
 
@@ -383,5 +444,14 @@ export const {
     // report
     useGetLeadReportQuery,
     useGetSalesReportQuery,
+
+
+
+    useDeleteRemarkMutation,
+    useEditRemarkMutation,
+    useAddRemarkMutation,
+    useGetLeadRemarksQuery,
+
+
 
 } = api;

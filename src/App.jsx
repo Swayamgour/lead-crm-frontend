@@ -17,9 +17,12 @@ import { Toaster } from 'react-hot-toast';
 // import AssignLeadView from "./pages/salesExcuting/AssignLeadView";
 import ProtectRoute from "./components/ProtectRoute";
 import ReportPage from "./pages/ReportPage";
+// import { useGetProfileQuery } from "./redux/api";
 
 
 function App() {
+
+  // const { data } = useGetProfileQuery()
   return (
     <BrowserRouter>
       <Toaster />
