@@ -42,6 +42,7 @@ import {
     FileText
 } from "lucide-react";
 import { useGetConversionReportQuery, useGetExecutiveSalesReportQuery, useGetLeadReportQuery, useGetSalesPerformanceQuery, useGetSalesReportQuery } from "../redux/api";
+import Loading from "../components/Loading";
 
 const ReportPage = () => {
     const [timeframe, setTimeframe] = useState("monthly");
@@ -52,13 +53,13 @@ const ReportPage = () => {
     const [fullscreenSection, setFullscreenSection] = useState(null);
 
     // Mock data - replace with your actual API data
-    const { data: leadReport } = useGetLeadReportQuery();
+    const { data: leadReport, isLoading } = useGetLeadReportQuery();
     const { data: salesReport } = useGetSalesReportQuery();
     const { data: conversionReport } = useGetConversionReportQuery();
     const { data: performanceReport } = useGetSalesPerformanceQuery();
     const { data: executiveReport } = useGetExecutiveSalesReportQuery();
 
-    console.log(conversionReport)
+    // console.log(conversionReport)
 
     const toggleSection = (section) => {
         setExpandedSections(prev => ({
@@ -104,6 +105,13 @@ const ReportPage = () => {
         ];
         return gradients[index % gradients.length];
     };
+
+
+    if (isLoading) {
+        return (
+            <Loading data={'Report'} />
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-blue-50/30">
@@ -468,7 +476,7 @@ const ReportPage = () => {
                 </div>
 
                 {/* Conversion Trends */}
-              
+
 
                 {/* Export Section */}
                 <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 border border-gray-200">

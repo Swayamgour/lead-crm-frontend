@@ -5,7 +5,8 @@ import {
     ArrowLeft, MessageSquare, Clock, Bell, TrendingUp,
     RotateCcwIcon,
     Eye,
-    SaveAll
+    SaveAll,
+    Check
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import RemarkEditor from "../../components/RemarkEditor";
@@ -461,6 +462,55 @@ function AddLead() {
                                     }
                                 />
                             </div>
+
+
+                            {/* <div className="modal-remark-form bg-gray-50 rounded-lg p-4 mb-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs font-semibold text-[#4f46e5] uppercase tracking-wider">New Remark</span>
+                                    <button
+                                        onClick={() => setShowAddRemark(false)}
+                                        className="text-gray-400 hover:text-gray-600"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                                <textarea
+                                    className="w-full p-3 border border-[#e5e7eb] rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:ring-2 focus:ring-[#4f46e5] focus:border-transparent resize-none"
+                                    placeholder="Write your remark..."
+                                    value={newRemark}
+                                    onChange={e => setNewRemark(e.target.value)}
+                                    rows={3}
+                                    autoFocus
+                                />
+                                <div className="flex justify-end gap-2 mt-2">
+                                    <button
+                                        className="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-200 rounded-md transition-colors"
+                                        onClick={() => {
+                                            setShowAddRemark(false);
+                                            setNewRemark('');
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="px-3 py-1.5 text-xs bg-[#4f46e5] text-white rounded-md hover:bg-[#4338ca] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                        onClick={handleAddRemark}
+                                        disabled={modalSaving || !newRemark.trim()}
+                                    >
+                                        {modalSaving ? (
+                                            <>
+                                                <span className="spinner inline-block w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Check size={14} />
+                                                Save Remark
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div> */}
                         </div>
 
                         {/* Form Actions */}

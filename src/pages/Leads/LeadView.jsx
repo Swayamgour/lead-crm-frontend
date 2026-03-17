@@ -17,7 +17,9 @@ import {
     Trash2,
     History,
     Check,
-    AlertCircle
+    AlertCircle,
+    ArrowRight,
+    Edit
 
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -33,9 +35,10 @@ import {
 } from "../../redux/api";
 import toast from "react-hot-toast";
 import { leadStatus } from "../../components/data";
+import Loading from "../../components/Loading";
 
 function LeadView() {
-    const { data: leadsData } = useGetLeadsQuery();
+    const { data: leadsData, isLoading } = useGetLeadsQuery();
     const { data: Executive } = useGetUsersQuery();
     const { data: profile } = useGetProfileQuery();
     const [updateLead] = useUpdateLeadMutation();
@@ -55,6 +58,8 @@ function LeadView() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedLead, setSelectedLead] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
+    const [confirmAssignId, setConfirmAssignId] = useState(null);
+    const [selectedExecutive, setSelectedExecutive] = useState("");
 
     // Modal states
     const [viewLead, setViewLead] = useState(null);
@@ -64,7 +69,6 @@ function LeadView() {
     const [editRemarkText, setEditRemarkText] = useState("");
     const [modalSaving, setModalSaving] = useState(false);
     const [showReassignModal, setShowReassignModal] = useState(false);
-    const [selectedExecutive, setSelectedExecutive] = useState("");
     const [activeTab, setActiveTab] = useState("remarks"); // 'remarks' or 'history'
     const [selectedRemarkForHistory, setSelectedRemarkForHistory] = useState(null);
 
@@ -118,6 +122,7 @@ function LeadView() {
             toast.error(`Error updating ${field}`);
         } finally {
             setModalSaving(false);
+            setConfirmAssignId(null);
         }
     };
 
@@ -226,6 +231,12 @@ function LeadView() {
         };
         return colors[status] || 'bg-gray-100 text-gray-800';
     };
+
+    if (isLoading) {
+        return (
+            <Loading data={'Lead'} />
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#f7f8fa]">
@@ -457,7 +468,7 @@ function LeadView() {
                                                     className="action-btn view w-8 h-8 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors"
                                                     title="View Details"
                                                 >
-                                                    <FileText size={16} />
+                                                    <Edit size={16} />
                                                 </button>
                                             </div>
                                         </td>
@@ -540,7 +551,7 @@ function LeadView() {
 
                             {/* Tabs */}
                             <div className="flex border-b border-[#f0f2f5] px-6">
-                                <button
+                                {/* <button
                                     className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'remarks'
                                         ? 'border-[#4f46e5] text-[#4f46e5]'
                                         : 'border-transparent text-gray-500 hover:text-gray-700'}`}
@@ -549,9 +560,9 @@ function LeadView() {
                                     <div className="flex items-center gap-2">
                                         <MessageCircle size={16} />
                                         Remarks ({remarksData?.remarks?.length || 0})
-                                    </div>
-                                </button>
-                                <button
+                                     </div>
+                                </button> */}
+                                {/* <button
                                     className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'history'
                                         ? 'border-[#4f46e5] text-[#4f46e5]'
                                         : 'border-transparent text-gray-500 hover:text-gray-700'}`}
@@ -561,7 +572,7 @@ function LeadView() {
                                         <History size={16} />
                                         History
                                     </div>
-                                </button>
+                                </button> */}
                             </div>
 
                             {/* Scrollable Body */}
@@ -614,7 +625,10 @@ function LeadView() {
                                                         ? 'border-[#4f46e5] bg-[#ede9fe]'
                                                         : 'border-[#e5e7eb] bg-white hover:border-[#4f46e5] hover:bg-[#f5f3ff]'} 
                                                         rounded-lg transition-all min-w-[150px]`}
-                                                    onClick={() => handleModalFieldSave('assignedTo', exec._id)}
+                                                    onClick={() => {
+                                                        setSelectedExecutive(exec._id);
+                                                        setConfirmAssignId(exec._id);
+                                                    }}
                                                 >
                                                     <span className="assignee-name text-xs font-bold text-[#1a1a2e] tracking-wide">{exec.name.toUpperCase()}</span>
                                                     <span className="assignee-phone text-[11px] text-[#7a8394] mt-0.5">{exec.phone}</span>
@@ -928,7 +942,120 @@ function LeadView() {
                     </div>
                 )}
 
-                {/* Reassign Modal */}
+                {/* Beautiful Reassign Confirmation Modal */}
+                {confirmAssignId && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fadeIn">
+                        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-slideUp">
+                            {/* Header with gradient */}
+                            <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                                        <AlertCircle className="text-white" size={24} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-white">Confirm Reassignment</h3>
+                                        <p className="text-sm text-white/90">Please review the changes</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Body */}
+                            <div className="p-6">
+                                <div className="space-y-4">
+                                    {/* Lead Info */}
+                                    <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm">
+                                                {viewLead?.name?.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-700">Lead</p>
+                                                <p className="text-base font-bold text-gray-900">{viewLead?.name}</p>
+                                                <p className="text-xs text-gray-500 mt-0.5">{viewLead?.phone}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Transfer Details */}
+                                    <div className="flex items-center justify-between px-2">
+                                        {/* Current Assignee */}
+                                        <div className="text-center">
+                                            <p className="text-xs text-gray-500 mb-1">Current</p>
+                                            <div className="flex flex-col items-center">
+                                                <div className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center mb-1">
+                                                    {viewLead?.assignedTo ? (
+                                                        <span className="text-lg font-bold text-gray-600">
+                                                            {viewLead.assignedTo.name?.charAt(0).toUpperCase()}
+                                                        </span>
+                                                    ) : (
+                                                        <Users size={20} className="text-gray-400" />
+                                                    )}
+                                                </div>
+                                                <span className="text-xs font-medium text-gray-700">
+                                                    {viewLead?.assignedTo?.name || 'Unassigned'}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Arrow */}
+                                        <div className="flex-1 flex justify-center">
+                                            <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+                                                <ArrowRight className="w-6 h-6 text-amber-600" />
+                                            </div>
+                                        </div>
+
+                                        {/* New Assignee */}
+                                        <div className="text-center">
+                                            <p className="text-xs text-gray-500 mb-1">New</p>
+                                            <div className="flex flex-col items-center">
+                                                <div className="w-12 h-12 rounded-full bg-green-100 border-2 border-green-200 flex items-center justify-center mb-1">
+                                                    <span className="text-lg font-bold text-green-600">
+                                                        {executives.find(e => e._id === selectedExecutive)?.name?.charAt(0).toUpperCase()}
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs font-medium text-green-700">
+                                                    {executives.find(e => e._id === selectedExecutive)?.name}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Warning Message */}
+                                    <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                        <div className="flex gap-2">
+                                            <AlertCircle size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                                            <p className="text-xs text-amber-800">
+                                                This action will transfer the lead to the new executive.
+                                                All remarks and history will remain intact.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex gap-3 mt-6">
+                                    <button
+                                        onClick={() => setConfirmAssignId(null)}
+                                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            handleModalFieldSave('assignedTo', confirmAssignId);
+                                        }}
+                                        className="flex-1 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-semibold hover:from-amber-600 hover:to-orange-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                                    >
+                                        <Check size={18} />
+                                        Confirm Transfer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Reassign Modal (Old - Keep for reference, but not used) */}
                 {showReassignModal && (
                     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                         <div className="bg-white w-[500px] rounded-xl shadow-xl p-6">
@@ -960,7 +1087,12 @@ function LeadView() {
                                     Cancel
                                 </button>
                                 <button
-                                    onClick={handleReassign}
+                                    onClick={() => {
+                                        if (selectedExecutive) {
+                                            handleModalFieldSave('assignedTo', selectedExecutive);
+                                            setShowReassignModal(false);
+                                        }
+                                    }}
                                     className="px-4 py-2 bg-[#4f46e5] text-white rounded-lg text-sm hover:bg-[#4338ca] transition-colors"
                                 >
                                     Reassign
@@ -970,6 +1102,37 @@ function LeadView() {
                     </div>
                 )}
             </div>
+
+            {/* Add animations */}
+            <style>{`
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                    }
+                    to {
+                        opacity: 1;
+                    }
+                }
+
+                @keyframes slideUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .animate-fadeIn {
+                    animation: fadeIn 0.2s ease-out forwards;
+                }
+
+                .animate-slideUp {
+                    animation: slideUp 0.3s ease-out forwards;
+                }
+            `}</style>
         </div>
     );
 }

@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDeleteUserMutation, useGetUsersQuery, useUpdateUserMutation } from "../../redux/api";
+import Loading from "../../components/Loading";
 
 function ViewExecutives() {
     const navigate = useNavigate();
@@ -205,12 +206,7 @@ function ViewExecutives() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading executives...</p>
-                </div>
-            </div>
+            <Loading data={'Executives'} />
         );
     }
 
@@ -292,7 +288,7 @@ function ViewExecutives() {
                 {/* Performance Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     {/* Top Performer Card */}
-                    {stats.topPerformer && (
+                    {/* {stats.topPerformer && (
                         <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-2xl p-6 border border-yellow-200 shadow-lg">
                             <div className="flex items-center gap-4">
                                 <div className={`w-16 h-16 bg-gradient-to-br ${getRandomColor(stats.topPerformer.name)} rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg`}>
@@ -310,7 +306,7 @@ function ViewExecutives() {
                                 </div>
                             </div>
                         </div>
-                    )}
+                    )} */}
 
                     {/* Accuracy Distribution */}
                     <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
@@ -544,9 +540,9 @@ function ViewExecutives() {
                                             </td> */}
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-4">
-                                                    <div className={`w-12 h-12 bg-gradient-to-br ${getRandomColor(exec.name)} rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md transform group-hover:scale-110 transition-transform`}>
+                                                    {/* <div className={`w-12 h-12 bg-gradient-to-br ${getRandomColor(exec.name)} rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md transform group-hover:scale-110 transition-transform`}>
                                                         {getInitials(exec.name)}
-                                                    </div>
+                                                    </div> */}
                                                     <div>
                                                         <p className="font-semibold text-gray-800">{exec.name}</p>
                                                         <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
@@ -598,7 +594,7 @@ function ViewExecutives() {
                                                     <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                                         <div
                                                             className={`h-full rounded-full ${exec.accuracy >= 80 ? 'bg-green-500' :
-                                                                    exec.accuracy >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                                                                exec.accuracy >= 50 ? 'bg-yellow-500' : 'bg-red-500'
                                                                 }`}
                                                             style={{ width: `${exec.accuracy}%` }}
                                                         ></div>
@@ -855,7 +851,7 @@ function ViewExecutives() {
             </div>
 
             {/* Add custom animations */}
-            <style jsx>{`
+            <style>{`
                 @keyframes slideDown {
                     from {
                         opacity: 0;

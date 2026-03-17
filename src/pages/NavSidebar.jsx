@@ -3,26 +3,20 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
-    Users,
-    UserPlus,
-    GitBranch,
-    Clock,
-    Eye,
     ChevronDown,
     ChevronRight,
-    Wifi,
-    Activity,
     Bell,
-    Plus,
-    Layout,
     Menu,
-    X
+    X,
+    Users,
+    Activity,
+    Database,
+    PhoneCall,
+    BarChart3,
+    LogOut  // Added LogOut icon
 } from "lucide-react";
-
-// import { sidebarSections } from "../components/data";
 import { useGetProfileQuery } from "../redux/api";
-
-
+import { sidebarSections } from "../components/data";
 
 const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
@@ -30,74 +24,6 @@ const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
     const location = useLocation();
 
     const { data } = useGetProfileQuery()
-
-    // console.log()
-
-
-    const sidebarSections = [
-
-
-        {
-            title: "Sales Executives",
-            icon: Users,
-            key: "salesExecutives",
-            color: "from-green-500 to-green-600",
-            badge: null,
-            path: "/",
-            role: ['admin']
-
-        },
-        {
-            title: "Lead Sources",
-            icon: Wifi,
-            key: "leadSources",
-            color: "from-purple-500 to-purple-600",
-            badge: null,
-            path: "/Leads",
-            role: ['admin', "executive"]
-
-
-        },
-
-        // {
-        //     title: "Lead Pipeline",
-        //     icon: GitBranch,
-        //     path: "/LeadPipeline",
-        //     color: "from-orange-500 to-orange-600",
-        //     badge: 5
-        // },
-        {
-            title: "Follow Up",
-            icon: Clock,
-            path: "/followUps",
-            color: "from-yellow-500 to-yellow-600",
-            badge: null,
-            role: ['admin', "executive"]
-
-        },
-        {
-            title: "Lead Timeline",
-            icon: Activity,
-            path: "/LeadTimeline",
-            color: "from-indigo-500 to-indigo-600",
-            badge: null,
-            role: ['admin', "executive"]
-
-        },
-
-        {
-            title: "Report",
-            icon: Activity,
-            path: "/Report",
-            color: "from-indigo-400 to-indigo-900",
-            badge: null,
-            role: ['admin', "executive"]
-
-        },
-
-    ];
-
-
 
     const [expandedMenus, setExpandedMenus] = useState({
         leadSources: true,
@@ -152,6 +78,24 @@ const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
         return false;
     };
 
+    // Logout handler
+    const handleLogout = () => {
+        // Clear any auth tokens/user data from storage
+        localStorage.removeItem('token'); // or sessionStorage.removeItem('token')
+        localStorage.removeItem('user'); // if you store user data
+
+        // Clear any Redux persist data if you're using it
+        // localStorage.removeItem('persist:root');
+
+        // Redirect to login page
+        navigate('/login');
+
+        // Close sidebar on mobile/tablet
+        if (isMobile || isTablet) {
+            setSidebarOpen(false);
+        }
+    };
+
     const sidebarWidth = sidebarOpen
         ? (isMobile ? 'w-64' : isTablet ? 'w-56' : 'w-72')
         : (isMobile ? 'w-0' : 'lg:w-20');
@@ -170,7 +114,7 @@ const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
             {(isMobile || isTablet) && !sidebarOpen && (
                 <button
                     onClick={() => setSidebarOpen(true)}
-                    className="fixed top-2 left-4 z-50 p-2.5     transition-colors "
+                    className="fixed top-2 left-4 z-50 p-2.5 transition-colors"
                 >
                     <Menu size={22} className="text-gray-700" />
                 </button>
@@ -185,6 +129,7 @@ const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
                     ${sidebarWidth}
                     overflow-y-auto overflow-x-hidden
                     scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100
+                    flex flex-col  /* Added flex column layout */
                 `}
             >
                 {/* Header with close button for mobile/tablet */}
@@ -213,205 +158,242 @@ const NavSidebar = ({ sidebarOpen, setSidebarOpen }) => {
                     </div>
                 </div>
 
-                {/* User Profile - Only show when sidebar is open and not on very small mobile */}
-                {sidebarOpen && !isMobile && (
-                    <div className="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
-                        <div className="flex items-center gap-2">
-                            <div className="relative flex-shrink-0">
-                                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-base">
-                                    {data?.name
-                                        ?.split(" ")
-                                        .map(word => word[0])
-                                        .slice(0, 2)
-                                        .join("")
-                                        .toUpperCase()}
+                {/* Main Navigation Area - Scrollable */}
+                <div className="flex-1 overflow-y-auto">
+                    {/* User Profile - Only show when sidebar is open and not on very small mobile */}
+                    {sidebarOpen && !isMobile && (
+                        <div className="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
+                            <div className="flex items-center gap-2">
+                                <div className="relative flex-shrink-0">
+                                    <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-base">
+                                        {data?.name
+                                            ?.split(" ")
+                                            .map(word => word[0])
+                                            .slice(0, 2)
+                                            .join("")
+                                            .toUpperCase()}
+                                    </div>
+                                    <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                                 </div>
-                                <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-semibold text-gray-800 truncate">{data?.name}</p>
+                                    <p className="text-xs text-gray-500 truncate">{data?.role} · Online</p>
+                                </div>
+                                <button className="p-1.5 hover:bg-white/50 rounded-lg transition-colors flex-shrink-0">
+                                    <Bell size={16} className="text-gray-600" />
+                                </button>
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-xs font-semibold text-gray-800 truncate">{data?.name}</p>
-                                <p className="text-xs text-gray-500 truncate">{data?.role} · Online</p>
-                            </div>
-                            <button className="p-1.5 hover:bg-white/50 rounded-lg transition-colors flex-shrink-0">
-                                <Bell size={16} className="text-gray-600" />
-                            </button>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Navigation */}
-                <nav className={`p-2 ${sidebarOpen ? 'px-2' : 'px-1'} overflow-y-auto`}>
-                    {sidebarSections
-                        ?.filter(section => section.role?.includes(data?.role))
-                        ?.map((section, idx) => {
-                            const hasItems = section.items && section.items.length > 0;
-                            const isActive = isParentActive(section);
-                            const isExpanded = expandedMenus[section.key];
+                    {/* Navigation */}
+                    <nav className={`p-2 ${sidebarOpen ? 'px-2' : 'px-1'}`}>
+                        {sidebarSections
+                            ?.filter(section => section.role?.includes(data?.role))
+                            ?.map((section, idx) => {
+                                const hasItems = section.items && section.items.length > 0;
+                                const isActive = isParentActive(section);
+                                const isExpanded = expandedMenus[section.key];
 
-                            return (
-                                <div
-                                    key={section.key || idx}
-                                    className="mb-1 relative group"
-                                >
-                                    {/* Section Header */}
+                                return (
                                     <div
-                                        onMouseEnter={() => setHoveredItem(section.key)}
-                                        onMouseLeave={() => setHoveredItem(null)}
-                                        className={`
-                                        flex items-center rounded-lg transition-all duration-300 cursor-pointer
-                                        ${sidebarOpen ? 'justify-between px-3' : 'justify-center px-2'}
-                                        ${isActive
-                                                ? 'bg-gradient-to-r ' + section.color + ' text-white shadow-md'
-                                                : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                                            }
-                                        ${hasItems ? 'py-1.5' : 'py-2'}
-                                        relative overflow-hidden group
-                                    `}
-                                        onClick={() => {
-                                            if (hasItems) {
-                                                toggleMenu(section.key);
-                                            } else if (section.path) {
-                                                navigate(section.path);
-                                                if (isMobile || isTablet) setSidebarOpen(false);
-                                            }
-                                        }}
+                                        key={section.key || idx}
+                                        className="mb-1 relative group"
                                     >
-                                        {/* Hover Gradient */}
+                                        {/* Section Header */}
                                         <div
-                                            className={`absolute inset-0 bg-gradient-to-r ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-                                        />
-
-                                        <div className={`flex items-center ${!sidebarOpen && 'justify-center w-full'}`}>
+                                            onMouseEnter={() => setHoveredItem(section.key)}
+                                            onMouseLeave={() => setHoveredItem(null)}
+                                            className={`
+                                            flex items-center rounded-lg transition-all duration-300 cursor-pointer
+                                            ${sidebarOpen ? 'justify-between px-3' : 'justify-center px-2'}
+                                            ${isActive
+                                                    ? 'bg-gradient-to-r ' + section.color + ' text-white shadow-md'
+                                                    : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
+                                                }
+                                            ${hasItems ? 'py-1.5' : 'py-2'}
+                                            relative overflow-hidden group
+                                        `}
+                                            onClick={() => {
+                                                if (hasItems) {
+                                                    toggleMenu(section.key);
+                                                } else if (section.path) {
+                                                    navigate(section.path);
+                                                    if (isMobile || isTablet) setSidebarOpen(false);
+                                                }
+                                            }}
+                                        >
+                                            {/* Hover Gradient */}
                                             <div
-                                                className={`
-                                                p-1.5 rounded-lg transition-all duration-300 flex-shrink-0
-                                                ${isActive ? 'bg-white/20' : ''}
-                                            `}
-                                            >
-                                                <section.icon
-                                                    size={sidebarOpen ? 16 : 18}
-                                                    className={`transition-all duration-300
-                                                    ${isActive ? 'text-white' : 'text-gray-500'}
+                                                className={`absolute inset-0 bg-gradient-to-r ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+                                            />
+
+                                            <div className={`flex items-center ${!sidebarOpen && 'justify-center w-full'}`}>
+                                                <div
+                                                    className={`
+                                                    p-1.5 rounded-lg transition-all duration-300 flex-shrink-0
+                                                    ${isActive ? 'bg-white/20' : ''}
                                                 `}
-                                                />
+                                                >
+                                                    <section.icon
+                                                        size={sidebarOpen ? 16 : 18}
+                                                        className={`transition-all duration-300
+                                                        ${isActive ? 'text-white' : 'text-gray-500'}
+                                                    `}
+                                                    />
+                                                </div>
+
+                                                {sidebarOpen && (
+                                                    <span className="ml-2 text-xs font-medium flex-1 whitespace-nowrap">
+                                                        {section.title}
+                                                    </span>
+                                                )}
                                             </div>
 
                                             {sidebarOpen && (
-                                                <span className="ml-2 text-xs font-medium flex-1 whitespace-nowrap">
-                                                    {section.title}
-                                                </span>
+                                                <div className="flex items-center gap-1">
+                                                    {section.badge && (
+                                                        <span
+                                                            className={`px-1.5 py-0.5 text-xs rounded-full
+                                                            ${isActive
+                                                                    ? 'bg-white/20 text-white'
+                                                                    : 'bg-red-100 text-red-600'
+                                                                }
+                                                        `}
+                                                        >
+                                                            {section.badge}
+                                                        </span>
+                                                    )}
+
+                                                    {hasItems && (
+                                                        <div
+                                                            className={`transition-transform duration-300 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                                                        >
+                                                            {isExpanded ? (
+                                                                <ChevronDown size={14} />
+                                                            ) : (
+                                                                <ChevronRight size={14} />
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
 
-                                        {sidebarOpen && (
-                                            <div className="flex items-center gap-1">
-                                                {section.badge && (
-                                                    <span
-                                                        className={`px-1.5 py-0.5 text-xs rounded-full
+                                        {/* Submenu */}
+                                        {hasItems && sidebarOpen && isExpanded && (
+                                            <div className="mt-1 ml-8 space-y-0.5 animate-slideDown">
+                                                {section.items.map((item) => (
+                                                    <NavLink
+                                                        key={item.name}
+                                                        to={item.path}
+                                                        onClick={() => (isMobile || isTablet) && setSidebarOpen(false)}
+                                                        className={({ isActive }) => `
+                                                        flex items-center justify-between px-3 py-1.5 rounded-lg transition-all duration-200 text-xs
                                                         ${isActive
-                                                                ? 'bg-white/20 text-white'
-                                                                : 'bg-red-100 text-red-600'
+                                                                ? 'bg-blue-50 text-blue-600'
+                                                                : item.danger
+                                                                    ? 'text-red-600 hover:bg-red-50'
+                                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                                             }
+                                                        group relative overflow-hidden
                                                     `}
                                                     >
+                                                        <div className="flex items-center min-w-0">
+                                                            <div
+                                                                className={`
+                                                                p-1 rounded-md mr-2 transition-all duration-200 flex-shrink-0
+                                                                ${isActive ? 'bg-blue-100' : 'bg-gray-100 group-hover:scale-110'}
+                                                            `}
+                                                            >
+                                                                <item.icon
+                                                                    size={12}
+                                                                    className={isActive ? 'text-blue-600' : 'text-gray-500'}
+                                                                />
+                                                            </div>
+                                                            <span className="truncate">{item.name}</span>
+                                                        </div>
+
+                                                        {item.shortcut && !isMobile && (
+                                                            <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 flex-shrink-0">
+                                                                {item.shortcut}
+                                                            </span>
+                                                        )}
+
+                                                        {isActive && (
+                                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-blue-600 rounded-r-full"></div>
+                                                        )}
+                                                    </NavLink>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Tooltip when collapsed - only on desktop */}
+                                        {!sidebarOpen && !isMobile && !isTablet && section.title && (
+                                            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                                                {section.title}
+                                                {section.badge && (
+                                                    <span className="ml-2 px-1.5 py-0.5 bg-red-500 text-white rounded-full text-xs">
                                                         {section.badge}
                                                     </span>
-                                                )}
-
-                                                {hasItems && (
-                                                    <div
-                                                        className={`transition-transform duration-300 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
-                                                    >
-                                                        {isExpanded ? (
-                                                            <ChevronDown size={14} />
-                                                        ) : (
-                                                            <ChevronRight size={14} />
-                                                        )}
-                                                    </div>
                                                 )}
                                             </div>
                                         )}
                                     </div>
+                                );
+                            })}
+                    </nav>
+                </div>
 
-                                    {/* Submenu */}
-                                    {hasItems && sidebarOpen && isExpanded && (
-                                        <div className="mt-1 ml-8 space-y-0.5 animate-slideDown">
-                                            {section.items.map((item) => (
-                                                <NavLink
-                                                    key={item.name}
-                                                    to={item.path}
-                                                    onClick={() => (isMobile || isTablet) && setSidebarOpen(false)}
-                                                    className={({ isActive }) => `
-                                                    flex items-center justify-between px-3 py-1.5 rounded-lg transition-all duration-200 text-xs
-                                                    ${isActive
-                                                            ? 'bg-blue-50 text-blue-600'
-                                                            : item.danger
-                                                                ? 'text-red-600 hover:bg-red-50'
-                                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                                        }
-                                                    group relative overflow-hidden
-                                                `}
-                                                >
-                                                    <div className="flex items-center min-w-0">
-                                                        <div
-                                                            className={`
-                                                            p-1 rounded-md mr-2 transition-all duration-200 flex-shrink-0
-                                                            ${isActive ? 'bg-blue-100' : 'bg-gray-100 group-hover:scale-110'}
-                                                        `}
-                                                        >
-                                                            <item.icon
-                                                                size={12}
-                                                                className={isActive ? 'text-blue-600' : 'text-gray-500'}
-                                                            />
-                                                        </div>
-                                                        <span className="truncate">{item.name}</span>
-                                                    </div>
+                {/* Logout Button - Fixed at bottom */}
+                <div className="border-t border-gray-100 p-2 bg-white">
+                    <button
+                        onClick={handleLogout}
+                        className={`
+                            flex items-center rounded-lg transition-all duration-300 cursor-pointer w-full
+                            ${sidebarOpen ? 'justify-between px-3' : 'justify-center px-2'}
+                            hover:bg-red-50 text-gray-700 hover:text-red-600
+                            py-2 relative overflow-hidden group
+                        `}
+                        onMouseEnter={() => setHoveredItem('logout')}
+                        onMouseLeave={() => setHoveredItem(null)}
+                    >
+                        {/* Hover Gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
 
-                                                    {item.shortcut && !isMobile && (
-                                                        <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 flex-shrink-0">
-                                                            {item.shortcut}
-                                                        </span>
-                                                    )}
+                        <div className={`flex items-center ${!sidebarOpen && 'justify-center w-full'}`}>
+                            <div className="p-1.5 rounded-lg transition-all duration-300 flex-shrink-0 group-hover:scale-110">
+                                <LogOut
+                                    size={sidebarOpen ? 16 : 18}
+                                    className="transition-all duration-300 group-hover:text-red-600 text-gray-500"
+                                />
+                            </div>
 
-                                                    {isActive && (
-                                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-blue-600 rounded-r-full"></div>
-                                                    )}
-                                                </NavLink>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {/* Tooltip when collapsed - only on desktop */}
-                                    {!sidebarOpen && !isMobile && !isTablet && section.title && (
-                                        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
-                                            {section.title}
-                                            {section.badge && (
-                                                <span className="ml-2 px-1.5 py-0.5 bg-red-500 text-white rounded-full text-xs">
-                                                    {section.badge}
-                                                </span>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                </nav>
-
-                {/* Footer for mobile/tablet when sidebar is open */}
-                {sidebarOpen && (isMobile || isTablet) && (
-                    <div className="p-3 border-t border-gray-100 mt-auto">
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span>Connected</span>
-                            <span className="mx-1">•</span>
-                            <span>v1.0.0</span>
+                            {sidebarOpen && (
+                                <span className="ml-2 text-xs font-medium flex-1 whitespace-nowrap text-left">
+                                    Logout
+                                </span>
+                            )}
                         </div>
-                    </div>
-                )}
+
+                        {sidebarOpen && (
+                            <div className="flex items-center gap-1">
+                                {/* Optional: Add any badge or indicator here */}
+                            </div>
+                        )}
+                    </button>
+
+                    {/* Tooltip when collapsed - only on desktop */}
+                    {!sidebarOpen && !isMobile && !isTablet && (
+                        <div className="absolute left-full bottom-0 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                            Logout
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Animation */}
-            <style jsx>{`
+            <style>{`
                 @keyframes slideDown {
                     from {
                         opacity: 0;
