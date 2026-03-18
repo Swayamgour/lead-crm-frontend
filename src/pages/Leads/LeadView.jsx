@@ -397,9 +397,9 @@ function LeadView() {
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366f1] to-[#4f46e5] flex items-center justify-center text-white font-bold text-sm">
+                                                {/* <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366f1] to-[#4f46e5] flex items-center justify-center text-white font-bold text-sm">
                                                     {lead.name?.charAt(0).toUpperCase()}
-                                                </div>
+                                                </div> */}
                                                 <div>
                                                     <div className="font-semibold text-[#1a1a2e] text-sm">{lead.name}</div>
                                                 </div>
@@ -437,9 +437,9 @@ function LeadView() {
                                             <div className="flex items-center gap-2">
                                                 {lead.assignedTo ? (
                                                     <>
-                                                        <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#8b5cf6] to-[#4f46e5] flex items-center justify-center text-white text-xs font-bold">
+                                                        {/* <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#8b5cf6] to-[#4f46e5] flex items-center justify-center text-white text-xs font-bold">
                                                             {lead.assignedTo.name?.charAt(0).toUpperCase()}
-                                                        </div>
+                                                        </div> */}
                                                         <span className="text-xs font-medium text-[#1a1a2e]">{lead.assignedTo.name}</span>
                                                     </>
                                                 ) : (
