@@ -242,10 +242,10 @@ function AddEditExecutive() {
                         <span>Back to Executives</span>
                     </button>
 
-                    <div className="flex items-center gap-3">
+                    {/* <div className="flex items-center gap-3">
                         <span className="text-sm text-gray-500">Need help?</span>
                         <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">Contact Support</button>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Success Message */}
@@ -569,21 +569,7 @@ function AddEditExecutive() {
                 </div>
 
                 {/* Help Section */}
-                <div className="mt-6 bg-blue-50 rounded-xl p-5 flex items-start gap-3 border border-blue-100">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <HelpCircle className="text-blue-600" size={18} />
-                    </div>
-                    <div>
-                        <h4 className="text-sm font-semibold text-blue-800">
-                            {isEditMode ? "Editing Executive Profile" : "Adding New Executive"}
-                        </h4>
-                        <p className="text-sm text-blue-600 mt-1">
-                            {isEditMode
-                                ? "Update the executive's information. Leave password fields empty to keep the current password."
-                                : "Fill in the required information for the new sales executive. All fields marked with * are mandatory."}
-                        </p>
-                    </div>
-                </div>
+               
             </div>
 
             {/* Add CSS animations */}

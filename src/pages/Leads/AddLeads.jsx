@@ -177,20 +177,7 @@ function AddLead() {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
             <div className="max-w-5xl mx-auto px-4">
                 {/* Header with Navigation */}
-                <div className="mb-6 flex items-center justify-between">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-                    >
-                        <ArrowLeft size={20} />
-                        <span>Back to Leads</span>
-                    </button>
-
-                    <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-500">Need help?</span>
-                        <button className="text-blue-600 hover:text-blue-700 text-sm">Contact Support</button>
-                    </div>
-                </div>
+                
 
                 {/* Success Message */}
                 {showSuccess && (

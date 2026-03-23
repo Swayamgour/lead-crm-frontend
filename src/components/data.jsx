@@ -1,10 +1,11 @@
 import {
     Users,
-    
+
     Activity,
     Database,
     PhoneCall,
-    BarChart3
+    BarChart3,
+    GitBranch
 } from "lucide-react";
 
 
@@ -26,35 +27,42 @@ export const sidebarSections = [
         icon: Users, // 👥 perfect
         key: "salesExecutives",
         color: "from-green-500 to-green-600",
-        path: "/",
+        path: ["/", "/addExecutive"],
         role: ["admin"]
     },
     {
-        title: "Lead Sources",
+        title: "Lead",
         icon: Database, // 📊 data / source feel
         key: "leadSources",
         color: "from-purple-500 to-purple-600",
-        path: "/Leads",
+        path: ["/Leads", "/addLeads"],
         role: ["admin", "executive"]
     },
     {
         title: "Follow Up",
         icon: PhoneCall, // 📞 follow-up = call
-        path: "/followUps",
+        path: ["/followUps"],
         color: "from-yellow-500 to-yellow-600",
         role: ["admin", "executive"]
     },
     {
         title: "Lead Timeline",
         icon: Activity, // 📈 timeline activity
-        path: "/LeadTimeline",
+        path: ["/LeadTimeline"],
         color: "from-indigo-500 to-indigo-600",
+        role: ["admin", "executive"]
+    },
+    {
+        title: "Lead Pipeline",
+        icon: GitBranch, // 🌿 pipeline flow icon
+        path: ["/LeadPipeline"],
+        color: "from-pink-500 to-pink-600",
         role: ["admin", "executive"]
     },
     {
         title: "Report",
         icon: BarChart3, // 📊 reports
-        path: "/Report",
+        path: ["/Report"],
         color: "from-indigo-400 to-indigo-900",
         role: ["admin", "executive"]
     }

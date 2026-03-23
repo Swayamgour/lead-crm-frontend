@@ -19,6 +19,10 @@ import {
 import { useLoginMutation } from '../redux/api';
 import { useNavigate } from 'react-router-dom';
 
+import logo from "../assets/logo.png";
+
+
+
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
@@ -103,17 +107,17 @@ const Login = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-            <div className="flex min-h-screen">
+        <div className="min-h-screen  bg-gradient-to-br from-blue-600 to-purple-700">
+            <div className="flex min-h-screen items-center justify-center">
                 {/* Left Side - Login Form */}
-                <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-                    <div className="max-w-md w-full">
+                <div className="w-full  flex items-center justify-center p-8">
+                    <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl">
                         {/* Logo */}
                         <div className="text-center mb-8">
                             <div className="flex items-center justify-center space-x-2 mb-4">
-                                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                                    <span className="text-2xl font-bold text-white">CRM</span>
-                                </div>
+                                {/* y */}
+                                {/* <img src='/assets/logo.png' alt='dayro Logo' /> */}
+                                <img src={logo} alt="Logo" width={200} />
                             </div>
                             <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
                             <p className="text-gray-600">Sign in to manage your leads and chatbot</p>
@@ -263,78 +267,7 @@ const Login = () => {
                 </div>
 
                 {/* Right Side - Hero Section */}
-                <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-purple-700 p-12 relative overflow-hidden">
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 opacity-10">
-                        <div className="absolute top-0 -left-4 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
-                        <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
-                        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
-                    </div>
 
-                    {/* Content */}
-                    <div className="relative z-10 flex flex-col justify-center h-full text-white">
-                        <div className="max-w-lg mx-auto">
-                            {/* Animated Illustration */}
-                            <div className="mb-12 relative">
-                                <div className="flex items-center justify-center space-x-4 mb-8">
-                                    <div className="w-16 h-16 bg-white/20 rounded-2xl backdrop-blur-lg flex items-center justify-center animate-bounce">
-                                        <MessageSquare size={32} />
-                                    </div>
-                                    <ArrowRight size={32} className="text-white/60" />
-                                    <div className="w-16 h-16 bg-white/20 rounded-2xl backdrop-blur-lg flex items-center justify-center animate-pulse">
-                                        <Users size={32} />
-                                    </div>
-                                    <ArrowRight size={32} className="text-white/60" />
-                                    <div className="w-16 h-16 bg-white/20 rounded-2xl backdrop-blur-lg flex items-center justify-center animate-bounce animation-delay-200">
-                                        <BarChart3 size={32} />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Main Heading */}
-                            <h1 className="text-4xl font-bold mb-6">
-                                Complete CRM with WhatsApp Chatbot Integration
-                            </h1>
-
-                            {/* Description */}
-                            <p className="text-xl text-white/90 mb-8">
-                                Automate lead capture, engage customers instantly, and boost conversions with our intelligent CRM system.
-                            </p>
-
-                            {/* Features List */}
-                            <div className="space-y-4">
-                                {features.map((feature, index) => (
-                                    <div key={index} className="flex items-center space-x-3">
-                                        <div className="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                                            <feature.icon size={18} className={feature.color} />
-                                        </div>
-                                        <span className="text-white/90">{feature.text}</span>
-                                        <CheckCircle size={16} className="text-green-300 ml-auto" />
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Stats */}
-                            {/* <div className="grid grid-cols-3 gap-4 mt-12">
-                                <div className="text-center">
-                                    <div className="text-3xl font-bold">10k+</div>
-                                    <div className="text-sm text-white/80">Active Users</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-3xl font-bold">50k+</div>
-                                    <div className="text-sm text-white/80">Leads Managed</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-3xl font-bold">95%</div>
-                                    <div className="text-sm text-white/80">Satisfaction</div>
-                                </div>
-                            </div> */}
-
-                            {/* Testimonial */}
-
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {/* Custom CSS for animations */}

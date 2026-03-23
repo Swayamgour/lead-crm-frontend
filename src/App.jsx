@@ -9,7 +9,7 @@ import AddLead from "./pages/Leads/AddLeads";
 import LeadView from "./pages/Leads/LeadView";
 import AddExecutive from "./pages/salesExcuting/AddExecutive";
 import ViewExecutives from "./pages/salesExcuting/ViewExecutives";
-// import LeadPipeline from "./pages/Leads/LeadPipeline";
+import LeadPipeline from "./pages/Leads/LeadPipeline";
 import FollowUps from "./pages/Leads/FollowUps";
 import Dashboard from "./pages/Leads/Dashboard";
 import LeadTimeline from "./pages/Leads/LeadTimeline";
@@ -38,6 +38,7 @@ function App() {
 
             <Route path="/Leads" element={<LeadView />} />
             <Route path="/addLeads" element={<AddLead />} />
+            <Route path="/editLead/:id" element={<AddLead />} />
 
             <Route path="/addExecutive" element={<AddExecutive />} />
             <Route path="/editExecutive/:id" element={<AddExecutive />} />
@@ -49,9 +50,9 @@ function App() {
 
             <Route path="/Report" element={<ReportPage />} />
 
-            {/* <Route path="/LeadPipeline" element={<LeadPipeline />} />
-            <Route path="/Dashboard" element={<Dashboard />} />
-            <Route path="/AssignLeadView/:id" element={<AssignLeadView />} /> */}
+            <Route path="/LeadPipeline" element={<LeadPipeline />} />
+            {/* <Route path="/Dashboard" element={<Dashboard />} /> */}
+            {/* <Route path="/AssignLeadView/:id" element={<AssignLeadView />} /> */}
 
           </Route>
 
