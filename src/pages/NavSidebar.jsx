@@ -28,6 +28,7 @@ import {
 import { sidebarSections } from "../../sidebarConfig";
 // import { sidebarSections } from "../config/sidebarConfig"; // Import your config
 import logo from '../assets/logo.png'
+import { useGetProfileQuery } from "../redux/api";
 
 function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenuOpen }) {
     const location = useLocation();
@@ -35,7 +36,13 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
     const [expandedMenus, setExpandedMenus] = useState({});
 
     // Get user role from localStorage or context
-    const userRole = localStorage.getItem('userRole') || 'admin'; // Replace with actual role from auth
+    // Replace with actual role from auth
+
+    const { data } = useGetProfileQuery()
+
+    // console.log(data?.role)
+
+    const userRole = data?.role === "executive" ? 'executive' : 'admin';
 
     // Filter sections based on user role
     const filteredSections = sidebarSections.filter(section => {

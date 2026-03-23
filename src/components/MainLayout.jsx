@@ -29,6 +29,8 @@ function MainLayout() {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+
+
     // Close mobile menu when route changes
     useEffect(() => {
         setMobileMenuOpen(false);
@@ -47,6 +49,8 @@ function MainLayout() {
         localStorage.removeItem('token');
         navigate('/login');
     };
+
+  
 
     const getPageTitle = () => {
         const path = location.pathname;
