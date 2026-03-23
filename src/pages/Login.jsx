@@ -20,6 +20,7 @@ import { useLoginMutation } from '../redux/api';
 import { useNavigate } from 'react-router-dom';
 
 import logo from "../assets/logo.png";
+import toast from 'react-hot-toast';
 
 
 
@@ -85,6 +86,7 @@ const Login = () => {
 
                 } else {
                     console.log("Login failed");
+                    toast.error('InCorrect Password')
                 }
 
             } catch (error) {
