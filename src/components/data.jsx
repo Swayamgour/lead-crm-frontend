@@ -21,6 +21,18 @@ export const leadStatus = [
     { value: "No Response", icon: "🔇", color: "bg-gray-100 text-gray-700" }
 ];
 
+
+export const leadSources = [
+    { value: "IndiaMART", icon: "🛒", color: "bg-orange-100 text-orange-700" },
+    { value: "Website", icon: "🌐", color: "bg-blue-100 text-blue-700" },
+    { value: "Meta Platforms", icon: "📱", color: "bg-indigo-100 text-indigo-700" },
+    { value: "WhatsApp Chatbot", icon: "🤖", color: "bg-green-100 text-green-700" },
+    { value: "Manual Entry", icon: "📝", color: "bg-gray-100 text-gray-700" },
+    { value: "Reference", icon: "👥", color: "bg-purple-100 text-purple-700" },
+    { value: "Phone Call", icon: "📞", color: "bg-teal-100 text-teal-700" },
+    { value: "Email Campaign", icon: "✉️", color: "bg-red-100 text-red-700" }
+];
+
 export const sidebarSections = [
     {
         title: "Sales Executives",

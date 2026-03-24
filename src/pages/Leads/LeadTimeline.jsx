@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+// LeadOverview.jsx
+import React, { useState, useEffect } from "react";
 import {
     Clock,
     Search,
-    ChevronDown,
-    ChevronUp,
     User,
     Phone,
     Mail,
@@ -11,7 +10,6 @@ import {
     Filter,
     RefreshCw,
     Download,
-    MoreVertical,
     MessageCircle,
     PhoneCall,
     Mail as MailIcon,
@@ -22,364 +20,338 @@ import {
     Activity,
     Edit3,
     Bell,
-    Paperclip,
-    X,
-    Menu,
-    Grid,
-    List,
-    Settings,
+    Eye,
+    Star,
     TrendingUp,
     Award,
     Target,
-    Eye,
-    MessageSquare,
     Zap,
-    Star
+    ArrowRight,
+    Sparkles,
+    BarChart3,
+    CheckCircle,
+    AlertCircle,
+    MoreVertical,
+    MapPin,
+    Briefcase,
+    DollarSign,
+    ThumbsUp,
+    MessageSquare,
+    Shield,
+    Heart,
+    Layers,
+    PieChart,
+    Grid,
+    List,
+    Filter as FilterIcon,
+    X,
+    ChevronDown,
+    ChevronUp,
+    Menu
 } from "lucide-react";
-
+import { Link } from "react-router-dom";
 import { useGetTimelineGroupedQuery } from "../../redux/api";
 import Loading from "../../components/Loading";
 
-function LeadTimeline() {
+function LeadOverview() {
     const { data, isLoading, refetch } = useGetTimelineGroupedQuery();
     const leadsTimeline = data || [];
 
     const [searchTerm, setSearchTerm] = useState("");
-    const [expandedItems, setExpandedItems] = useState([]);
-    const [filterType, setFilterType] = useState("all");
+    const [filterStatus, setFilterStatus] = useState("all");
+    const [sortBy, setSortBy] = useState("activity");
+    const [viewMode, setViewMode] = useState("grid");
     const [showFilters, setShowFilters] = useState(false);
-    const [sortOrder, setSortOrder] = useState("desc");
-    const [selectedDateRange, setSelectedDateRange] = useState("all");
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [viewMode, setViewMode] = useState("timeline");
+    const [selectedLead, setSelectedLead] = useState(null);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [dateRange, setDateRange] = useState("all");
 
-    const toggleExpand = (id) => {
-        setExpandedItems(prev =>
-            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-        );
+    // Process leads data with enhanced metrics
+    const processedLeads = leadsTimeline.map(lead => {
+        const timeline = lead.timeline || [];
+        const now = new Date();
+        const last7Days = timeline.filter(t => {
+            const activityDate = new Date(t.createdAt);
+            const diffDays = Math.floor((now - activityDate) / (1000 * 60 * 60 * 24));
+            return diffDays <= 7;
+        }).length;
+
+        return {
+            ...lead,
+            totalActivities: timeline.length,
+            latestActivity: timeline[0]?.createdAt || null,
+            earliestActivity: timeline[timeline.length - 1]?.createdAt || null,
+            activitiesByType: {
+                calls: timeline.filter(t => t.type === 'call').length,
+                emails: timeline.filter(t => t.type === 'email').length,
+                meetings: timeline.filter(t => t.type === 'meeting').length,
+                followups: timeline.filter(t => t.type.includes('followup')).length,
+                updates: timeline.filter(t => t.type === 'lead_updated').length,
+                remarks: timeline.filter(t => t.type.includes('remark')).length,
+            },
+            lastInteraction: timeline[0]?.createdAt || null,
+            engagementScore: Math.min(100, Math.floor((timeline.length / 30) * 100)),
+            recentActivityCount: last7Days,
+            activityTrend: timeline.length > 10 ? 'high' : timeline.length > 5 ? 'medium' : 'low',
+        };
+    });
+
+    // Filter leads with date range
+    const filteredLeads = processedLeads
+        .filter(lead => {
+            if (!searchTerm) return true;
+            const search = searchTerm.toLowerCase();
+            return (
+                lead.lead.name?.toLowerCase().includes(search) ||
+                lead.lead.phone?.includes(search) ||
+                lead.lead.email?.toLowerCase().includes(search) ||
+                lead.lead.company?.toLowerCase().includes(search)
+            );
+        })
+        .filter(lead => {
+            if (filterStatus === "all") return true;
+            if (filterStatus === "active") return lead.totalActivities > 8;
+            if (filterStatus === "moderate") return lead.totalActivities > 3 && lead.totalActivities <= 8;
+            if (filterStatus === "low") return lead.totalActivities <= 3;
+            return true;
+        })
+        .filter(lead => {
+            if (dateRange === "all") return true;
+            if (dateRange === "today") {
+                return lead.latestActivity && new Date(lead.latestActivity).toDateString() === new Date().toDateString();
+            }
+            if (dateRange === "week") {
+                const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                return lead.latestActivity && new Date(lead.latestActivity) >= weekAgo;
+            }
+            if (dateRange === "month") {
+                const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+                return lead.latestActivity && new Date(lead.latestActivity) >= monthAgo;
+            }
+            return true;
+        })
+        .sort((a, b) => {
+            if (sortBy === "activity") return b.totalActivities - a.totalActivities;
+            if (sortBy === "recent") return new Date(b.latestActivity) - new Date(a.latestActivity);
+            if (sortBy === "name") return a.lead.name.localeCompare(b.lead.name);
+            if (sortBy === "engagement") return b.engagementScore - a.engagementScore;
+            return 0;
+        });
+
+    // Enhanced stats
+    const stats = {
+        totalLeads: processedLeads.length,
+        totalActivities: processedLeads.reduce((sum, l) => sum + l.totalActivities, 0),
+        avgEngagement: Math.floor(processedLeads.reduce((sum, l) => sum + l.engagementScore, 0) / processedLeads.length) || 0,
+        activeLeads: processedLeads.filter(l => l.totalActivities > 8).length,
+        totalCalls: processedLeads.reduce((sum, l) => sum + l.activitiesByType.calls, 0),
+        totalEmails: processedLeads.reduce((sum, l) => sum + l.activitiesByType.emails, 0),
+        totalMeetings: processedLeads.reduce((sum, l) => sum + l.activitiesByType.meetings, 0),
+        highEngagement: processedLeads.filter(l => l.engagementScore >= 70).length,
     };
 
-    /* -----------------------
-       DATE FORMAT
-    ----------------------- */
-    const formatDateTime = (dateString) => {
+    const formatDate = (dateString) => {
+        if (!dateString) return "Never";
         const d = new Date(dateString);
         const now = new Date();
-        const diffTime = Math.abs(now - d);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = Math.floor((now - d) / (1000 * 60 * 60 * 24));
 
-        let relativeTime = "";
-        if (diffDays === 0) {
-            relativeTime = "Today";
-        } else if (diffDays === 1) {
-            relativeTime = "Yesterday";
-        } else if (diffDays < 7) {
-            relativeTime = `${diffDays}d ago`;
-        } else {
-            relativeTime = d.toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric"
-            });
-        }
-
-        return {
-            date: d.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric"
-            }),
-            time: d.toLocaleTimeString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit"
-            }),
-            relative: relativeTime,
-            full: d,
-            day: d.toLocaleDateString("en-US", { weekday: 'short' }),
-            month: d.toLocaleDateString("en-US", { month: 'short' }),
-            dateNum: d.getDate()
-        };
+        if (diffDays === 0) return "Today";
+        if (diffDays === 1) return "Yesterday";
+        if (diffDays < 7) return `${diffDays} days ago`;
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     };
 
-    /* -----------------------
-       GET ICON BY TYPE
-    ----------------------- */
-    const getIconByType = (type) => {
-        switch (type) {
-            case 'lead_created':
-                return <Star className="text-blue-600" size={16} />;
-            case 'lead_updated':
-                return <Edit3 className="text-green-600" size={16} />;
-            case 'followup_created':
-                return <MessageCircle className="text-purple-600" size={16} />;
-            case 'followup_updated':
-                return <Bell className="text-orange-600" size={16} />;
-            case 'call':
-                return <PhoneCall className="text-indigo-600" size={16} />;
-            case 'email':
-                return <MailIcon className="text-yellow-600" size={16} />;
-            case 'meeting':
-                return <CalendarIcon className="text-red-600" size={16} />;
-            case 'note':
-                return <FileText className="text-gray-600" size={16} />;
-            default:
-                return <Activity className="text-gray-500" size={16} />;
-        }
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        await refetch();
+        setTimeout(() => setIsRefreshing(false), 1000);
     };
 
-    /* -----------------------
-       GET COLOR BY TYPE
-    ----------------------- */
-    const getColorByType = (type) => {
-        switch (type) {
-            case 'lead_created':
-                return 'bg-blue-500';
-            case 'lead_updated':
-                return 'bg-green-500';
-            case 'followup_created':
-                return 'bg-purple-500';
-            case 'followup_updated':
-                return 'bg-orange-500';
-            case 'call':
-                return 'bg-indigo-500';
-            case 'email':
-                return 'bg-yellow-500';
-            case 'meeting':
-                return 'bg-red-500';
-            default:
-                return 'bg-gray-500';
-        }
-    };
-
-    const getTypeGradient = (type) => {
-        switch (type) {
-            case 'lead_created':
-                return 'from-blue-400 to-blue-400';
-            case 'lead_updated':
-                return 'from-green-400 to-green-400';
-            case 'followup_created':
-                return 'from-purple-400 to-purple-400';
-            case 'followup_updated':
-                return 'from-orange-400 to-orange-400';
-            case 'call':
-                return 'from-indigo-400 to-indigo-400';
-            case 'email':
-                return 'from-yellow-400 to-yellow-400';
-            case 'meeting':
-                return 'from-red-400 to-red-400';
-            default:
-                return 'from-gray-400 to-gray-400';
-        }
-    };
-
-    /* -----------------------
-       FILTER DATA
-    ----------------------- */
-    const filterByDateRange = (date) => {
-        const now = new Date();
-        const itemDate = new Date(date);
-
-        switch (selectedDateRange) {
-            case 'today':
-                return itemDate.toDateString() === now.toDateString();
-            case 'week':
-                const weekAgo = new Date(now.setDate(now.getDate() - 7));
-                return itemDate >= weekAgo;
-            case 'month':
-                const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
-                return itemDate >= monthAgo;
-            default:
-                return true;
-        }
-    };
-
-    const filteredLeads = leadsTimeline?.map((leadBlock) => {
-        const filteredTimeline = leadBlock.timeline
-            .filter(item => {
-                if (filterType !== "all" && item.type !== filterType) return false;
-                if (!filterByDateRange(item.createdAt)) return false;
-
-                if (searchTerm) {
-                    const text = searchTerm.toLowerCase();
-                    return (
-                        item.title?.toLowerCase().includes(text) ||
-                        item.description?.toLowerCase().includes(text) ||
-                        item.createdBy?.toLowerCase().includes(text) ||
-                        leadBlock.lead.name?.toLowerCase().includes(text) ||
-                        leadBlock.lead.phone?.includes(text)
-                    );
-                }
-                return true;
-            })
-            .sort((a, b) => {
-                const dateA = new Date(a.createdAt);
-                const dateB = new Date(b.createdAt);
-                return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-            });
-
-        return {
-            ...leadBlock,
-            timeline: filteredTimeline
-        };
-    }).filter(lead => lead.timeline.length > 0);
-
-    /* -----------------------
-       STATS
-    ----------------------- */
-    const stats = {
-        total: leadsTimeline.reduce((acc, lead) => acc + lead.timeline.length, 0),
-        leads: leadsTimeline.reduce(
-            (acc, lead) => acc + lead.timeline.filter(i => i.type === "lead_created").length, 0
-        ),
-        updates: leadsTimeline.reduce(
-            (acc, lead) => acc + lead.timeline.filter(i => i.type === "lead_updated").length, 0
-        ),
-        followups: leadsTimeline.reduce(
-            (acc, lead) => acc + lead.timeline.filter(i => i.type.includes("followup")).length, 0
-        )
-    };
-
-    /* -----------------------
-       LOADING
-    ----------------------- */
     if (isLoading) {
-        return <Loading data={'Lead Timeline'} />;
+        return <Loading data={'Lead Overview'} />;
     }
 
-    /* -----------------------
-       UI
-    ----------------------- */
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header Section */}
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
+            {/* Animated Background */}
+            {/* <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+            </div> */}
+
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Header Section with Animation */}
                 <div className="mb-8">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
+                        <div className="relative">
                             <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-                                    <Clock size={20} className="text-white" />
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur-lg opacity-50 animate-pulse"></div>
+                                    <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl">
+                                        <Users size={24} className="text-white" />
+                                    </div>
                                 </div>
-                                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                                    Activity Timeline
-                                </h1>
+                                <div>
+                                    <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-purple-800 bg-clip-text text-transparent">
+                                        Lead Overview
+                                    </h1>
+                                    <p className="text-gray-500 mt-1 text-sm">
+                                        Track and manage all your leads with powerful insights
+                                    </p>
+                                </div>
                             </div>
-                            <p className="text-gray-500 mt-1 text-sm">
-                                Track every interaction and activity with your leads
-                            </p>
                         </div>
-
-
-
+                        
                     </div>
 
-                    {/* Statistics Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-                        <StatCard
+                    {/* Enhanced Stats Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+                        <EnhancedStatCard
+                            title="Total Leads"
+                            value={stats.totalLeads}
+                            icon={<Users size={22} />}
+                            gradient="from-blue-500 to-cyan-500"
+                            trend="+12%"
+                            description="Active leads this month"
+                        />
+                        <EnhancedStatCard
                             title="Total Activities"
-                            value={stats.total}
-                            icon={<Activity size={20} />}
-                            bgColor="bg-blue-50"
-                            textColor="text-blue-600"
-                            gradient="from-blue-500 to-blue-600"
+                            value={stats.totalActivities}
+                            icon={<Activity size={22} />}
+                            gradient="from-purple-500 to-pink-500"
+                            trend="+8%"
+                            description="Across all interactions"
                         />
-                        <StatCard
-                            title="Leads Created"
-                            value={stats.leads}
-                            icon={<Star size={20} />}
-                            bgColor="bg-green-50"
-                            textColor="text-green-600"
-                            gradient="from-green-500 to-green-600"
+                        <EnhancedStatCard
+                            title="Engagement Rate"
+                            value={`${stats.avgEngagement}%`}
+                            icon={<TrendingUp size={22} />}
+                            gradient="from-green-500 to-emerald-500"
+                            trend="+5%"
+                            description="Average engagement score"
                         />
-                        <StatCard
-                            title="Updates"
-                            value={stats.updates}
-                            icon={<Edit3 size={20} />}
-                            bgColor="bg-orange-50"
-                            textColor="text-orange-600"
-                            gradient="from-orange-500 to-orange-600"
-                        />
-                        <StatCard
-                            title="Follow-ups"
-                            value={stats.followups}
-                            icon={<MessageCircle size={20} />}
-                            bgColor="bg-purple-50"
-                            textColor="text-purple-600"
-                            gradient="from-purple-500 to-purple-600"
+                        <EnhancedStatCard
+                            title="Active Leads"
+                            value={stats.activeLeads}
+                            icon={<Zap size={22} />}
+                            gradient="from-orange-500 to-red-500"
+                            trend="+3%"
+                            description="High activity leads"
                         />
                     </div>
 
-                    {/* Filters Section */}
-                    <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 backdrop-blur-sm">
+                    {/* Secondary Stats Row */}
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-4">
+                        <MiniStatCard title="Calls" value={stats.totalCalls} icon={<PhoneCall size={14} />} color="blue" />
+                        <MiniStatCard title="Emails" value={stats.totalEmails} icon={<MailIcon size={14} />} color="red" />
+                        <MiniStatCard title="Meetings" value={stats.totalMeetings} icon={<CalendarIcon size={14} />} color="purple" />
+                        <MiniStatCard title="Updates" value={processedLeads.reduce((s, l) => s + l.activitiesByType.updates, 0)} icon={<Edit3 size={14} />} color="green" />
+                        <MiniStatCard title="Remarks" value={processedLeads.reduce((s, l) => s + l.activitiesByType.remarks, 0)} icon={<MessageSquare size={14} />} color="orange" />
+                        <MiniStatCard title="Follow-ups" value={processedLeads.reduce((s, l) => s + l.activitiesByType.followups, 0)} icon={<Bell size={14} />} color="indigo" />
+                    </div>
+
+                    {/* Enhanced Filters Section */}
+                    <div className="mt-6 bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-4">
                         <div className="flex flex-col lg:flex-row gap-4">
                             <div className="flex-1 relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                                 <input
                                     type="text"
-                                    placeholder="Search leads or activities..."
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 hover:bg-white"
+                                    placeholder="Search leads by name, phone, email or company..."
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 transition-all bg-gray-50/50 hover:bg-white"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
-                            <div className="relative min-w-[160px]">
-                                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                                <select
-                                    value={filterType}
-                                    onChange={(e) => setFilterType(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setShowFilters(!showFilters)}
+                                    className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all flex items-center gap-2"
                                 >
-                                    <option value="all">All Activities</option>
-                                    <option value="lead_created">✨ Lead Created</option>
-                                    <option value="lead_updated">📝 Lead Updated</option>
-                                    <option value="followup_created">🔔 Follow-up Created</option>
-                                    <option value="followup_updated">🔄 Follow-up Updated</option>
-                                    <option value="call">📞 Calls</option>
-                                    <option value="email">✉️ Emails</option>
-                                    <option value="meeting">📅 Meetings</option>
-                                </select>
+                                    <FilterIcon size={16} />
+                                    <span className="text-sm">Filters</span>
+                                    {showFilters ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                </button>
+                                <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+                                    <button
+                                        onClick={() => setViewMode("grid")}
+                                        className={`px-3 py-1.5 rounded-lg transition-all ${viewMode === "grid" ? "bg-white shadow-md text-indigo-600" : "text-gray-500"}`}
+                                    >
+                                        <Grid size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode("list")}
+                                        className={`px-3 py-1.5 rounded-lg transition-all ${viewMode === "list" ? "bg-white shadow-md text-indigo-600" : "text-gray-500"}`}
+                                    >
+                                        <List size={18} />
+                                    </button>
+                                </div>
                             </div>
-                            <div className="relative min-w-[160px]">
-                                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                                <select
-                                    value={selectedDateRange}
-                                    onChange={(e) => setSelectedDateRange(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
-                                >
-                                    <option value="all">All Time</option>
-                                    <option value="today">Today</option>
-                                    <option value="week">This Week</option>
-                                    <option value="month">This Month</option>
-                                </select>
-                            </div>
-                            <button
-                                onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
-                                className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all text-gray-700 flex items-center gap-2 group"
-                            >
-                                <Clock size={16} className="group-hover:rotate-180 transition-transform duration-300" />
-                                <span className="text-sm font-medium">{sortOrder === "desc" ? "Newest First" : "Oldest First"}</span>
-                            </button>
-
                         </div>
+
+                        {/* Expanded Filters */}
+                        {showFilters && (
+                            <div className="mt-4 pt-4 border-t border-gray-100">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="text-xs font-medium text-gray-500 mb-1 block">Lead Status</label>
+                                        <select
+                                            value={filterStatus}
+                                            onChange={(e) => setFilterStatus(e.target.value)}
+                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        >
+                                            <option value="all">All Leads</option>
+                                            <option value="active">Active (8+ activities)</option>
+                                            <option value="moderate">Moderate (4-7 activities)</option>
+                                            <option value="low">Low (1-3 activities)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-medium text-gray-500 mb-1 block">Sort By</label>
+                                        <select
+                                            value={sortBy}
+                                            onChange={(e) => setSortBy(e.target.value)}
+                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        >
+                                            <option value="activity">Most Active</option>
+                                            <option value="recent">Recently Active</option>
+                                            <option value="engagement">Highest Engagement</option>
+                                            <option value="name">Name A-Z</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-medium text-gray-500 mb-1 block">Date Range</label>
+                                        <select
+                                            value={dateRange}
+                                            onChange={(e) => setDateRange(e.target.value)}
+                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        >
+                                            <option value="all">All Time</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">Last 7 Days</option>
+                                            <option value="month">Last 30 Days</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Timeline Content */}
+                {/* Leads Display */}
                 {filteredLeads.length === 0 ? (
-                    <EmptyState />
+                    <EnhancedEmptyState />
                 ) : (
-                    <div className="space-y-6">
-                        {filteredLeads.map((leadBlock) => (
-                            <LeadTimelineCard
-                                key={leadBlock._id}
-                                leadBlock={leadBlock}
-                                expandedItems={expandedItems}
-                                toggleExpand={toggleExpand}
-                                formatDateTime={formatDateTime}
-                                getIconByType={getIconByType}
-                                getColorByType={getColorByType}
-                                getTypeGradient={getTypeGradient}
-                                viewMode={viewMode}
-                            />
+                    <div className={viewMode === "grid"
+                        ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                        : "space-y-4"
+                    }>
+                        {filteredLeads.map((lead) => (
+                            viewMode === "grid"
+                                ? <EnhancedLeadCard key={lead._id} lead={lead} formatDate={formatDate} />
+                                : <EnhancedLeadListItem key={lead._id} lead={lead} formatDate={formatDate} />
                         ))}
                     </div>
                 )}
@@ -388,222 +360,233 @@ function LeadTimeline() {
     );
 }
 
-/* ======================
-   STAT CARD COMPONENT
-====================== */
-const StatCard = ({ title, value, icon, bgColor, textColor, gradient }) => (
-    <div className="bg-white rounded-2xl shadow-sm p-5 hover:shadow-lg transition-all duration-300 border border-gray-100 group">
-        <div className="flex items-center justify-between">
-            <div className="flex-1">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{title}</p>
-                <p className="text-3xl font-bold text-gray-900">{value}</p>
-            </div>
-            <div className={`w-12 h-12 ${bgColor} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                <div className={textColor}>{icon}</div>
+// Enhanced Stat Card Component
+const EnhancedStatCard = ({ title, value, icon, gradient, trend, description }) => (
+    <div className="relative group">
+        <div className="absolute inset-0 bg-gradient-to-r from-white/50 to-white/0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-5">
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{title}</p>
+                    <p className="text-3xl font-bold text-gray-800 mt-1">{value}</p>
+                    {trend && (
+                        <div className="flex items-center gap-1 mt-2">
+                            <TrendingUp size={12} className="text-green-500" />
+                            <span className="text-xs text-green-600">{trend}</span>
+                            <span className="text-xs text-gray-400 ml-1">{description}</span>
+                        </div>
+                    )}
+                </div>
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <div className="text-white">{icon}</div>
+                </div>
             </div>
         </div>
     </div>
 );
 
-/* ======================
-   LEAD TIMELINE CARD COMPONENT
-====================== */
-const LeadTimelineCard = ({
-    leadBlock,
-    expandedItems,
-    toggleExpand,
-    formatDateTime,
-    getIconByType,
-    getColorByType,
-    getTypeGradient,
-    viewMode
-}) => {
-    // Group activities by date for better organization
-    const groupedByDate = leadBlock.timeline.reduce((acc, item) => {
-        const dateKey = new Date(item.createdAt).toDateString();
-        if (!acc[dateKey]) {
-            acc[dateKey] = [];
-        }
-        acc[dateKey].push(item);
-        return acc;
-    }, {});
+// Mini Stat Card
+const MiniStatCard = ({ title, value, icon, color }) => {
+    const colors = {
+        blue: "bg-blue-50 text-blue-600",
+        red: "bg-red-50 text-red-600",
+        purple: "bg-purple-50 text-purple-600",
+        green: "bg-green-50 text-green-600",
+        orange: "bg-orange-50 text-orange-600",
+        indigo: "bg-indigo-50 text-indigo-600",
+    };
 
     return (
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-500">
-            {/* Lead Header - Modern with Gradient */}
-            <div className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-6 overflow-hidden">
-                {/* Animated Background Pattern */}
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute inset-0" style={{
-                        backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 1px)`,
-                        backgroundSize: '24px 24px'
-                    }}></div>
-                </div>
-
-                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-lg flex items-center justify-center shadow-lg ring-2 ring-white/30">
-                            <span className="text-white font-bold text-xl">
-                                {leadBlock.lead.name?.charAt(0).toUpperCase()}
-                            </span>
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-white text-xl mb-1">{leadBlock.lead.name}</h3>
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-white/90">
-                                <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
-                                    <Phone size={14} className="text-white" />
-                                    {leadBlock.lead.phone}
-                                </span>
-                                {leadBlock.lead.email && (
-                                    <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
-                                        <Mail size={14} className="text-white" />
-                                        <span className="truncate max-w-[200px]">{leadBlock.lead.email}</span>
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="px-4 py-2 bg-white/20 backdrop-blur-lg rounded-xl">
-                            <span className="text-sm font-bold text-white">
-                                {leadBlock.timeline.length} Activities
-                            </span>
-                        </div>
-                    </div>
-                </div>
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center hover:shadow-md transition-all group">
+            <div className={`w-8 h-8 rounded-lg ${colors[color]} flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform`}>
+                {icon}
             </div>
-
-            {/* Timeline Grid Layout */}
-            <div className="p-6 bg-gradient-to-br from-gray-50 to-white">
-                {Object.entries(groupedByDate).map(([dateKey, items]) => {
-                    const date = new Date(dateKey);
-                    const isToday = date.toDateString() === new Date().toDateString();
-                    const isYesterday = new Date(date.setDate(date.getDate() + 1)).toDateString() === new Date().toDateString();
-
-                    let dateLabel = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-                    if (isToday) dateLabel = 'Today';
-                    if (isYesterday) dateLabel = 'Yesterday';
-
-                    return (
-                        <div key={dateKey} className="mb-8 last:mb-0">
-                            {/* Date Header */}
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
-                                    <Calendar size={20} className="text-white" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-gray-800 text-lg">{dateLabel}</h4>
-                                    <p className="text-xs text-gray-500">{items.length} activities</p>
-                                </div>
-                                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent"></div>
-                            </div>
-
-                            {/* Activities Grid - 2 columns on desktop, 1 on mobile */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                {items.map((item, index) => {
-                                    const { time, relative } = formatDateTime(item.createdAt);
-                                    const uniqueId = `${leadBlock._id}-${dateKey}-${index}`;
-                                    const isExpanded = expandedItems.includes(uniqueId);
-                                    const gradientClass = getTypeGradient(item.type);
-
-                                    return (
-                                        <div
-                                            key={uniqueId}
-                                            className={`group relative bg-white rounded-xl border transition-all duration-300 overflow-hidden
-                                                ${isExpanded ? 'border-indigo-300 shadow-xl scale-[1.02]' : 'border-gray-200 shadow-sm hover:shadow-lg hover:scale-[1.01]'}`}
-                                        >
-                                            {/* Colorful Top Bar */}
-                                            <div className={`h-1.5 bg-gradient-to-r ${gradientClass}`}></div>
-
-                                            <div className="p-5">
-                                                {/* Header with Icon and Status */}
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${gradientClass} flex items-center justify-center shadow-md`}>
-                                                            {getIconByType(item.type)}
-                                                        </div>
-                                                        <div>
-                                                            <h5 className="font-semibold text-gray-800 text-sm">
-                                                                {item.title}
-                                                            </h5>
-                                                            <div className="flex items-center gap-2 mt-1">
-                                                                <span className="text-xs text-gray-500 flex items-center gap-1">
-                                                                    <Clock size={10} />
-                                                                    {time}
-                                                                </span>
-                                                                <span className="text-xs text-gray-400">•</span>
-                                                                <span className="text-xs text-gray-500 flex items-center gap-1">
-                                                                    <User size={10} />
-                                                                    {item.createdBy?.split(' ')[0] || "System"}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex flex-col items-end gap-1">
-                                                        <span className="px-2 py-1 bg-gray-100 rounded-lg text-xs font-medium text-gray-600">
-                                                            {relative}
-                                                        </span>
-                                                        {/* <button
-                                                            onClick={() => toggleExpand(uniqueId)}
-                                                            className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
-                                                        >
-                                                            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                                                        </button> */}
-                                                    </div>
-                                                </div>
-
-                                                {/* Description */}
-                                                <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
-                                                    {item.description}
-                                                </p>
-
-                                                {/* Activity Type Badge */}
-                                                <div className="flex items-center gap-2">
-                                                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg text-xs text-gray-600">
-                                                        <Tag size={10} />
-                                                        <span className="capitalize">{item.type.replace(/_/g, ' ')}</span>
-                                                    </span>
-                                                </div>
-
-                                               
-                                            </div>
-
-                                            {/* Hover Effect Overlay */}
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500"></div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+            <p className="text-lg font-bold text-gray-800">{value}</p>
+            <p className="text-xs text-gray-500">{title}</p>
         </div>
     );
 };
 
-/* ======================
-   EMPTY STATE COMPONENT
-====================== */
-const EmptyState = () => (
-    <div className="bg-white rounded-2xl shadow-sm p-16 text-center border border-gray-100">
-        <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Clock size={40} className="text-gray-400" />
+// Enhanced Lead Card (Grid View)
+const EnhancedLeadCard = ({ lead, formatDate }) => {
+    const initials = lead.lead.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    const engagementColor = lead.engagementScore >= 70 ? "bg-green-500" : lead.engagementScore >= 40 ? "bg-yellow-500" : "bg-red-500";
+    const trendIcon = lead.activityTrend === 'high' ? <TrendingUp size={12} className="text-green-500" /> :
+        lead.activityTrend === 'medium' ? <Activity size={12} className="text-yellow-500" /> :
+            <TrendingUp size={12} className="text-red-500 rotate-180" />;
+
+    return (
+        <Link to={`/lead-timeline/${lead._id}`} className="block group">
+            <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1">
+                {/* Gradient Border */}
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" style={{ padding: '2px', margin: '-2px' }}>
+                    <div className="absolute inset-0 bg-white rounded-2xl"></div>
+                </div>
+
+                <div className="relative bg-white rounded-2xl p-5">
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl blur opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                                    <span className="text-white font-bold text-lg">{initials}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-gray-800 text-base group-hover:text-indigo-600 transition-colors">
+                                    {lead.lead.name}
+                                </h3>
+                                <div className="flex items-center gap-1 mt-0.5">
+                                    <Phone size={12} className="text-gray-400" />
+                                    <span className="text-xs text-gray-500">{lead.lead.phone}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg">
+                            {trendIcon}
+                            <span className="text-xs font-medium text-gray-600">{lead.recentActivityCount} recent</span>
+                        </div>
+                    </div>
+
+                    {/* Engagement Score */}
+                    {/* <div className="mt-3">
+                        <div className="flex justify-between text-xs mb-1">
+                            <span className="text-gray-500">Engagement Score</span>
+                            <span className="font-semibold text-gray-700">{lead.engagementScore}%</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                                className={`h-full rounded-full transition-all duration-500 ${engagementColor}`}
+                                style={{ width: `${lead.engagementScore}%` }}
+                            ></div>
+                        </div>
+                    </div> */}
+
+                    {/* Activity Stats */}
+                   
+
+                    {/* Footer */}
+                    <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                            <Clock size={12} className="text-gray-400" />
+                            <span className="text-xs text-gray-500">{formatDate(lead.lastInteraction)}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-indigo-600 text-xs font-medium group-hover:gap-2 transition-all">
+                            <span>View Timeline</span>
+                            <ArrowRight size={12} className="group-hover:translate-x-1 transition" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Link>
+    );
+};
+
+// Enhanced Lead List Item
+const EnhancedLeadListItem = ({ lead, formatDate }) => {
+    const initials = lead.lead.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    const engagementColor = lead.engagementScore >= 70 ? "bg-green-500" : lead.engagementScore >= 40 ? "bg-yellow-500" : "bg-red-500";
+
+    return (
+        <Link to={`/lead-timeline/${lead._id}`} className="block group">
+            <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-4 hover:bg-gradient-to-r hover:from-white hover:to-indigo-50/30">
+                <div className="flex items-center gap-4">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl blur opacity-0 group-hover:opacity-50 transition-opacity"></div>
+                        <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">{initials}</span>
+                        </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                                <h3 className="font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">
+                                    {lead.lead.name}
+                                </h3>
+                                <div className="flex items-center gap-3 mt-1 flex-wrap">
+                                    <span className="flex items-center gap-1 text-xs text-gray-500">
+                                        <Phone size={12} />
+                                        {lead.lead.phone}
+                                    </span>
+                                    {lead.lead.email && (
+                                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                                            <Mail size={12} />
+                                            {lead.lead.email}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="text-right">
+                                    <div className="text-sm font-semibold text-gray-800">{lead.totalActivities} Activities</div>
+                                    <div className="text-xs text-gray-500">Last: {formatDate(lead.lastInteraction)}</div>
+                                </div>
+                                <div className="w-16">
+                                    <div className="flex justify-between text-xs mb-1">
+                                        <span className="text-gray-500">Score</span>
+                                    </div>
+                                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full rounded-full ${engagementColor}`}
+                                            style={{ width: `${lead.engagementScore}%` }}
+                                        ></div>
+                                    </div>
+                                    <div className="text-xs text-right mt-1 font-medium text-gray-600">
+                                        {lead.engagementScore}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Link>
+    );
+};
+
+// Enhanced Empty State
+const EnhancedEmptyState = () => (
+    <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl p-16 text-center overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-r from-pink-500/10 to-orange-500/10 rounded-full blur-3xl"></div>
+
+        <div className="relative">
+            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <Users size={40} className="text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">No leads found</h3>
+            <p className="text-gray-500 max-w-md mx-auto">
+                Try adjusting your search or filters to find leads. You can also add new leads from the CRM dashboard.
+            </p>
+            <button className="mt-6 px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all inline-flex items-center gap-2">
+                <Sparkles size={16} />
+                Clear Filters
+            </button>
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">No activities found</h3>
-        <p className="text-gray-500 mb-6 max-w-md mx-auto">
-            No activities match your current filters. Try adjusting your search or filters to see more results.
-        </p>
-        <button
-            onClick={() => {
-                // Reset filters logic
-            }}
-            className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all font-medium"
-        >
-            <RefreshCw size={16} className="mr-2" />
-            Reset Filters
-        </button>
     </div>
 );
 
-export default LeadTimeline;
+// Add these styles to your global CSS
+const styles = `
+@keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+`;
+
+export default LeadOverview;

@@ -7,44 +7,30 @@ import {
     Trash2,
     Plus,
     Search,
-    Filter,
-    Download,
-    Upload,
-    RefreshCw,
-    ChevronDown,
+
     X,
     Users,
     Star,
     TrendingUp,
     Award,
     Calendar,
-    Clock,
-    MoreVertical,
-    UserPlus,
-    MessageCircle,
-    BarChart3,
+
     CheckCircle,
     XCircle,
     ChevronLeft,
     ChevronRight,
-    Grid,
-    List,
-    DownloadCloud,
-    Settings,
+
     Target,
-    DollarSign,
-    Activity,
-    PieChart,
-    TrendingDown,
+
     Crown,
-    Medal,
-    Sparkles,
-    Zap,
-    AlertCircle
+
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDeleteUserMutation, useGetUsersQuery, useUpdateUserMutation } from "../../redux/api";
 import Loading from "../../components/Loading";
+import { Chip } from "@mui/material";
+import ConfirmModal from "../../components/ConfirmModal";
+import ExcelButton from "../../components/ExcelButton";
 
 function ViewExecutives() {
     const navigate = useNavigate();
@@ -57,12 +43,34 @@ function ViewExecutives() {
     const [sortOrder, setSortOrder] = useState("asc");
     const [selectedExecutive, setSelectedExecutive] = useState(null);
     const [showPerformanceModal, setShowPerformanceModal] = useState(false);
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    const [deleteConfirmStatus, setDeleteConfirmStatus] = useState(null);
+
 
     const itemsPerPage = 8;
 
     const { data: usersData, isLoading, refetch } = useGetUsersQuery();
     const [updateExecutive] = useUpdateUserMutation();
     const [deleteUser] = useDeleteUserMutation();
+
+
+    const handleDeleteLead = async (id) => {
+        try {
+            const res = await deleteUser(id).unwrap();
+            console.log(res?.message)
+            setDeleteConfirmId(null);
+            toast.success("User deleted successfully");
+
+            if (res?.success) {
+
+                // refetch();
+            } else {
+                toast.error("Failed to delete User");
+            }
+        } catch (error) {
+            toast.error("Error deleting User");
+        }
+    };
 
     // Process executives data with performance metrics
     const executives = usersData?.map(exec => ({
@@ -158,18 +166,16 @@ function ViewExecutives() {
                 executives.reduce((sum, e) => sum + (e.totalLeads || 0), 0)) * 100) : 0
     };
 
-    const toggleSelectExecutive = (id) => {
-        setSelectedExecutives(prev =>
-            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-        );
-    };
+
 
     const handleStatusToggle = async (exec) => {
         try {
             await updateExecutive({
                 id: exec._id,
-                isActive: !exec.isActive
-            });
+                data: { isActive: !exec.isActive }
+            }).unwrap();
+
+            setDeleteConfirmStatus(null); // close modal
             refetch();
         } catch (error) {
             console.error("Error toggling status:", error);
@@ -204,6 +210,18 @@ function ViewExecutives() {
         </div>
     );
 
+    const formatExecutives = () =>
+        paginatedExecutives?.map((item, i) => ({
+            "S.No": i + 1,
+            Name: item.name,
+            Email: item.email,
+            Phone: item.phone,
+            Leads: item.totalLeads,
+            Won: item.wonLeads,
+            Accuracy: item.accuracy
+        }));
+    // console.log(deleteConfirmId)
+
     if (isLoading) {
         return (
             <Loading data={'Executives'} />
@@ -226,15 +244,28 @@ function ViewExecutives() {
 
                     </div>
 
+
+
                     {/* Add Lead Button */}
 
-                    <button
-                        onClick={() => navigate("/addExecutive")}
-                        className="flex items-center gap-2 bg-gradient-to-r from-[#4f46e5] to-[#6366f1] text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition-all text-sm font-semibold"
-                    >
-                        <Plus size={18} />
-                        Add Executive
-                    </button>
+                    <div className="flex gap-2">
+                        <ExcelButton
+                            data={executives}
+                            fileName="executives"
+                            sheetName="Executives"
+                            formatData={formatExecutives}
+                        >
+                            Download Executives
+                        </ExcelButton>
+
+                        <button
+                            onClick={() => navigate("/addExecutive")}
+                            className="flex items-center gap-2 bg-gradient-to-r from-[#4f46e5] to-[#6366f1] text-white px-6 py-2.5 rounded-lg hover:shadow-lg transition-all text-sm font-semibold"
+                        >
+                            <Plus size={18} />
+                            Add Executive
+                        </button>
+                    </div>
 
                 </div>
                 {/* </div> */}
@@ -450,10 +481,10 @@ function ViewExecutives() {
                                                 <td className="px-6 py-4">
                                                     <div className="space-y-3">
                                                         {/* Performance Badge */}
-                                                        <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${getPerformanceColor(exec.accuracy)}`}>
+                                                        {/* <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${getPerformanceColor(exec.accuracy)}`}>
                                                             <PerformanceIcon size={12} />
                                                             {getPerformanceBadge(exec.accuracy).text}
-                                                        </div>
+                                                        </div> */}
 
                                                         {/* Stats */}
                                                         <div className="flex items-center gap-4">
@@ -487,7 +518,9 @@ function ViewExecutives() {
                                                 <td className="px-6 py-4">
                                                     <div className="flex flex-col items-start gap-3">
                                                         <button
-                                                            onClick={() => handleStatusToggle(exec)}
+                                                            // onClick={() => handleStatusToggle(exec)}
+                                                            // onClick={() => setDeleteConfirmStatus(exec?._id)}
+                                                            onClick={() => setDeleteConfirmStatus(exec)}
                                                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
                                                                 ${exec.isActive ? "bg-green-500" : "bg-gray-300"}`}
                                                         >
@@ -496,12 +529,15 @@ function ViewExecutives() {
                                                                     ${exec.isActive ? "translate-x-6" : "translate-x-1"}`}
                                                             />
                                                         </button>
-                                                        <span className={`text-xs font-medium px-2 py-1 rounded-full ${exec.isActive
-                                                            ? "bg-green-100 text-green-700"
-                                                            : "bg-gray-100 text-gray-700"
-                                                            }`}>
-                                                            {exec.isActive ? "Active" : "Inactive"}
-                                                        </span>
+
+
+                                                        <Chip
+
+                                                            label={exec.isActive ? "Enabled" : "Disabled"}
+                                                            color={exec.isActive ? "success" : "error"}
+                                                            size="small"
+                                                        />
+                                                        {/* </span */}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
@@ -524,9 +560,9 @@ function ViewExecutives() {
                                                             className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
                                                             title="Delete"
                                                             onClick={() => {
-                                                                if (window.confirm('Are you sure you want to delete this executive?')) {
-                                                                    deleteUser(exec?._id);
-                                                                }
+                                                                // if (window.confirm('Are you sure you want to delete this executive?')) {
+                                                                setDeleteConfirmId(exec?._id);
+                                                                // }
                                                             }}
                                                         >
                                                             <Trash2 size={18} className="text-red-600 group-hover:scale-110 transition-transform" />
@@ -732,6 +768,32 @@ function ViewExecutives() {
                         </div>
                     )}
                 </div>
+
+
+
+
+                {deleteConfirmId && (
+                    <ConfirmModal
+                        open={!!deleteConfirmId}
+                        title="Delete Executive"
+                        message="Are you sure you want to delete this Executive? All associated remarks and history will be permanently removed."
+                        onCancel={() => setDeleteConfirmId(null)}
+                        onConfirm={() => handleDeleteLead(deleteConfirmId)}
+                    />
+                )}
+
+                {deleteConfirmStatus && (
+                    <ConfirmModal
+                        open={!!deleteConfirmStatus}
+                        type="toggle"
+                        title="Change Status"
+                        message={`Are you sure you want to ${deleteConfirmStatus?.isActive ? "Disable" : "Enable"
+                            } this Executive?`}
+                        confirmText={deleteConfirmStatus?.isActive ? "Disable" : "Enable"}
+                        onCancel={() => setDeleteConfirmStatus(null)}
+                        onConfirm={() => handleStatusToggle(deleteConfirmStatus)}
+                    />
+                )}
             </div>
 
             {/* Add custom animations */}

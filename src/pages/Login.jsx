@@ -121,7 +121,7 @@ const Login = () => {
                                 {/* <img src='/assets/logo.png' alt='dayro Logo' /> */}
                                 <img src={logo} alt="Logo" width={200} />
                             </div>
-                            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+                            <h2 className="text-3xl font-bold text-gray-900 mb-2">Log in </h2>
                             <p className="text-gray-600">Sign in to manage your leads and chatbot</p>
                         </div>
 

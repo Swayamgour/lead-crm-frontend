@@ -46,6 +46,8 @@ import Loading from "../../components/Loading";
 import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import ConfirmModal from "../../components/ConfirmModal";
+import ExcelButton from "../../components/ExcelButton";
 
 
 
@@ -297,50 +299,60 @@ function LeadView() {
         });
     };
 
+
+
     const handleDownloadPDF = async () => {
         try {
-            const element = pdfRef.current;
-
-            if (!element) {
-                alert("Element not found");
-                return;
-            }
-
-            // 🔥 Clone the element
-            const clone = element.cloneNode(true);
-
-            // 👇 Apply black & white styles
-            clone.querySelectorAll("*").forEach((el) => {
-                el.style.color = "#000";
-                el.style.backgroundColor = "#fff";
-                el.style.borderColor = "#000";
-                el.style.boxShadow = "none";
-            });
-
-            clone.style.padding = "20px";
-
-            // 👇 Hidden attach to DOM
-            clone.style.position = "fixed";
-            clone.style.top = "-9999px";
-            document.body.appendChild(clone);
-
-            // 👇 Generate canvas
-            const canvas = await html2canvas(clone, {
-                scale: 2
-            });
-
-            document.body.removeChild(clone);
-
-            const imgData = canvas.toDataURL("image/png");
-
             const pdf = new jsPDF("p", "mm", "a4");
 
-            const imgWidth = 210;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let y = 10;
 
-            pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+            // Title
+            pdf.setFontSize(16);
+            pdf.text("Remarks Report", 10, y);
 
-            pdf.save(`${viewLead?.name || "lead"}_remarks.pdf`);
+            y += 10;
+
+            const remarks = remarksData?.remarks || [];
+
+            remarks.forEach((item, index) => {
+                // 🟢 Format Date
+                const date = new Date(item.createdAt).toLocaleString();
+
+                // 🟢 Main text
+                const remarkText = `${index + 1}. ${item.text}`;
+
+                // 🟢 Split long text
+                const splitText = pdf.splitTextToSize(remarkText, 180);
+
+                pdf.setFontSize(11);
+                pdf.text(splitText, 10, y);
+
+                y += splitText.length * 6;
+
+                // 🟢 Created by + date
+                pdf.setFontSize(9);
+                pdf.setTextColor(100);
+
+                pdf.text(
+                    `By: ${item.createdByName || "Unknown"} | ${date}`,
+                    10,
+                    y
+                );
+
+                // Reset color
+                pdf.setTextColor(0);
+
+                y += 10;
+
+                // 🔥 Page break
+                if (y > 270) {
+                    pdf.addPage();
+                    y = 10;
+                }
+            });
+
+            pdf.save("remarks.pdf");
 
         } catch (error) {
             console.error("PDF Error:", error);
@@ -398,6 +410,30 @@ function LeadView() {
         return getStatusColor(status);
     };
 
+    const formatLeads = (data) =>
+        data?.map((item, i) => ({
+            "S.No": i + 1,
+            "Name": item.name,
+            "Phone": item.phone,
+            "Email": item.email || "-",
+            "Source": item.source || "-",
+            "Status": item.status || "-",
+            "Priority": item.priority || "-",
+            "Assigned To": item.assignedTo?.name || "-",
+            "Pipeline Stage": item.pipelineStage || "-",
+
+            "Follow Up Date": item.followUpDate
+                ? new Date(item.followUpDate).toLocaleDateString()
+                : "-",
+
+            "Total Remarks": item.remarksCount || 0,
+            "Pending Follow Ups": item.pendingFollowUpsCount || 0,
+
+            "Created At": item.createdAt
+                ? new Date(item.createdAt).toLocaleString()
+                : "-"
+        }));
+
     if (isLoading) {
         return <Loading data={'Lead'} />;
     }
@@ -418,16 +454,30 @@ function LeadView() {
                             </p>
                         </div>
 
-                        {/* Add Lead Button */}
-                        {profile?.role === 'admin' && (
-                            <button
-                                onClick={() => navigate("/addLeads")}
-                                className="flex items-center gap-2 bg-gradient-to-r from-[#4f46e5] to-[#6366f1] text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition-all text-sm font-semibold"
+
+                        <div className="flex gap-2">
+                            <ExcelButton
+                                data={leads}
+                                fileName="Leads"
+                                sheetName="Leads"
+                                formatData={formatLeads}
                             >
-                                <Plus size={18} />
-                                Add New Lead
-                            </button>
-                        )}
+                                Download Executives
+                            </ExcelButton>
+
+                            {profile?.role === 'admin' && (
+                                <button
+                                    onClick={() => navigate("/addLeads")}
+                                    className="flex items-center gap-2 bg-gradient-to-r from-[#4f46e5] to-[#6366f1] text-white px-6 py-2.5 rounded-lg hover:shadow-lg transition-all text-sm font-semibold"
+                                >
+                                    <Plus size={18} />
+                                    Add New Lead
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Add Lead Button */}
+
                     </div>
 
                     {/* 4 Stats Cards */}
@@ -632,7 +682,7 @@ function LeadView() {
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Contact</th>
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Status</th>
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Assigned To</th>
-                                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Follow Up</th>
+                                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Next Follow Up</th>
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Remarks</th>
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
                                 </tr>
@@ -669,20 +719,17 @@ function LeadView() {
                                         </td>
                                         <td className="px-4 py-3">
                                             {/* <div className="relative inline-block"> */}
-                                            <div className="relative inline-block w-[120px]">
+                                            <div className="relative inline-block w-[108px]">
 
                                                 {/* Status Chip */}
                                                 <div
                                                     className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-semibold cursor-pointer shadow-sm
                                                      ${getStatusColorStatus(lead.status)}`}
                                                 >
-                                                    {/* Dot */}
-                                                    {/* <span className="w-2 h-4 rounded-full bg-white/80"></span> */}
 
-                                                    {/* Text */}
                                                     {lead.status}
 
-                                                    {/* Arrow */}
+
                                                     <ChevronDown size={14} className="opacity-70" />
                                                 </div>
 
@@ -780,46 +827,19 @@ function LeadView() {
 
                 {/* Delete Confirmation Modal */}
                 {deleteConfirmId && (
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fadeIn">
-                        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-slideUp">
-                            <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-                                        <AlertCircle className="text-white" size={24} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-white">Delete Lead</h3>
-                                        <p className="text-sm text-white/90">This action cannot be undone</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="p-6">
-                                <p className="text-gray-600 mb-6">
-                                    Are you sure you want to delete this lead? All associated remarks and history will be permanently removed.
-                                </p>
-                                <div className="flex gap-3">
-                                    <button
-                                        onClick={() => setDeleteConfirmId(null)}
-                                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteLead(deleteConfirmId)}
-                                        className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <ConfirmModal
+                        open={!!deleteConfirmId}
+                        title="Delete Lead"
+                        message="Are you sure you want to delete this lead? All associated remarks and history will be permanently removed."
+                        onCancel={() => setDeleteConfirmId(null)}
+                        onConfirm={() => handleDeleteLead(deleteConfirmId)}
+                    />
                 )}
 
                 {/* Lead Detail Modal - Keep existing modal code */}
                 {viewLead && (
                     // ... (keep existing modal code)
-                    <div className="modal-overlay fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-5" onClick={() => {
+                    <div className="modal-overlay fixed inset-0 bg-black/45 backdrop-blur-sm z-9999 flex items-center justify-center p-5" onClick={() => {
                         setViewLead(null);
                         setShowAddRemark(false);
                         setNewRemark('');
@@ -1179,7 +1199,7 @@ function LeadView() {
                             </div>
 
                             {/* Footer */}
-                            <div className="modal-footer p-6 border-t border-[#f0f2f5] flex justify-end">
+                            {/* <div className="modal-footer p-6 border-t border-[#f0f2f5] flex justify-end">
                                 <button className="btn-reset px-5 py-2 border border-[#e5e7eb] rounded-lg text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-colors" onClick={() => {
                                     setViewLead(null);
                                     setShowAddRemark(false);
@@ -1189,7 +1209,7 @@ function LeadView() {
                                 }}>
                                     Close
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 )}

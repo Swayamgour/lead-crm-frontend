@@ -137,6 +137,10 @@ function FollowUps() {
        LEAD STATUS CONFIGURATION
     ----------------------------*/
     const getLeadStatusColor = (status) => {
+        if (!status) return 'bg-gray-100 text-gray-800';
+
+        const normalized = status.trim().toLowerCase();
+
         const colors = {
             'incoming': 'bg-blue-100 text-blue-800',
             'contacted': 'bg-yellow-100 text-yellow-800',
@@ -144,10 +148,15 @@ function FollowUps() {
             'qualified': 'bg-green-100 text-green-800',
             'proposal': 'bg-indigo-100 text-indigo-800',
             'negotiation': 'bg-orange-100 text-orange-800',
-            'closed-won': 'bg-emerald-100 text-emerald-800',
-            'closed-lost': 'bg-red-100 text-red-800'
+
+            // 🔥 YOUR API VALUES
+            'won': 'bg-emerald-100 text-emerald-800',
+            'lost': 'bg-red-100 text-red-800',
+            'cold': 'bg-gray-200 text-gray-700',
+            'no response': 'bg-gray-300 text-gray-800'
         };
-        return colors[status] || 'bg-gray-100 text-gray-800';
+
+        return colors[normalized] || 'bg-gray-100 text-gray-800';
     };
 
     /* ---------------------------
@@ -496,6 +505,7 @@ const TableView = ({
                 <table className="w-full">
                     <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                         <tr>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">#</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Lead</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Lead Status</th>
@@ -507,7 +517,7 @@ const TableView = ({
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {filteredFollowups.map(item => {
+                        {filteredFollowups.map((item, index) => {
                             const next = getNextFollowUp(item.history);
                             const statusConfig = getStatusConfig(next.status);
                             const isExpanded = expandedLead === item.lead._id;
@@ -516,6 +526,10 @@ const TableView = ({
                             return (
                                 <React.Fragment key={item.lead._id}>
                                     <tr className={`hover:bg-gray-50 transition-all duration-200 ${isExpanded ? 'bg-indigo-50/50' : ''}`}>
+                                        <td className="px-6 py-4 text-xs text-gray-500">
+                                            {index + 1}
+                                        </td>
+
                                         <td className="px-6 py-4">
                                             <div>
                                                 <div className="font-semibold text-gray-900">{item.lead.name}</div>
@@ -527,7 +541,8 @@ const TableView = ({
                                             <div className="text-xs text-gray-500 truncate max-w-[150px]">{item.lead.email || 'No email'}</div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${getLeadStatusColor(item.lead.status)}`}>
+                                            {console.log(item?.lead?.status)}
+                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${getLeadStatusColor(item?.lead?.status)}`}>
                                                 <span className="w-1.5 h-1.5 rounded-full mr-1.5 bg-current opacity-60"></span>
                                                 {item.lead.status?.replace('-', ' ') || 'New'}
                                             </span>

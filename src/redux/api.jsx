@@ -84,14 +84,13 @@ export const api = createApi({
         }),
 
         updateUser: builder.mutation({
-            query: ({ id, ...data }) => ({
+            query: ({ id, data }) => ({
                 url: `/users/${id}`,
                 method: "PUT",
                 body: data,
             }),
             invalidatesTags: ["Users"],
         }),
-
         deleteUser: builder.mutation({
             query: (id) => ({
                 url: `/users/${id}`,
@@ -309,6 +308,11 @@ export const api = createApi({
             providesTags: ["Timeline", "Leads"],
         }),
 
+        getTimelineGroupedById: builder.query({
+            query: (id) => `/TimeLine/lead/${id}`,
+            providesTags: ["Timeline", "Leads"],
+        }),
+
 
         // report 
 
@@ -468,6 +472,7 @@ export const {
     // TIMELINE
     useGetTimelineQuery,
     useGetTimelineGroupedQuery,
+    useGetTimelineGroupedByIdQuery,
 
     // report
     useGetLeadReportQuery,

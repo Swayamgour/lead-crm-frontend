@@ -48,6 +48,7 @@ import {
 } from "lucide-react";
 import { useGetConversionReportQuery, useGetExecutiveSalesReportQuery, useGetLeadReportQuery, useGetSalesPerformanceQuery, useGetSalesReportQuery } from "../redux/api";
 import Loading from "../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 const ReportPage = () => {
     const [timeframe, setTimeframe] = useState("monthly");
@@ -62,6 +63,8 @@ const ReportPage = () => {
     const { data: conversionReport } = useGetConversionReportQuery();
     const { data: performanceReport } = useGetSalesPerformanceQuery();
     const { data: executiveReport } = useGetExecutiveSalesReportQuery();
+
+    const navigate = useNavigate()
 
     const toggleSection = (section) => {
         setExpandedSections(prev => ({
@@ -125,16 +128,16 @@ const ReportPage = () => {
                                     <BarChart3 size={20} className="text-white" />
                                 </div>
                                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                                    Analytics Dashboard
+                                    Report
                                 </h1>
                                 <Sparkles size={20} className="text-yellow-500 animate-pulse" />
                             </div>
-                            <p className="text-gray-500 mt-1 text-sm">
+                            {/* <p className="text-gray-500 mt-1 text-sm">
                                 Comprehensive insights into your sales performance
-                            </p>
+                            </p> */}
                         </div>
 
-                      
+
                     </div>
 
                     {/* Quick Stats Row */}
@@ -276,7 +279,7 @@ const ReportPage = () => {
                                         <p className="text-xs text-gray-500 mt-0.5">Sales team performance metrics</p>
                                     </div>
                                 </div>
-                                <button className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1">
+                                <button onClick={() => navigate('/ViewExecutives')} className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1">
                                     View All
                                     <ArrowUpRight size={14} />
                                 </button>
@@ -459,7 +462,7 @@ const ReportPage = () => {
                 )}
 
                 {/* Export Section */}
-               
+
             </div>
         </div>
     );
@@ -544,7 +547,8 @@ const SummaryCard = ({ title, value, icon: Icon, change, color, subtext }) => {
    CHART CARD
 ====================== */
 const ChartCard = ({ title, icon, iconBg, iconColor, children }) => (
-    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-all">
+    // <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-all">
+    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-all relative">
         <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
                 <div className={`p-2 ${iconBg} rounded-lg`}>
@@ -552,13 +556,20 @@ const ChartCard = ({ title, icon, iconBg, iconColor, children }) => (
                 </div>
                 <h2 className="text-lg font-bold text-gray-800">{title}</h2>
             </div>
-            <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <MoreVertical size={16} className="text-gray-500" />
+            {/* <div  className="flex items-center gap-2 z-50"> */}
+            <div className="flex items-center gap-2 relative z-50">
+              
+
+                <button onClick={() => navigate('/Leads')} className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1  cursor-pointer">
+                    View All
+                    <ArrowUpRight size={14} />
                 </button>
+                {/* </button> */}
             </div>
         </div>
-        {children}
+        <div className="relative z-0">
+            {children}
+        </div>
     </div>
 );
 

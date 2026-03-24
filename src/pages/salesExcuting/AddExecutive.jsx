@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
     User,
     Phone,
@@ -15,14 +15,15 @@ import {
     HelpCircle,
     ArrowLeft,
     Edit3,
-    Loader
+    Loader,
+    X
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCreateUserMutation, useUpdateUserMutation, useGetUserByIdQuery } from "../../redux/api";
 
 function AddEditExecutive() {
     const navigate = useNavigate();
-    const { id } = useParams(); // Get ID from URL for edit mode
+    const { id } = useParams();
     const isEditMode = Boolean(id);
 
     const [executive, setExecutive] = useState({
@@ -33,10 +34,17 @@ function AddEditExecutive() {
         confirmPassword: "",
     });
 
+    const [touched, setTouched] = useState({
+        name: false,
+        phone: false,
+        email: false,
+        password: false,
+        confirmPassword: false,
+    });
+
     const [addExecutive] = useCreateUserMutation();
     const [updateExecutive] = useUpdateUserMutation();
 
-    // Fetch executive data if in edit mode
     const { data: existingExecutive, isLoading: isLoadingExecutive } = useGetUserByIdQuery(id, {
         skip: !isEditMode
     });
@@ -48,6 +56,79 @@ function AddEditExecutive() {
     const [profileImage, setProfileImage] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Validation functions
+    const validateName = useCallback((name) => {
+        if (!name.trim()) return "Name is required";
+        if (name.trim().length < 2) return "Name must be at least 2 characters";
+        if (name.trim().length > 50) return "Name must be less than 50 characters";
+        if (!/^[a-zA-Z\s\-']+$/.test(name.trim())) return "Name can only contain letters, spaces, hyphens, and apostrophes";
+        return null;
+    }, []);
+
+    const validatePhone = useCallback((phone) => {
+        if (!phone.trim()) return "Phone number is required";
+        const phoneRegex = /^[6-9]\d{9}$/;
+        if (!phoneRegex.test(phone)) return "Enter a valid 10-digit mobile number starting with 6,7,8, or 9";
+        return null;
+    }, []);
+
+    const validateEmail = useCallback((email) => {
+        if (!email.trim()) return "Email is required";
+        const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
+        if (!emailRegex.test(email)) return "Enter a valid email address (e.g., name@company.com)";
+        if (email.length > 100) return "Email must be less than 100 characters";
+        return null;
+    }, []);
+
+    const validatePassword = useCallback((password, isEditMode, existingPassword = "") => {
+        if (!isEditMode && !password) return "Password is required";
+        if (password) {
+            if (password.length < 8) return "Password must be at least 8 characters";
+            if (password.length > 50) return "Password must be less than 50 characters";
+            if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+                return "Password must contain at least one uppercase letter, one lowercase letter, and one number";
+            }
+        }
+        return null;
+    }, []);
+
+    const validateConfirmPassword = useCallback((confirmPassword, password) => {
+        if (password || confirmPassword) {
+            if (confirmPassword !== password) return "Passwords do not match";
+        }
+        return null;
+    }, []);
+
+    // Real-time validation
+    const validateField = useCallback((field, value) => {
+        switch (field) {
+            case 'name':
+                return validateName(value);
+            case 'phone':
+                return validatePhone(value);
+            case 'email':
+                return validateEmail(value);
+            case 'password':
+                return validatePassword(value, isEditMode, existingExecutive?.password);
+            case 'confirmPassword':
+                return validateConfirmPassword(value, executive.password);
+            default:
+                return null;
+        }
+    }, [validateName, validatePhone, validateEmail, validatePassword, validateConfirmPassword, isEditMode, existingExecutive, executive.password]);
+
+    // Update errors when fields change
+    useEffect(() => {
+        const newErrors = {};
+        Object.keys(executive).forEach(field => {
+            if (touched[field]) {
+                const error = validateField(field, executive[field]);
+                if (error) newErrors[field] = error;
+            }
+        });
+        setErrors(newErrors);
+    }, [executive, touched, validateField]);
+
     // Populate form when in edit mode
     useEffect(() => {
         if (isEditMode && existingExecutive) {
@@ -55,11 +136,10 @@ function AddEditExecutive() {
                 name: existingExecutive.name || "",
                 phone: existingExecutive.phone || "",
                 email: existingExecutive.email || "",
-                password: "", // Don't populate password for security
+                password: "",
                 confirmPassword: "",
             });
 
-            // Set profile image if exists
             if (existingExecutive.avatar) {
                 setProfileImage(existingExecutive.avatar);
             }
@@ -68,51 +148,67 @@ function AddEditExecutive() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setExecutive(prev => ({
-            ...prev,
-            [name]: value
-        }));
 
-        // Clear error for this field
-        if (errors[name]) {
-            setErrors(prev => ({
+        // Special handling for phone to only allow digits
+        if (name === 'phone') {
+            const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
+            setExecutive(prev => ({
                 ...prev,
-                [name]: null
+                [name]: digitsOnly
+            }));
+        } else {
+            setExecutive(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
+
+        // Mark field as touched
+        if (!touched[name]) {
+            setTouched(prev => ({
+                ...prev,
+                [name]: true
             }));
         }
     };
 
+    const handleBlur = (field) => {
+        setTouched(prev => ({
+            ...prev,
+            [field]: true
+        }));
+    };
+
     const validateForm = () => {
         const newErrors = {};
+        const fields = ['name', 'phone', 'email'];
 
-        if (!executive.name.trim()) newErrors.name = "Name is required";
+        // Always validate these fields
+        fields.forEach(field => {
+            const error = validateField(field, executive[field]);
+            if (error) newErrors[field] = error;
+        });
 
-        if (!executive.phone.trim()) newErrors.phone = "Phone number is required";
-        else if (!/^\d{10}$/.test(executive.phone)) newErrors.phone = "Enter a valid 10-digit phone number";
+        // Validate password fields
+        const passwordError = validateField('password', executive.password);
+        if (passwordError) newErrors.password = passwordError;
 
-        if (!executive.email.trim()) newErrors.email = "Email is required";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(executive.email)) newErrors.email = "Enter a valid email address";
+        const confirmPasswordError = validateField('confirmPassword', executive.confirmPassword);
+        if (confirmPasswordError) newErrors.confirmPassword = confirmPasswordError;
 
-        // Password validation only for new executives or if password field is filled in edit mode
-        if (!isEditMode) {
-            if (!executive.password) newErrors.password = "Password is required";
-            else if (executive.password.length < 8) newErrors.password = "Password must be at least 8 characters";
-
-            if (executive.password !== executive.confirmPassword) {
-                newErrors.confirmPassword = "Passwords do not match";
-            }
-        } else {
-            // In edit mode, password is optional
-            if (executive.password) {
-                if (executive.password.length < 8) newErrors.password = "Password must be at least 8 characters";
-                if (executive.password !== executive.confirmPassword) {
-                    newErrors.confirmPassword = "Passwords do not match";
-                }
-            }
-        }
+        // Mark all fields as touched
+        setTouched({
+            name: true,
+            phone: true,
+            email: true,
+            password: true,
+            confirmPassword: true,
+        });
 
         return newErrors;
     };
+
+    // console.log(id)
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -121,7 +217,13 @@ function AddEditExecutive() {
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            // Scroll to first error
+            const firstErrorField = Object.keys(newErrors)[0];
+            const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+            if (errorElement) {
+                errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
+                errorElement.focus();
+            }
             return;
         }
 
@@ -130,16 +232,14 @@ function AddEditExecutive() {
         try {
             const formData = new FormData();
 
-            formData.append("name", executive.name);
+            formData.append("name", executive.name.trim());
             formData.append("phone", executive.phone);
-            formData.append("email", executive.email);
+            formData.append("email", executive.email.trim().toLowerCase());
 
-            // Only append password if it's provided (for new users or password update)
             if (executive.password) {
                 formData.append("password", executive.password);
             }
 
-            // Add profile image if exists
             if (profileImage && typeof profileImage !== 'string') {
                 formData.append("avatar", profileImage);
             }
@@ -147,26 +247,42 @@ function AddEditExecutive() {
             let response;
 
             if (isEditMode) {
-                // Update existing executive
                 formData.append("id", id);
-                response = await updateExecutive(formData).unwrap();
-                console.log("Updated:", response);
+                // response = await updateExecutive(formData).unwrap();
+                // console.log("Updated:", response);
+
+                response = await updateExecutive({
+                    id: id,
+                    data: formData
+                }).unwrap();
             } else {
-                // Add new executive
                 response = await addExecutive(formData).unwrap();
                 console.log("Created:", response);
             }
 
             setShowSuccess(true);
 
-            // Navigate back after success
             setTimeout(() => {
-                navigate("/"); // or whatever your executives list route is
+                navigate("/ViewExecutives");
             }, 1500);
 
         } catch (error) {
             console.error("Error saving executive:", error);
-            setErrors({ submit: error.data?.message || "Failed to save executive" });
+            const errorMessage = error.data?.message || "Failed to save executive";
+
+            // Handle specific error messages from API
+            if (errorMessage.includes("email")) {
+                setErrors({ email: "Email already exists" });
+                setTouched(prev => ({ ...prev, email: true }));
+            } else if (errorMessage.includes("phone")) {
+                setErrors({ phone: "Phone number already exists" });
+                setTouched(prev => ({ ...prev, phone: true }));
+            } else {
+                setErrors({ submit: errorMessage });
+            }
+
+            // Scroll to error
+            window.scrollTo({ top: 0, behavior: "smooth" });
         } finally {
             setIsSubmitting(false);
         }
@@ -174,7 +290,6 @@ function AddEditExecutive() {
 
     const handleReset = () => {
         if (isEditMode && existingExecutive) {
-            // Reset to original values in edit mode
             setExecutive({
                 name: existingExecutive.name || "",
                 phone: existingExecutive.phone || "",
@@ -184,7 +299,6 @@ function AddEditExecutive() {
             });
             setProfileImage(existingExecutive.avatar || null);
         } else {
-            // Reset form in add mode
             setExecutive({
                 name: "",
                 phone: "",
@@ -194,28 +308,56 @@ function AddEditExecutive() {
             });
             setProfileImage(null);
         }
+
+        setTouched({});
         setErrors({});
     };
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                setErrors({ image: "Please upload a valid image file (JPG, PNG, GIF)" });
+                return;
+            }
+
+            // Validate file size (2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                setErrors({ image: "Image size should be less than 2MB" });
+                return;
+            }
+
+            setErrors(prev => ({ ...prev, image: null }));
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 setProfileImage(reader.result);
             };
             reader.readAsDataURL(file);
-
-            // Also store the file for FormData
             setProfileImage(file);
         }
     };
 
     const getInitials = (name) => {
-        return name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : 'EX';
+        return name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EX';
     };
 
-    // Loading state for edit mode
+    // Helper function to get input styling based on validation state
+    const getInputClassName = (fieldName) => {
+        const hasError = errors[fieldName] && touched[fieldName];
+        const isValid = !errors[fieldName] && touched[fieldName] && executive[fieldName];
+
+        if (hasError) {
+            return "border-red-300 focus:ring-red-200 bg-red-50";
+        }
+        if (isValid) {
+            return "border-green-300 focus:ring-green-200 bg-green-50";
+        }
+        return "border-gray-200 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-300";
+    };
+
     if (isEditMode && isLoadingExecutive) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6 flex items-center justify-center">
@@ -241,11 +383,6 @@ function AddEditExecutive() {
                         </div>
                         <span>Back to Executives</span>
                     </button>
-
-                    {/* <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-500">Need help?</span>
-                        <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">Contact Support</button>
-                    </div> */}
                 </div>
 
                 {/* Success Message */}
@@ -349,6 +486,12 @@ function AddEditExecutive() {
                                         </button>
                                     )}
                                 </div>
+                                {errors.image && (
+                                    <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
+                                        <AlertCircle size={12} />
+                                        {errors.image}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -367,33 +510,44 @@ function AddEditExecutive() {
                             )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                                 {/* Full Name */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                         Full Name <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="relative group">
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                            <User size={18} />
+
+                                    <div className="group">
+                                        <div className="relative">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                                <User size={18} />
+                                            </div>
+
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                value={executive.name}
+                                                onChange={handleChange}
+                                                onBlur={() => handleBlur('name')}
+                                                placeholder="Enter executive's full name"
+                                                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('name')}`}
+                                            />
                                         </div>
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={executive.name}
-                                            onChange={handleChange}
-                                            placeholder="Enter executive's full name"
-                                            className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all
-                                                ${errors.name
-                                                    ? 'border-red-300 focus:ring-red-200 bg-red-50'
-                                                    : 'border-gray-200 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-300'
-                                                }`}
-                                        />
-                                        {errors.name && (
-                                            <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
-                                                <AlertCircle size={12} />
-                                                {errors.name}
-                                            </p>
-                                        )}
+
+                                        <div className="min-h-[20px]">
+                                            {touched.name && errors.name && (
+                                                <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                                    <AlertCircle size={12} />
+                                                    {errors.name}
+                                                </p>
+                                            )}
+                                            {touched.name && !errors.name && executive.name && (
+                                                <p className="mt-1.5 text-xs text-green-600 flex items-center gap-1">
+                                                    <CheckCircle size={12} />
+                                                    Valid name
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -402,29 +556,39 @@ function AddEditExecutive() {
                                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                         Phone Number <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="relative group">
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                            <Phone size={18} />
+
+                                    <div className="group">
+                                        <div className="relative">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500">
+                                                <Phone size={18} />
+                                            </div>
+
+                                            <input
+                                                type="tel"
+                                                name="phone"
+                                                value={executive.phone}
+                                                onChange={handleChange}
+                                                onBlur={() => handleBlur('phone')}
+                                                placeholder="10-digit mobile number"
+                                                maxLength="10"
+                                                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 ${getInputClassName('phone')}`}
+                                            />
                                         </div>
-                                        <input
-                                            type="tel"
-                                            name="phone"
-                                            value={executive.phone}
-                                            onChange={handleChange}
-                                            placeholder="10-digit mobile number"
-                                            maxLength="10"
-                                            className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all
-                                                ${errors.phone
-                                                    ? 'border-red-300 focus:ring-red-200 bg-red-50'
-                                                    : 'border-gray-200 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-300'
-                                                }`}
-                                        />
-                                        {errors.phone && (
-                                            <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
-                                                <AlertCircle size={12} />
-                                                {errors.phone}
-                                            </p>
-                                        )}
+
+                                        <div className="min-h-[20px]">
+                                            {touched.phone && errors.phone && (
+                                                <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                                    <AlertCircle size={12} />
+                                                    {errors.phone}
+                                                </p>
+                                            )}
+                                            {touched.phone && !errors.phone && executive.phone && (
+                                                <p className="mt-1.5 text-xs text-green-600 flex items-center gap-1">
+                                                    <CheckCircle size={12} />
+                                                    Valid phone number
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -433,28 +597,38 @@ function AddEditExecutive() {
                                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                         Email Address <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="relative group">
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                            <Mail size={18} />
+
+                                    <div className="group">
+                                        <div className="relative">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500">
+                                                <Mail size={18} />
+                                            </div>
+
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                value={executive.email}
+                                                onChange={handleChange}
+                                                onBlur={() => handleBlur('email')}
+                                                placeholder="executive@company.com"
+                                                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 ${getInputClassName('email')}`}
+                                            />
                                         </div>
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            value={executive.email}
-                                            onChange={handleChange}
-                                            placeholder="executive@company.com"
-                                            className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all
-                                                ${errors.email
-                                                    ? 'border-red-300 focus:ring-red-200 bg-red-50'
-                                                    : 'border-gray-200 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-300'
-                                                }`}
-                                        />
-                                        {errors.email && (
-                                            <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
-                                                <AlertCircle size={12} />
-                                                {errors.email}
-                                            </p>
-                                        )}
+
+                                        <div className="min-h-[20px]">
+                                            {touched.email && errors.email && (
+                                                <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                                    <AlertCircle size={12} />
+                                                    {errors.email}
+                                                </p>
+                                            )}
+                                            {touched.email && !errors.email && executive.email && (
+                                                <p className="mt-1.5 text-xs text-green-600 flex items-center gap-1">
+                                                    <CheckCircle size={12} />
+                                                    Valid email
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -462,77 +636,86 @@ function AddEditExecutive() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                         Password {!isEditMode && <span className="text-red-500">*</span>}
-                                        {isEditMode && <span className="text-xs text-gray-400 ml-2">(optional)</span>}
                                     </label>
-                                    <div className="relative group">
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                            <Lock size={18} />
+
+                                    <div className="group">
+                                        <div className="relative">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                                <Lock size={18} />
+                                            </div>
+
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                name="password"
+                                                value={executive.password}
+                                                onChange={handleChange}
+                                                onBlur={() => handleBlur('password')}
+                                                placeholder="Create password"
+                                                className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 ${getInputClassName('password')}`}
+                                            />
+
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            >
+                                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
                                         </div>
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            name="password"
-                                            value={executive.password}
-                                            onChange={handleChange}
-                                            placeholder={isEditMode ? "Leave empty to keep current" : "Create password"}
-                                            className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all
-                                                ${errors.password
-                                                    ? 'border-red-300 focus:ring-red-200 bg-red-50'
-                                                    : 'border-gray-200 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-300'
-                                                }`}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
-                                        >
-                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                        </button>
-                                        {errors.password && (
-                                            <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
-                                                <AlertCircle size={12} />
-                                                {errors.password}
-                                            </p>
-                                        )}
+
+                                        <div className="min-h-[20px]">
+                                            {touched.password && errors.password && (
+                                                <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                                    <AlertCircle size={12} />
+                                                    {errors.password}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
                                 {/* Confirm Password */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                        Confirm Password {!isEditMode && <span className="text-red-500">*</span>}
-                                        {isEditMode && <span className="text-xs text-gray-400 ml-2">(if changing)</span>}
+                                        Confirm Password
                                     </label>
-                                    <div className="relative group">
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                            <Lock size={18} />
+
+                                    <div className="group">
+                                        <div className="relative">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                                <Lock size={18} />
+                                            </div>
+
+                                            <input
+                                                type={showConfirmPassword ? "text" : "password"}
+                                                name="confirmPassword"
+                                                value={executive.confirmPassword}
+                                                onChange={handleChange}
+                                                onBlur={() => handleBlur('confirmPassword')}
+                                                placeholder="Confirm password"
+                                                className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 ${getInputClassName('confirmPassword')}`}
+                                            />
+
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            >
+                                                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
                                         </div>
-                                        <input
-                                            type={showConfirmPassword ? "text" : "password"}
-                                            name="confirmPassword"
-                                            value={executive.confirmPassword}
-                                            onChange={handleChange}
-                                            placeholder={isEditMode ? "Confirm new password" : "Confirm password"}
-                                            className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all
-                                                ${errors.confirmPassword
-                                                    ? 'border-red-300 focus:ring-red-200 bg-red-50'
-                                                    : 'border-gray-200 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-300'
-                                                }`}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
-                                        >
-                                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                        </button>
-                                        {errors.confirmPassword && (
-                                            <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
-                                                <AlertCircle size={12} />
-                                                {errors.confirmPassword}
-                                            </p>
-                                        )}
+
+                                        <div className="min-h-[20px]">
+                                            {touched.confirmPassword && errors.confirmPassword && (
+                                                <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                                    <AlertCircle size={12} />
+                                                    {errors.confirmPassword}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
@@ -549,7 +732,7 @@ function AddEditExecutive() {
 
                             <button
                                 type="submit"
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || Object.keys(errors).some(key => errors[key] && key !== 'submit')}
                                 className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isSubmitting ? (
@@ -567,9 +750,6 @@ function AddEditExecutive() {
                         </div>
                     </form>
                 </div>
-
-                {/* Help Section */}
-               
             </div>
 
             {/* Add CSS animations */}

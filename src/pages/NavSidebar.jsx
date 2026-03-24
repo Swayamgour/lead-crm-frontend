@@ -77,6 +77,15 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
         return false;
     };
 
+
+    const handelClickHome = () => {
+        if (userRole === 'admin') {
+            navigate('/ViewExecutives')
+        } else {
+            navigate('/Leads')
+        }
+    }
+
     // Check if any submenu item is active
     const isSubmenuActive = (section) => {
         if (section.submenu) {
@@ -103,7 +112,7 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
                         <Target size={20} className="text-white" />
                     </div> */}
                     {sidebarOpen && (
-                        <div className="flex justify-center">
+                        <div onClick={() => handelClickHome()} className="flex justify-center cursor-pointer">
                             <img src={logo} alt="Logo" width={120} />
                         </div>
                     )}
