@@ -111,7 +111,7 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
 
                 {sidebarOpen && (
                     <button
-                        onClick={() => setSidebarOpen(false)}
+                        onClick={() => { setMobileMenuOpen(false); setSidebarOpen(false) }}
                         className="p-1.5 rounded-lg hover:bg-white/10 transition-colors lg:hidden"
                     >
                         <X size={18} />

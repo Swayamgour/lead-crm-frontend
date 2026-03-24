@@ -1,273 +1,339 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import NavSidebar from "../pages/NavSidebar.jsx";
 import { useGetProfileQuery } from "../redux/api.jsx";
-import { Menu, X, ChevronRight, Bell, User, LogOut, Settings, ChevronDown } from "lucide-react";
+import {
+    Box,
+    Drawer,
+    AppBar,
+    Toolbar,
+    IconButton,
+    Typography,
+    Avatar,
+    Menu,
+    MenuItem,
+    ListItemIcon,
+    ListItemText,
+    Divider,
+    useTheme,
+    useMediaQuery,
+    Chip,
+    Fade,
+    Paper,
+    Stack,
+} from "@mui/material";
+import {
+    Menu as MenuIcon,
+    ChevronLeft as ChevronLeftIcon,
+    ChevronRight as ChevronRightIcon,
+    Dashboard as DashboardIcon,
+    People as PeopleIcon,
+    Notifications as NotificationsIcon,
+    Schedule as ScheduleIcon,
+    Timeline as TimelineIcon,
+    Assessment as AssessmentIcon,
+    Add as AddIcon,
+    Edit as EditIcon,
+    Person as PersonIcon,
+    Settings as SettingsIcon,
+    Logout as LogoutIcon,
+    KeyboardArrowDown as KeyboardArrowDownIcon,
+} from "@mui/icons-material";
+import NavSidebar from "../pages/NavSidebar.jsx";
 
-function MainLayout() {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [showUserMenu, setShowUserMenu] = useState(false);
-    const location = useLocation();
+const drawerWidth = 280;
+const collapsedDrawerWidth = 80;
+
+const MainLayout = () => {
+    const theme = useTheme();
     const navigate = useNavigate();
+    const location = useLocation();
+    const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
+
+    const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+
     const { data: profile } = useGetProfileQuery();
 
-    // Detect screen size
+    // Handle responsive sidebar
     useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 1024) {
-                setSidebarOpen(false);
-                setMobileMenuOpen(false);
-            } else {
-                setSidebarOpen(true);
-                setMobileMenuOpen(false);
-            }
-        };
+        if (isMobile) {
+            setSidebarOpen(false);
+            setMobileOpen(false);
+        } else {
+            setSidebarOpen(true);
+        }
+    }, [isMobile]);
 
-        handleResize();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
-
-
-
-    // Close mobile menu when route changes
+    // Close mobile drawer on route change
     useEffect(() => {
-        setMobileMenuOpen(false);
+        setMobileOpen(false);
     }, [location]);
 
-    const toggleSidebar = () => {
-        if (window.innerWidth < 1024) {
-            setMobileMenuOpen(!mobileMenuOpen);
+    const handleDrawerToggle = () => {
+        if (isMobile) {
+            setMobileOpen(!mobileOpen);
         } else {
             setSidebarOpen(!sidebarOpen);
         }
     };
 
+    const handleUserMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleUserMenuClose = () => {
+        setAnchorEl(null);
+    };
+
     const handleLogout = () => {
-        // Add your logout logic here
         localStorage.removeItem('token');
         navigate('/login');
     };
 
-  
 
-    const getPageTitle = () => {
-        const path = location.pathname;
-        if (path.includes('dashboard')) return 'Dashboard';
-        if (path.includes('leads')) return 'Lead Management';
-        if (path.includes('follow-ups')) return 'Follow-ups';
-        if (path.includes('pipeline')) return 'Lead Pipeline';
-        if (path.includes('timeline')) return 'Activity Timeline';
-        if (path.includes('reports')) return 'Reports & Analytics';
-        if (path.includes('addLeads')) return 'Add New Lead';
-        if (path.includes('editLead')) return 'Edit Lead';
-        if (path.includes('profile')) return 'My Profile';
-        return 'Dashboard';
-    };
+
+    const drawer = (
+        <NavSidebar
+            sidebarOpen={isMobile ? true : sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+            mobileMenuOpen={mobileOpen}
+            setMobileMenuOpen={setMobileOpen}
+        />
+    );
 
     return (
-        <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-            {/* Mobile Overlay */}
-            {mobileMenuOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
-                    onClick={() => setMobileMenuOpen(false)}
-                />
-            )}
-
-            {/* Sidebar */}
-            <div
-                className={`
-    fixed lg:sticky top-0 left-0 h-screen z-50
-    transition-all duration-300 ease-in-out
-    ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-    w-64 lg:${sidebarOpen ? 'w-72' : 'w-20'}
-  `}
+        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+            {/* App Bar */}
+            <AppBar
+                position="fixed"
+                sx={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(12px)',
+                    boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    zIndex: isMobile ? theme.zIndex.drawer - 1 : theme.zIndex.drawer + 1,
+                    transition: theme.transitions.create(['width', 'margin'], {
+                        easing: theme.transitions.easing.sharp,
+                        duration: theme.transitions.duration.leavingScreen,
+                    }),
+                    ...(sidebarOpen && !isMobile && {
+                        width: `calc(100% - ${drawerWidth}px)`,
+                        marginLeft: `${drawerWidth}px`,
+                        transition: theme.transitions.create(['width', 'margin'], {
+                            easing: theme.transitions.easing.sharp,
+                            duration: theme.transitions.duration.enteringScreen,
+                        }),
+                    }),
+                }}
             >
-                <NavSidebar
-                    sidebarOpen={mobileMenuOpen ? true : sidebarOpen}
-                    setSidebarOpen={setSidebarOpen}
-                    mobileMenuOpen={mobileMenuOpen}
-                    setMobileMenuOpen={setMobileMenuOpen}
-                />
-            </div>
+                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                    {/* Left Section */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <IconButton
+                            color="inherit"
+                            aria-label="toggle drawer"
+                            onClick={handleDrawerToggle}
+                            edge="start"
+                            sx={{ color: 'text.secondary' }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
 
-            {/* Right Side Content */}
-            <div
-                className={`
-                    flex-1 flex flex-col transition-all duration-300 w-full overflow-hidden
-                    ${sidebarOpen ? '' : ''}
-                `}
-            >
-                {/* Topbar */}
-                <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-0 z-30">
-                    <div className="flex items-center justify-between px-4 sm:px-6 py-3">
-                        {/* Left Section - Menu Button & Page Title */}
-                        <div className="flex items-center gap-3">
-                            <button
-                                onClick={toggleSidebar}
-                                className="p-2 rounded-xl hover:bg-gray-100 transition-all duration-200 lg:hidden"
-                                aria-label="Toggle Menu"
+
+                    </Box>
+
+                    {/* Right Section */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        {/* User Menu */}
+                        <Box>
+                            <IconButton
+                                onClick={handleUserMenuOpen}
+                                size="small"
+                                sx={{
+                                    p: 0.5,
+                                    borderRadius: 2,
+                                    '&:hover': {
+                                        backgroundColor: 'action.hover',
+                                    },
+                                    // width:'full'
+                                }}
                             >
-                                {mobileMenuOpen ? (
-                                    <X size={20} className="text-gray-600" />
-                                ) : (
-                                    <Menu size={20} className="text-gray-600" />
-                                )}
-                            </button>
-
-                            <button
-                                onClick={toggleSidebar}
-                                className="hidden lg:block p-2 rounded-xl hover:bg-gray-100 transition-all duration-200"
-                                aria-label="Toggle Sidebar"
-                            >
-                                {sidebarOpen ? (
-                                    <ChevronRight size={20} className="text-gray-600" />
-                                ) : (
-                                    <Menu size={20} className="text-gray-600" />
-                                )}
-                            </button>
-
-                            {/* Page Title */}
-                            <div className="hidden sm:block">
-                                <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                                    {getPageTitle()}
-                                </h1>
-                                <p className="text-xs text-gray-500 hidden md:block">
-                                    {new Date().toLocaleDateString('en-US', {
-                                        weekday: 'long',
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric'
-                                    })}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Right Section - User Menu & Notifications */}
-                        <div className="flex items-center gap-2 sm:gap-4">
-                            {/* Notification Button */}
-
-                            {/* User Menu */}
-                            <div className="relative">
-                                <button
-                                    onClick={() => setShowUserMenu(!showUserMenu)}
-                                    className="flex items-center gap-2 sm:gap-3 p-1.5 rounded-xl hover:bg-gray-100 transition-all duration-200"
+                                <Avatar
+                                    sx={{
+                                        width: 36,
+                                        height: 36,
+                                        bgcolor: 'primary.main',
+                                        background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                                    }}
                                 >
-                                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
-                                        <span className="text-white font-semibold text-sm">
+                                    {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
+                                </Avatar>
+                                <Box sx={{ display: { xs: 'none', md: 'block' }, ml: 1.5, mr: 0.5, textAlign: 'left' }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                                        {profile?.name || 'User'}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                        {profile?.role || 'Employee'}
+                                    </Typography>
+                                </Box>
+                                <KeyboardArrowDownIcon sx={{ color: 'text.secondary', fontSize: 20, display: { xs: 'none', md: 'block' } }} />
+                            </IconButton>
+
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleUserMenuClose}
+                                TransitionComponent={Fade}
+                                PaperProps={{
+                                    elevation: 3,
+                                    sx: {
+                                        mt: 1.5,
+                                        minWidth: 240,
+                                        borderRadius: 2,
+                                        overflow: 'visible',
+                                        filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.1))',
+                                        '&:before': {
+                                            content: '""',
+                                            position: 'absolute',
+                                            top: -8,
+                                            right: 20,
+                                            width: 0,
+                                            height: 0,
+                                            borderLeft: '8px solid transparent',
+                                            borderRight: '8px solid transparent',
+                                            borderBottom: '8px solid white',
+                                        },
+                                    },
+                                }}
+                            >
+                                <Box sx={{ p: 2, bgcolor: 'grey.50' }}>
+                                    <Stack direction="row" spacing={2} alignItems="center">
+                                        <Avatar
+                                            sx={{
+                                                width: 48,
+                                                height: 48,
+                                                bgcolor: 'primary.main',
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                                            }}
+                                        >
                                             {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
-                                        </span>
-                                    </div>
-                                    <div className="hidden md:flex flex-col items-start">
-                                        <span className="text-sm font-semibold text-gray-700">
-                                            {profile?.name || 'User'}
-                                        </span>
-                                        <span className="text-xs text-gray-500">
-                                            {profile?.role || 'Employee'}
-                                        </span>
-                                    </div>
-                                    <ChevronDown
-                                        size={16}
-                                        className={`hidden md:block text-gray-500 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`}
-                                    />
-                                </button>
+                                        </Avatar>
+                                        <Box>
+                                            <Typography variant="subtitle1" fontWeight={600}>
+                                                {profile?.name || 'User'}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {profile?.email || 'user@example.com'}
+                                            </Typography>
+                                        </Box>
+                                    </Stack>
+                                </Box>
+                                <Divider />
 
-                                {/* Dropdown Menu */}
-                                {showUserMenu && (
-                                    <>
-                                        <div
-                                            className="fixed inset-0 z-40"
-                                            onClick={() => setShowUserMenu(false)}
-                                        />
-                                        <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-slideDown">
-                                            <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
-                                                        <span className="text-white font-bold">
-                                                            {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-semibold text-gray-800">{profile?.name || 'User'}</p>
-                                                        <p className="text-xs text-gray-500">{profile?.email || 'user@example.com'}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                                    <ListItemIcon>
+                                        <LogoutIcon fontSize="small" color="error" />
+                                    </ListItemIcon>
+                                    <ListItemText>Logout</ListItemText>
+                                </MenuItem>
+                            </Menu>
+                        </Box>
+                    </Box>
+                </Toolbar>
 
-                                            {/* <div className="p-2">
-                                                <button
-                                                    onClick={() => {
-                                                        navigate('/profile');
-                                                        setShowUserMenu(false);
-                                                    }}
-                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
-                                                >
-                                                    <User size={18} className="text-gray-500" />
-                                                    <span className="text-sm text-gray-700">My Profile</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        navigate('/settings');
-                                                        setShowUserMenu(false);
-                                                    }}
-                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
-                                                >
-                                                    <Settings size={18} className="text-gray-500" />
-                                                    <span className="text-sm text-gray-700">Settings</span>
-                                                </button>
-                                            </div> */}
 
-                                            <div className="border-t border-gray-100 p-2">
-                                                <button
-                                                    onClick={handleLogout}
-                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 transition-colors text-red-600"
-                                                >
-                                                    <LogOut size={18} />
-                                                    <span className="text-sm font-medium">Logout</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+            </AppBar>
 
-                    {/* Mobile Page Title */}
-                    <div className="sm:hidden px-4 pb-3">
-                        <h1 className="text-lg font-bold text-gray-800">{getPageTitle()}</h1>
-                    </div>
-                </header>
+            {/* Sidebar Drawer */}
+            <Box
+                component="nav"
+                sx={{
+                    width: { lg: sidebarOpen ? drawerWidth : collapsedDrawerWidth },
+                    flexShrink: { lg: 0 },
+                    transition: theme.transitions.create('width', {
+                        easing: theme.transitions.easing.sharp,
+                        duration: theme.transitions.duration.enteringScreen,
+                    }),
+                }}
+            >
+                {/* Mobile Drawer */}
+                <Drawer
+                    variant="temporary"
+                    open={mobileOpen}
+                    onClose={handleDrawerToggle}
+                    ModalProps={{ keepMounted: true }}
+                    sx={{
+                        display: { xs: 'block', lg: 'none' },
+                        '& .MuiDrawer-paper': {
+                            width: drawerWidth,
+                            boxSizing: 'border-box',
+                            border: 'none',
+                        },
+                    }}
+                >
+                    {drawer}
+                </Drawer>
+
+                {/* Desktop Drawer */}
+                <Drawer
+                    variant="permanent"
+                    sx={{
+                        display: { xs: 'none', lg: 'block' },
+                        width: sidebarOpen ? drawerWidth : collapsedDrawerWidth,
+                        '& .MuiDrawer-paper': {
+                            width: sidebarOpen ? drawerWidth : collapsedDrawerWidth,
+                            boxSizing: 'border-box',
+                            border: 'none',
+                            borderRight: '1px solid',
+                            borderColor: 'divider',
+                            backgroundColor: 'background.paper',
+                            transition: theme.transitions.create('width', {
+                                easing: theme.transitions.easing.sharp,
+                                duration: theme.transitions.duration.enteringScreen,
+                            }),
+                            overflowX: 'hidden',
+                        },
+                    }}
+                    open
+                >
+                    {drawer}
+                </Drawer>
+            </Box>
+
+            {/* Main Content */}
+            <Box
+                component="main"
+                sx={{
+                    flexGrow: 1,
+                    p: isMobile ? 0 : 3,
+                    width: '100%',
+                    minHeight: '100vh',
+                    backgroundColor: 'grey.50',
+                    transition: theme.transitions.create('margin', {
+                        easing: theme.transitions.easing.sharp,
+                        duration: theme.transitions.duration.leavingScreen,
+                    }),
+                    ...(sidebarOpen && !isMobile && {
+                        transition: theme.transitions.create('margin', {
+                            easing: theme.transitions.easing.easeOut,
+                            duration: theme.transitions.duration.enteringScreen,
+                        }),
+                    }),
+                }}
+            >
+                {/* Toolbar spacer */}
+                <Toolbar sx={{ display: { xs: 'block', sm: 'none' } }} />
+                <Toolbar sx={{ display: { xs: 'none', sm: 'block' } }} />
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-y-auto">
-                    <div className="p-4 sm:p-6">
-                        <Outlet />
-                    </div>
-                </main>
-            </div>
-
-            {/* Add animations */}
-            <style jsx>{`
-                @keyframes slideDown {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-10px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                
-                .animate-slideDown {
-                    animation: slideDown 0.2s ease-out forwards;
-                }
-            `}</style>
-        </div>
+                <Box sx={{ maxWidth: '100%' }}>
+                    <Outlet />
+                </Box>
+            </Box>
+        </Box>
     );
-}
+};
 
 export default MainLayout;
