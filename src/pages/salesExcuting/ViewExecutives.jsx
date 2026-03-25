@@ -16,9 +16,7 @@ import {
     Calendar,
 
     CheckCircle,
-    XCircle,
-    ChevronLeft,
-    ChevronRight,
+   
 
     Target,
 
@@ -37,7 +35,7 @@ function ViewExecutives() {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
     const [selectedExecutives, setSelectedExecutives] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
+    // const [currentPage, setCurrentPage] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
     const [sortBy, setSortBy] = useState("name");
     const [sortOrder, setSortOrder] = useState("asc");
@@ -46,10 +44,19 @@ function ViewExecutives() {
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [deleteConfirmStatus, setDeleteConfirmStatus] = useState(null);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
 
-    const itemsPerPage = 8;
 
-    const { data: usersData, isLoading, refetch } = useGetUsersQuery();
+    // const itemsPerPage = 8;
+
+    // const { data: usersData, isLoading, refetch } = useGetUsersQuery();
+    const { data: usersData, isLoading, error, isFetching } = useGetUsersQuery({
+        page: currentPage,
+        limit: itemsPerPage
+    });
+
+    // console.log()
     const [updateExecutive] = useUpdateUserMutation();
     const [deleteUser] = useDeleteUserMutation();
 
@@ -73,13 +80,15 @@ function ViewExecutives() {
     };
 
     // Process executives data with performance metrics
-    const executives = usersData?.map(exec => ({
+    const executives = usersData?.data?.map(exec => ({
         ...exec,
         totalLeads: exec.totalLeads || 0,
         wonLeads: exec.wonLeads || 0,
         accuracy: exec.accuracy || 0,
         pendingLeads: (exec.totalLeads || 0) - (exec.wonLeads || 0)
     })) || [];
+
+    // console.log(executives)
 
     const getInitials = (name) => {
         return name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?';
@@ -145,11 +154,7 @@ function ViewExecutives() {
     });
 
     // Pagination
-    const totalPages = Math.ceil(sortedExecutives.length / itemsPerPage);
-    const paginatedExecutives = sortedExecutives.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    const paginatedExecutives = sortedExecutives;
 
     // Calculate stats
     const stats = {
@@ -279,10 +284,11 @@ function ViewExecutives() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 -mt-6 ">
                         <StatCard
                             title="Total Executives"
-                            value={stats.total}
+                            value={usersData?.pagination?.totalItems}
                             icon={Users}
                             color="from-blue-500 to-blue-600"
-                            trend={`${stats.active} active now`}
+                            // trend={`${stats.active} active now`}
+
                         />
                         <StatCard
                             title="Total Leads"
@@ -577,41 +583,7 @@ function ViewExecutives() {
                         </div>
 
                         {/* Pagination */}
-                        {totalPages > 1 && (
-                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                                <p className="text-sm text-gray-600">
-                                    Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, sortedExecutives.length)} of {sortedExecutives.length} results
-                                </p>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                        disabled={currentPage === 1}
-                                        className="p-2 border border-gray-300 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                    >
-                                        <ChevronLeft size={18} />
-                                    </button>
-                                    {[...Array(totalPages)].map((_, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => setCurrentPage(i + 1)}
-                                            className={`w-10 h-10 rounded-lg transition-colors ${currentPage === i + 1
-                                                ? "bg-blue-600 text-white"
-                                                : "hover:bg-gray-100"
-                                                }`}
-                                        >
-                                            {i + 1}
-                                        </button>
-                                    ))}
-                                    <button
-                                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                        disabled={currentPage === totalPages}
-                                        className="p-2 border border-gray-300 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                    >
-                                        <ChevronRight size={18} />
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+                      
                     </div>
 
                     {/* Performance Modal */}
@@ -795,6 +767,219 @@ function ViewExecutives() {
                     />
                 )}
             </div>
+
+
+
+
+            {usersData?.pagination && (
+                <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6 rounded-b-xl">
+                    {/* Mobile view */}
+                    <div className="flex justify-between flex-1 sm:hidden">
+                        <button
+                            onClick={() => setCurrentPage(prev => prev - 1)}
+                            disabled={!usersData?.pagination.hasPrevPage || isFetching}
+                            className={`
+                    relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                    ${!usersData?.pagination.hasPrevPage || isFetching
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm'
+                                }
+                `}
+                        >
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                            Previous
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(prev => prev + 1)}
+                            disabled={!usersData?.pagination.hasNextPage || isFetching}
+                            className={`
+                    relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                    ${!usersData?.pagination.hasNextPage || isFetching
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm'
+                                }
+                `}
+                        >
+                            Next
+                            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {/* Desktop view */}
+                    <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-end">
+                        {/* Info section */}
+                       
+
+                        {/* Pagination buttons */}
+                        <div className="flex items-center space-x-2">
+                            {/* First Page Button */}
+                            <button
+                                onClick={() => setCurrentPage(1)}
+                                disabled={!usersData?.pagination.hasPrevPage || isFetching}
+                                className={`
+                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        ${!usersData?.pagination.hasPrevPage || isFetching
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                    }
+                    `}
+                                title="First Page"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                                </svg>
+                            </button>
+
+                            {/* Previous Button */}
+                            <button
+                                onClick={() => setCurrentPage(prev => prev - 1)}
+                                disabled={!usersData?.pagination.hasPrevPage || isFetching}
+                                className={`
+                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        ${!usersData?.pagination.hasPrevPage || isFetching
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                    }
+                    `}
+                            >
+                                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                                Previous
+                            </button>
+
+                            {/* Page Numbers */}
+                            <div className="flex items-center space-x-1">
+                                {(() => {
+                                    const currentPage = usersData?.pagination.currentPage;
+                                    const totalPages = usersData?.pagination.totalPages;
+                                    const maxVisible = 5;
+                                    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+                                    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+                                    if (endPage - startPage + 1 < maxVisible) {
+                                        startPage = Math.max(1, endPage - maxVisible + 1);
+                                    }
+
+                                    const pages = [];
+                                    for (let i = startPage; i <= endPage; i++) {
+                                        pages.push(i);
+                                    }
+
+                                    return (
+                                        <>
+                                            {/* First page indicator if not in range */}
+                                            {startPage > 1 && (
+                                                <>
+                                                    <button
+                                                        onClick={() => setCurrentPage(1)}
+                                                        disabled={isFetching}
+                                                        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                                                    >
+                                                        1
+                                                    </button>
+                                                    {startPage > 2 && (
+                                                        <span className="px-2 text-gray-500">...</span>
+                                                    )}
+                                                </>
+                                            )}
+
+                                            {/* Page number buttons */}
+                                            {pages.map(page => (
+                                                <button
+                                                    key={page}
+                                                    onClick={() => setCurrentPage(page)}
+                                                    disabled={isFetching}
+                                                    className={`
+                                            relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                                            ${currentPage === page
+                                                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md transform scale-105'
+                                                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm'
+                                                        }
+                                            ${isFetching ? 'cursor-wait opacity-50' : 'cursor-pointer'}
+                                        `}
+                                                >
+                                                    {page}
+                                                </button>
+                                            ))}
+
+                                            {/* Last page indicator if not in range */}
+                                            {endPage < totalPages && (
+                                                <>
+                                                    {endPage < totalPages - 1 && (
+                                                        <span className="px-2 text-gray-500">...</span>
+                                                    )}
+                                                    <button
+                                                        onClick={() => setCurrentPage(totalPages)}
+                                                        disabled={isFetching}
+                                                        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                                                    >
+                                                        {totalPages}
+                                                    </button>
+                                                </>
+                                            )}
+                                        </>
+                                    );
+                                })()}
+                            </div>
+
+                            {/* Next Button */}
+                            <button
+                                onClick={() => setCurrentPage(prev => prev + 1)}
+                                disabled={!usersData?.pagination.hasNextPage || isFetching}
+                                className={`
+                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        ${!usersData?.pagination.hasNextPage || isFetching
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                    }
+                    `}
+                            >
+                                Next
+                                <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+
+                            {/* Last Page Button */}
+                            <button
+                                onClick={() => setCurrentPage(usersData?.pagination.totalPages)}
+                                disabled={!usersData?.pagination.hasNextPage || isFetching}
+                                className={`
+                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        ${!usersData?.pagination.hasNextPage || isFetching
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                    }
+                    `}
+                                title="Last Page"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Loading indicator */}
+                    {isFetching && (
+                        <div className="absolute left-1/2 transform -translate-x-1/2 -top-10">
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full shadow-lg border border-gray-200">
+                                <svg className="animate-spin h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span className="text-xs text-gray-600">Loading...</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+            {/* )} */}
 
             {/* Add custom animations */}
             <style>{`

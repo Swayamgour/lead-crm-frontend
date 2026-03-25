@@ -37,7 +37,8 @@ import {
     useEditRemarkMutation,
     useDeleteRemarkMutation,
     useGetLeadRemarksQuery,
-    useDeleteLeadMutation
+    useDeleteLeadMutation,
+    useGetLeadsPaginatedQuery
 } from "../../redux/api";
 import toast from "react-hot-toast";
 import { leadStatus } from "../../components/data";
@@ -58,15 +59,20 @@ function LeadView() {
     const [updateLead] = useUpdateLeadMutation();
     const [deleteLead] = useDeleteLeadMutation();
 
+    // const { data: PaginatedLeads , isFetching } = useGetLeadsPaginatedQuery()
+
+
+    // console.log(data)
+
     const pdfRef = useRef();
+
 
     // New remark mutations
     const [addRemark] = useAddRemarkMutation();
     const [editRemark] = useEditRemarkMutation();
     const [deleteRemark] = useDeleteRemarkMutation();
 
-    const leads = leadsData || [];
-    const executives = Executive || [];
+
 
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState("");
@@ -78,6 +84,10 @@ function LeadView() {
     const [confirmAssignId, setConfirmAssignId] = useState(null);
     const [selectedExecutive, setSelectedExecutive] = useState("");
     const [activeSideTab, setActiveSideTab] = useState("all"); // 'all', 'won', 'active', 'lost', 'pending'
+
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
 
     // Modal states
     const [viewLead, setViewLead] = useState(null);
@@ -91,6 +101,22 @@ function LeadView() {
     const [selectedRemarkForHistory, setSelectedRemarkForHistory] = useState(null);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
+
+  
+
+
+    const { data: PaginatedLeads, isFetching } = useGetLeadsPaginatedQuery({
+        page: currentPage,
+        limit: itemsPerPage,
+        status: statusFilter || undefined,
+        search: searchTerm || undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined
+    });
+
+    const leads = PaginatedLeads?.data || [];
+    const executives = Executive || [];
+
     // Fetch remarks for selected lead
     const { data: remarksData, refetch: refetchRemarks } = useGetLeadRemarksQuery(viewLead?._id, {
         skip: !viewLead?._id
@@ -98,7 +124,7 @@ function LeadView() {
 
     // Calculate statistics
 
-    console.log(leads)
+    // console.log(leads)
     const wonLeads = leads.filter(
         lead => lead.status?.toLowerCase() === 'won'
     );
@@ -122,50 +148,9 @@ function LeadView() {
     );
 
     // Filter leads based on side tab
-    const getFilteredLeadsByTab = () => {
-        let filtered = leads;
 
-        switch (activeSideTab) {
-            case 'Won':
-                filtered = wonLeads;
-                break;
-            case 'active':
-                filtered = activeLeads;
-                break;
-            case 'lost':
-                filtered = lostLeads;
-                break;
-            case 'pending':
-                filtered = pendingLeads;
-                break;
-            default:
-                filtered = leads;
-        }
 
-        return filtered.filter((lead) => {
-            const leadDate = new Date(lead.createdAt);
-            const start = startDate ? new Date(startDate) : null;
-            const end = endDate ? new Date(endDate) : null;
-
-            const statusMatch = statusFilter
-                ? lead.status?.toLowerCase() === statusFilter.toLowerCase()
-                : true;
-
-            const dateMatch =
-                (!start || leadDate >= start) &&
-                (!end || leadDate <= end);
-
-            const searchMatch = searchTerm
-                ? lead.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                lead.phone?.includes(searchTerm) ||
-                lead.email?.toLowerCase().includes(searchTerm.toLowerCase())
-                : true;
-
-            return statusMatch && dateMatch && searchMatch;
-        });
-    };
-
-    const filteredLeads = getFilteredLeadsByTab();
+    const filteredLeads = leads;
 
     const handleStatusChange = async (id, newStatus) => {
         try {
@@ -692,7 +677,7 @@ function LeadView() {
                                     <tr key={lead._id} className="hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
                                         <td className="px-4 py-3">
                                             <span className="text-gray-400 text-xs font-medium">
-                                                {(index + 1).toString().padStart(2, '0')}
+                                                {((currentPage - 1) * itemsPerPage + index + 1)}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3">
@@ -961,7 +946,7 @@ function LeadView() {
                                             </span>
                                             <div className="modal-edit-row flex items-center gap-3 flex-wrap">
                                                 <div className="assignee-grid modal-assignee-grid flex flex-wrap gap-2">
-                                                    {executives?.map(exec => (
+                                                    {executives?.data?.map(exec => (
                                                         <button
                                                             key={exec._id}
                                                             type="button"
@@ -1317,6 +1302,161 @@ function LeadView() {
                         </div>
                     </div>
                 )}
+
+                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-end mt-6">
+                    {/* Info section */}
+
+
+                    {/* Pagination buttons */}
+                    <div className="flex items-center space-x-2">
+                        {/* First Page Button */}
+                        <button
+                            onClick={() => setCurrentPage(1)}
+                            disabled={!PaginatedLeads?.pagination.hasPrevPage || isFetching}
+                            className={`
+                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        ${!PaginatedLeads?.pagination.hasPrevPage || isFetching
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                }
+                    `}
+                            title="First Page"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                            </svg>
+                        </button>
+
+                        {/* Previous Button */}
+                        <button
+                            onClick={() => setCurrentPage(prev => prev - 1)}
+                            disabled={!PaginatedLeads?.pagination.hasPrevPage || isFetching}
+                            className={`
+                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        ${!PaginatedLeads?.pagination.hasPrevPage || isFetching
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                }
+                    `}
+                        >
+                            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                            Previous
+                        </button>
+
+                        {/* Page Numbers */}
+                        <div className="flex items-center space-x-1">
+                            {(() => {
+                                const currentPage = PaginatedLeads?.pagination.currentPage;
+                                const totalPages = PaginatedLeads?.pagination.totalPages;
+                                const maxVisible = 5;
+                                let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+                                let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+                                if (endPage - startPage + 1 < maxVisible) {
+                                    startPage = Math.max(1, endPage - maxVisible + 1);
+                                }
+
+                                const pages = [];
+                                for (let i = startPage; i <= endPage; i++) {
+                                    pages.push(i);
+                                }
+
+                                return (
+                                    <>
+                                        {/* First page indicator if not in range */}
+                                        {startPage > 1 && (
+                                            <>
+                                                <button
+                                                    onClick={() => setCurrentPage(1)}
+                                                    disabled={isFetching}
+                                                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                                                >
+                                                    1
+                                                </button>
+                                                {startPage > 2 && (
+                                                    <span className="px-2 text-gray-500">...</span>
+                                                )}
+                                            </>
+                                        )}
+
+                                        {/* Page number buttons */}
+                                        {pages.map(page => (
+                                            <button
+                                                key={page}
+                                                onClick={() => setCurrentPage(page)}
+                                                disabled={isFetching}
+                                                className={`
+                                            relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                                            ${currentPage === page
+                                                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md transform scale-105'
+                                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm'
+                                                    }
+                                            ${isFetching ? 'cursor-wait opacity-50' : 'cursor-pointer'}
+                                        `}
+                                            >
+                                                {page}
+                                            </button>
+                                        ))}
+
+                                        {/* Last page indicator if not in range */}
+                                        {endPage < totalPages && (
+                                            <>
+                                                {endPage < totalPages - 1 && (
+                                                    <span className="px-2 text-gray-500">...</span>
+                                                )}
+                                                <button
+                                                    onClick={() => setCurrentPage(totalPages)}
+                                                    disabled={isFetching}
+                                                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                                                >
+                                                    {totalPages}
+                                                </button>
+                                            </>
+                                        )}
+                                    </>
+                                );
+                            })()}
+                        </div>
+
+                        {/* Next Button */}
+                        <button
+                            onClick={() => setCurrentPage(prev => prev + 1)}
+                            disabled={!PaginatedLeads?.pagination.hasNextPage || isFetching}
+                            className={`
+                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        ${!PaginatedLeads?.pagination.hasNextPage || isFetching
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                }
+                    `}
+                        >
+                            Next
+                            <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+
+                        {/* Last Page Button */}
+                        <button
+                            onClick={() => setCurrentPage(PaginatedLeads?.pagination.totalPages)}
+                            disabled={!PaginatedLeads?.pagination.hasNextPage || isFetching}
+                            className={`
+                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        ${!PaginatedLeads?.pagination.hasNextPage || isFetching
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                }
+                    `}
+                            title="Last Page"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Add animations */}

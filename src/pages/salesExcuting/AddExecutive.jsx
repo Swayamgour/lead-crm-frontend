@@ -261,10 +261,11 @@ function AddEditExecutive() {
             }
 
             setShowSuccess(true);
+             navigate("/ViewExecutives");
 
-            setTimeout(() => {
-                navigate("/ViewExecutives");
-            }, 1500);
+            // setTimeout(() => {
+               
+            // }, 1500);
 
         } catch (error) {
             console.error("Error saving executive:", error);

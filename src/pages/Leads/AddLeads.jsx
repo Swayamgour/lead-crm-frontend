@@ -583,8 +583,9 @@ function AddLead() {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Assign Lead To <span className="text-red-500">*</span>
                                 </label>
+                                {console.log(salesTeam)}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    {salesTeam.map((person) => (
+                                    {salesTeam?.data.map((person) => (
                                         <label
                                             key={person._id}
                                             className={`flex items-center p-3 border rounded-xl cursor-pointer transition-all

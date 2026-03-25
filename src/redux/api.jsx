@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const BASE_URL = "https://lead-crm-backend-1cq8.onrender.com/api";
-// const BASE_URL = "http://localhost:5001/api";
+// const BASE_URL = "https://lead-crm-backend-1cq8.onrender.com/api";
+const BASE_URL = "http://localhost:5001/api";
 
 const baseQuery = fetchBaseQuery({
     baseUrl: BASE_URL,
@@ -64,8 +64,14 @@ export const api = createApi({
 
         // ================= USERS =================
 
+        // getUsers: builder.query({
+        //     query: () => "/users",
+        //     providesTags: ["Users"],
+        // }),
+
+        // In your API slice
         getUsers: builder.query({
-            query: () => "/users",
+            query: ({ page = 1, limit = 10 } = {}) => `/users?page=${page}&limit=${limit}`,
             providesTags: ["Users"],
         }),
 
@@ -104,6 +110,23 @@ export const api = createApi({
         getLeads: builder.query({
             query: () => "/leads",
             providesTags: ["Leads"],
+        }),
+
+
+        getLeadsPaginated: builder.query({
+            query: ({ page, limit, status, search, startDate, endDate }) => ({
+                url: "/leads/paginated",
+                params: {
+                    page,
+                    limit,
+                    status,
+                    search,
+                    startDate,
+                    endDate
+                }
+            }),
+            providesTags: ["Leads"],
+
         }),
 
         getLeadById: builder.query({
@@ -433,6 +456,7 @@ export const {
 
     // LEADS
     useGetLeadsQuery,
+    useGetLeadsPaginatedQuery,
     useGetLeadByIdQuery,
     useCreateLeadMutation,
     useUpdateLeadMutation,
