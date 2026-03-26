@@ -6,27 +6,14 @@ import {
     DollarSign,
     Target,
     Award,
-    Calendar,
-    Download,
-    RefreshCw,
-    ChevronDown,
-    ChevronUp,
+
     PieChart,
     BarChart3,
-    LineChart,
-    Activity,
-    Eye,
-    Star,
-    Zap,
+
     Clock,
     CheckCircle,
-    XCircle,
-    AlertCircle,
-    Filter,
-    Search,
+
     Mail,
-    Phone,
-    User,
     Trophy,
     Medal,
     Crown,
@@ -34,12 +21,9 @@ import {
     Rocket,
     ArrowUpRight,
     ArrowDownRight,
-    MoreVertical,
-    Printer,
-    Share2,
+
     Maximize2,
-    Minimize2,
-    FileText,
+
     Users as UsersIcon,
     Calendar as CalendarIcon,
     Package,
@@ -51,12 +35,7 @@ import Loading from "../components/Loading";
 import { useNavigate } from "react-router-dom";
 
 const ReportPage = () => {
-    const [timeframe, setTimeframe] = useState("monthly");
-    const [expandedSections, setExpandedSections] = useState({});
-    const [selectedChart, setSelectedChart] = useState("bar");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [showFilters, setShowFilters] = useState(false);
-    const [fullscreenSection, setFullscreenSection] = useState(null);
+
 
     const { data: leadReport, isLoading } = useGetLeadReportQuery();
     const { data: salesReport } = useGetSalesReportQuery();
@@ -66,16 +45,7 @@ const ReportPage = () => {
 
     const navigate = useNavigate()
 
-    const toggleSection = (section) => {
-        setExpandedSections(prev => ({
-            ...prev,
-            [section]: !prev[section]
-        }));
-    };
 
-    const toggleFullscreen = (section) => {
-        setFullscreenSection(fullscreenSection === section ? null : section);
-    };
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', {
@@ -86,18 +56,7 @@ const ReportPage = () => {
         }).format(amount || 0);
     };
 
-    const getStatusColor = (status) => {
-        const colors = {
-            'won': 'bg-emerald-100 text-emerald-800 border-emerald-200',
-            'lost': 'bg-red-100 text-red-800 border-red-200',
-            'pending': 'bg-amber-100 text-amber-800 border-amber-200',
-            'converted': 'bg-green-100 text-green-800 border-green-200',
-            'incoming': 'bg-blue-100 text-blue-800 border-blue-200',
-            'contacted': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-            'follow-up': 'bg-purple-100 text-purple-800 border-purple-200'
-        };
-        return colors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800 border-gray-200';
-    };
+
 
     const getGradient = (index) => {
         const gradients = [
@@ -197,6 +156,7 @@ const ReportPage = () => {
                         icon={<PieChart size={20} />}
                         iconBg="bg-blue-100"
                         iconColor="text-blue-600"
+                        navigate={navigate}
                     >
                         <div className="space-y-4">
                             {leadReport?.statusReport?.map((item, idx) => {
@@ -233,6 +193,7 @@ const ReportPage = () => {
                         icon={<BarChart3 size={20} />}
                         iconBg="bg-purple-100"
                         iconColor="text-purple-600"
+                        navigate={navigate}
                     >
                         <div className="space-y-4">
                             {leadReport?.sourceReport?.map((item, idx) => {
@@ -471,7 +432,7 @@ const ReportPage = () => {
 /* ======================
    QUICK STAT CARD
 ====================== */
-const QuickStatCard = ({ title, value, change, trend, icon, gradient }) => (
+const QuickStatCard = ({ title, value, change, trend, icon, gradient  }) => (
     <div className="bg-white rounded-2xl shadow-sm p-5 hover:shadow-lg transition-all duration-300 border border-gray-100 group">
         <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{title}</p>
@@ -546,7 +507,7 @@ const SummaryCard = ({ title, value, icon: Icon, change, color, subtext }) => {
 /* ======================
    CHART CARD
 ====================== */
-const ChartCard = ({ title, icon, iconBg, iconColor, children }) => (
+const ChartCard = ({ title, icon, iconBg, iconColor, children , navigate }) => (
     // <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-all">
     <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-all relative">
         <div className="flex items-center justify-between mb-6">
@@ -558,7 +519,7 @@ const ChartCard = ({ title, icon, iconBg, iconColor, children }) => (
             </div>
             {/* <div  className="flex items-center gap-2 z-50"> */}
             <div className="flex items-center gap-2 relative z-50">
-              
+
 
                 <button onClick={() => navigate('/Leads')} className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1  cursor-pointer">
                     View All

@@ -63,10 +63,18 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
         }
     };
 
+    // const handleLogout = () => {
+    //     localStorage.removeItem('token');
+    //     localStorage.removeItem('userRole');
+    //     navigate('/login');
+    // };
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userRole');
+
         navigate('/login');
+        window.location.reload();
     };
 
     // Check if a section is active

@@ -102,7 +102,7 @@ function LeadView() {
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
 
-  
+
 
 
     const { data: PaginatedLeads, isFetching } = useGetLeadsPaginatedQuery({
@@ -447,7 +447,7 @@ function LeadView() {
                                 sheetName="Leads"
                                 formatData={formatLeads}
                             >
-                                Download Executives
+                                Download Leads
                             </ExcelButton>
 
                             {profile?.role === 'admin' && (
@@ -767,13 +767,13 @@ function LeadView() {
                                                 >
                                                     <Eye size={16} />
                                                 </button>
-                                                <button
+                                                {/* <button
                                                     onClick={() => navigate(`/editLead/${lead._id}`)}
                                                     className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-all"
                                                     title="Edit Lead"
                                                 >
                                                     <Edit2 size={16} />
-                                                </button>
+                                                </button> */}
                                                 <button
                                                     onClick={() => setDeleteConfirmId(lead._id)}
                                                     className="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-all"
@@ -944,27 +944,40 @@ function LeadView() {
                                                 <Users size={12} />
                                                 Assigned To
                                             </span>
-                                            <div className="modal-edit-row flex items-center gap-3 flex-wrap">
-                                                <div className="assignee-grid modal-assignee-grid flex flex-wrap gap-2">
+
+                                            <div className="modal-edit-row flex items-center gap-3 flex-wrap w-full">
+                                                <select
+                                                    value={String(viewLead.assignedTo?._id || viewLead.assignedTo || '')}
+                                                    // onChange={(e) => {
+                                                    //     const selectedId = e.target.value;
+                                                    //     setSelectedExecutive(selectedId);
+                                                    //     setConfirmAssignId(selectedId);
+                                                    // }}
+
+                                                    onChange={async (e) => {
+                                                        const selectedId = e.target.value;
+
+                                                        setSelectedExecutive(selectedId);
+
+                                                        await handleModalFieldSave('assignedTo', selectedId);
+                                                    }}
+                                                    className="w-full p-3 border border-[#e5e7eb] rounded-lg bg-white text-sm 
+                                                      focus:outline-none focus:ring-2 focus:ring-[#4f46e5]"
+                                                >
+                                                    <option value="">Select Executive</option>
+
                                                     {executives?.data?.map(exec => (
-                                                        <button
-                                                            key={exec._id}
-                                                            type="button"
-                                                            className={`assignee-card flex flex-col items-start p-3 border ${String(viewLead.assignedTo?._id || viewLead.assignedTo || '') === String(exec._id)
-                                                                ? 'border-[#4f46e5] bg-[#ede9fe]'
-                                                                : 'border-[#e5e7eb] bg-white hover:border-[#4f46e5] hover:bg-[#f5f3ff]'} 
-                                                        rounded-lg transition-all min-w-[150px]`}
-                                                            onClick={() => {
-                                                                setSelectedExecutive(exec._id);
-                                                                setConfirmAssignId(exec._id);
-                                                            }}
-                                                        >
-                                                            <span className="assignee-name text-xs font-bold text-[#1a1a2e] tracking-wide">{exec.name.toUpperCase()}</span>
-                                                            <span className="assignee-phone text-[11px] text-[#7a8394] mt-0.5">{exec.phone}</span>
-                                                        </button>
+                                                        <option key={exec._id} value={exec._id}>
+                                                            {exec.name.toUpperCase()} {exec.phone ? `(${exec.phone})` : ""}
+                                                        </option>
                                                     ))}
-                                                    {executives.length === 0 && <p className="hint-text text-xs text-[#9ca3af] italic">No executives available.</p>}
-                                                </div>
+                                                </select>
+
+                                                {executives?.data?.length === 0 && (
+                                                    <p className="hint-text text-xs text-[#9ca3af] italic">
+                                                        No executives available.
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
 
@@ -1260,11 +1273,11 @@ function LeadView() {
                                             <div className="flex flex-col items-center">
                                                 <div className="w-12 h-12 rounded-full bg-green-100 border-2 border-green-200 flex items-center justify-center mb-1">
                                                     <span className="text-lg font-bold text-green-600">
-                                                        {executives.find(e => e._id === selectedExecutive)?.name?.charAt(0).toUpperCase()}
+                                                        {executives?.data?.find(e => e._id === selectedExecutive)?.name?.charAt(0).toUpperCase()}
                                                     </span>
                                                 </div>
                                                 <span className="text-xs font-medium text-green-700">
-                                                    {executives.find(e => e._id === selectedExecutive)?.name}
+                                                    {executives?.data?.find(e => e._id === selectedExecutive)?.name}
                                                 </span>
                                             </div>
                                         </div>

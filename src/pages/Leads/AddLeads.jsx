@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import RemarkEditor from "../../components/RemarkEditor";
 import { useGetUsersQuery, useCreateLeadMutation } from "../../redux/api";
 import { leadSources, leadStatus } from "../../components/data";
+import toast from "react-hot-toast";
 
 function AddLead() {
     const navigate = useNavigate();
@@ -36,8 +37,10 @@ function AddLead() {
     });
 
     const { data } = useGetUsersQuery();
-    const [CreateLead] = useCreateLeadMutation();
+    const [CreateLead, result] = useCreateLeadMutation();
     const salesTeam = data || [];
+
+    console.log()
 
     const [errors, setErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
@@ -251,11 +254,12 @@ function AddLead() {
             await CreateLead(lead).unwrap();
 
             setShowSuccess(true);
+            navigate(-1);
 
-            setTimeout(() => {
-                setShowSuccess(false);
-                navigate(-1);
-            }, 2000);
+            // setTimeout(() => {
+            //     setShowSuccess(false);
+
+            // }, 2000);
 
             // Reset form after successful submission
             setTimeout(() => {
@@ -278,6 +282,7 @@ function AddLead() {
 
         } catch (error) {
             console.error("Error creating lead:", error);
+            toast.error(error?.data?.message)
             const errorMessage = error.data?.message || "Failed to create lead";
 
             if (errorMessage.includes("phone")) {
@@ -576,51 +581,37 @@ function AddLead() {
                                 </div>
                             </div>
 
-                            {/* 👉 baaki code SAME rakho (Assign, FollowUp, Value, Remarks etc.) */}
+
 
                             {/* Assign Lead */}
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Assign Lead To <span className="text-red-500">*</span>
                                 </label>
-                                {console.log(salesTeam)}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    {salesTeam?.data.map((person) => (
-                                        <label
-                                            key={person._id}
-                                            className={`flex items-center p-3 border rounded-xl cursor-pointer transition-all
-                                                ${lead.assignedTo === person._id
-                                                    ? "border-blue-500 bg-blue-50 shadow-sm"
-                                                    : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
-                                                }`}
-                                            onClick={() => handleRadioChange(person._id)}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="assignedTo"
-                                                value={person._id}
-                                                checked={lead.assignedTo === person._id}
-                                                onChange={handleChange}
-                                                className="sr-only"
-                                            />
-                                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-semibold text-sm">
-                                                {person.name?.charAt(0)?.toUpperCase() || 'U'}
-                                            </div>
-                                            <div className="ml-3 flex-1">
-                                                <p className="text-sm font-medium text-gray-900">{person.name}</p>
-                                                <p className="text-xs text-gray-500">{person.phone || 'No phone'}</p>
-                                            </div>
-                                            {lead.assignedTo === person._id && (
-                                                <CheckCircle size={16} className="text-blue-600" />
-                                            )}
-                                        </label>
-                                    ))}
-                                    {salesTeam.length === 0 && (
-                                        <div className="col-span-full text-center py-8 text-gray-500">
+                                {/* {console.log(salesTeam)} */}
+                                <div className="w-full">
+                                    <select
+                                        name="assignedTo"
+                                        value={lead.assignedTo || ""}
+                                        onChange={handleChange}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                        <option value="">Select Sales Executive</option>
+
+                                        {salesTeam?.data?.map((person) => (
+                                            <option key={person._id} value={person._id}>
+                                                {person.name} {person.phone ? `(${person.phone})` : ""}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    {salesTeam?.data?.length === 0 && (
+                                        <p className="text-sm text-gray-500 mt-2">
                                             No sales executives available
-                                        </div>
+                                        </p>
                                     )}
                                 </div>
+
                                 {touched.assignedTo && errors.assignedTo && (
                                     <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
                                         <AlertCircle size={12} />
@@ -729,9 +720,10 @@ function AddLead() {
                             <button
                                 type="submit"
                                 className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium"
+                                disabled={result?.isLoading}
                             >
                                 <SaveAll size={16} />
-                                Save Lead
+                                {result?.isLoading ? "Loading.." : "Save Lead"}
                             </button>
                         </div>
                     </form>

@@ -588,7 +588,7 @@ function ViewExecutives() {
 
                     {/* Performance Modal */}
                     {showPerformanceModal && selectedExecutive && (
-                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowPerformanceModal(false)}>
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-1500 flex items-center justify-center p-4" onClick={() => setShowPerformanceModal(false)}>
                             <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
                                     <div className="flex items-center justify-between">
