@@ -1,5 +1,5 @@
 // Login.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Mail,
     Lock,
@@ -16,8 +16,8 @@ import {
     Mail as MailIcon,
     Chrome
 } from 'lucide-react';
-import { useLoginMutation } from '../redux/api';
-import { useNavigate } from 'react-router-dom';
+import { useGetProductsQuery, useLoginMutation } from '../redux/api';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 import logo from "../assets/logo.png";
 import toast from 'react-hot-toast';
@@ -31,6 +31,17 @@ const Login = () => {
     const [rememberMe, setRememberMe] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({});
+
+
+
+
+    // useEffect(() => {
+    //     let value = localStorage.getItem('token')
+    //     if (value) {
+    //         navigate(-1)
+    //     }
+
+    // }, [])
 
     // use2
 
@@ -76,16 +87,17 @@ const Login = () => {
                 if (res?.data?.token) {
 
                     localStorage.setItem("token", res.data.token);
+
+                    // ✅ ADD THIS
+                    localStorage.setItem("user", JSON.stringify(res.data.user));
+
                     if (res?.data?.user?.role === "admin") {
                         navigate('/');
-
                     } else {
                         navigate('/Leads');
                     }
 
-
                 } else {
-                    // console.log("Login failed");
                     toast.error(res?.error?.data?.message)
                 }
 
@@ -100,13 +112,18 @@ const Login = () => {
         }
     };
 
-    // Features list for the right side
-    const features = [
-        { icon: MessageSquare, text: 'WhatsApp Chatbot Integration', color: 'text-green-500' },
-        { icon: Users, text: 'Lead Management & Tracking', color: 'text-blue-500' },
-        { icon: BarChart3, text: 'Real-time Analytics', color: 'text-purple-500' },
-        { icon: Shield, text: 'Secure & Encrypted', color: 'text-red-500' },
-    ];
+
+
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (token && user) {
+        if (user.role === "admin") {
+            return <Navigate to="/" replace />;
+        } else {
+            return <Navigate to="/Leads" replace />;
+        }
+    }
 
     return (
         <div className="min-h-screen  bg-gradient-to-br from-blue-600 to-purple-700">
@@ -182,24 +199,7 @@ const Login = () => {
                                 )}
                             </div>
 
-                            {/* Remember Me & Forgot Password */}
-                            {/* <div className="flex items-center justify-between">
-                                <label className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        checked={rememberMe}
-                                        onChange={(e) => setRememberMe(e.target.checked)}
-                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                    />
-                                    <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                                </label>
-                                <button
-                                    type="button"
-                                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                                >
-                                    Forgot Password?
-                                </button>
-                            </div> */}
+
 
                             {/* Login Button */}
                             <button
@@ -223,47 +223,8 @@ const Login = () => {
                                 )}
                             </button>
 
-                            {/* Social Login Options */}
-                            <div className="relative my-8">
-                                {/* <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-gray-300"></div>
-                                </div> */}
-                                {/* <div className="relative flex justify-center text-sm">
-                                    <span className="px-4 bg-white text-gray-500">Or continue with</span>
-                                </div> */}
-                            </div>
 
-                            {/* <div className="grid grid-cols-3 gap-3">
-                                <button
-                                    type="button"
-                                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    <Chrome size={20} className="text-gray-700" />
-                                </button>
-                                <button
-                                    type="button"
-                                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    <MailIcon size={20} className="text-gray-700" />
-                                </button>
-                                <button
-                                    type="button"
-                                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    <Facebook size={20} className="text-blue-600" />
-                                </button>
-                            </div> */}
 
-                            {/* Sign Up Link */}
-                            {/* <p className="text-center text-gray-600">
-                                Don't have an account?{' '}
-                                <button
-                                    type="button"
-                                    className="text-blue-600 hover:text-blue-800 font-medium"
-                                >
-                                    Sign up for free
-                                </button>
-                            </p> */}
                         </form>
                     </div>
                 </div>
