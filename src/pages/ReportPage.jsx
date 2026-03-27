@@ -100,40 +100,7 @@ const ReportPage = () => {
                     </div>
 
                     {/* Quick Stats Row */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-                        <QuickStatCard
-                            title="Total Revenue"
-                            value={formatCurrency(salesReport?.revenue)}
-                            change="+12.5%"
-                            trend="up"
-                            icon={<DollarSign size={20} />}
-                            gradient="from-emerald-500 to-green-600"
-                        />
-                        <QuickStatCard
-                            title="Conversion Rate"
-                            value={salesReport?.conversionRate || '0%'}
-                            change="+5.2%"
-                            trend="up"
-                            icon={<Target size={20} />}
-                            gradient="from-blue-500 to-indigo-600"
-                        />
-                        <QuickStatCard
-                            title="Active Deals"
-                            value={salesReport?.activeDeals || 0}
-                            change="23 closing"
-                            trend="neutral"
-                            icon={<Clock size={20} />}
-                            gradient="from-orange-500 to-amber-600"
-                        />
-                        <QuickStatCard
-                            title="Team Performance"
-                            value="94%"
-                            change="Above target"
-                            trend="up"
-                            icon={<Award size={20} />}
-                            gradient="from-purple-500 to-pink-600"
-                        />
-                    </div>
+                    
                 </div>
 
                 {/* Summary Cards */}
