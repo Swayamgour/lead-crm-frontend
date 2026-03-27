@@ -71,7 +71,7 @@ const Login = () => {
 
                 const res = await login(body);
 
-                console.log(res?.data?.user?.role);
+                console.log();
 
                 if (res?.data?.token) {
 
@@ -85,8 +85,8 @@ const Login = () => {
 
 
                 } else {
-                    console.log("Login failed");
-                    toast.error('InCorrect Password')
+                    // console.log("Login failed");
+                    toast.error(res?.error?.data?.message)
                 }
 
             } catch (error) {
