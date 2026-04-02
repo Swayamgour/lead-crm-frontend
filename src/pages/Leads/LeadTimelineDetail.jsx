@@ -79,18 +79,18 @@ function LeadTimelineDetail() {
     // Get icon based on activity type
     const getActivityIcon = (type) => {
         const icons = {
-            'lead_created': <Sparkles size={18} className="text-yellow-500" />,
-            'lead_updated': <Edit3 size={18} className="text-green-500" />,
-            'lead_assigned': <UserPlus size={18} className="text-blue-500" />,
-            'remark_added': <MessageSquare size={18} className="text-purple-500" />,
-            'remark_edited': <Edit3 size={18} className="text-orange-500" />,
-            'followup_created': <Bell size={18} className="text-indigo-500" />,
-            'followup_updated': <RefreshIcon size={18} className="text-amber-500" />,
-            'call': <PhoneCall size={18} className="text-emerald-500" />,
-            'email': <MailIcon size={18} className="text-red-500" />,
-            'meeting': <CalendarIcon size={18} className="text-rose-500" />,
+            'lead_created': <Sparkles size={18} className="text-yellow-100" />,
+            'lead_updated': <Edit3 size={18} className="text-green-100" />,
+            'lead_assigned': <UserPlus size={18} className="text-blue-100" />,
+            'remark_added': <MessageSquare size={18} className="text-purple-100" />,
+            'remark_edited': <Edit3 size={18} className="text-orange-100" />,
+            'followup_created': <Bell size={18} className="text-indigo-100" />,
+            'followup_updated': <RefreshIcon size={18} className="text-amber-100" />,
+            'call': <PhoneCall size={18} className="text-emerald-100" />,
+            'email': <MailIcon size={18} className="text-red-100" />,
+            'meeting': <CalendarIcon size={18} className="text-rose-100" />,
         };
-        return icons[type] || <Activity size={18} className="text-gray-500" />;
+        return icons[type] || <Activity size={18} className="text-gray-100" />;
     };
 
     // Get gradient based on activity type

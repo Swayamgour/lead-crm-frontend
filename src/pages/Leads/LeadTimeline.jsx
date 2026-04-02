@@ -243,14 +243,14 @@ function LeadOverview() {
                     </div>
 
                     {/* Secondary Stats Row */}
-                    <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-4">
+                    {/* <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-4">
                         <MiniStatCard title="Calls" value={stats.totalCalls} icon={<PhoneCall size={14} />} color="blue" />
                         <MiniStatCard title="Emails" value={stats.totalEmails} icon={<MailIcon size={14} />} color="red" />
                         <MiniStatCard title="Meetings" value={stats.totalMeetings} icon={<CalendarIcon size={14} />} color="purple" />
                         <MiniStatCard title="Updates" value={processedLeads.reduce((s, l) => s + l.activitiesByType.updates, 0)} icon={<Edit3 size={14} />} color="green" />
                         <MiniStatCard title="Remarks" value={processedLeads.reduce((s, l) => s + l.activitiesByType.remarks, 0)} icon={<MessageSquare size={14} />} color="orange" />
                         <MiniStatCard title="Follow-ups" value={processedLeads.reduce((s, l) => s + l.activitiesByType.followups, 0)} icon={<Bell size={14} />} color="indigo" />
-                    </div>
+                    </div> */}
 
                     {/* Enhanced Filters Section */}
                     <div className="mt-6 bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-4">
