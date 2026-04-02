@@ -84,11 +84,11 @@ function AddEditExecutive() {
     const validatePassword = useCallback((password, isEditMode, existingPassword = "") => {
         if (!isEditMode && !password) return "Password is required";
         if (password) {
-            if (password.length < 8) return "Password must be at least 8 characters";
-            if (password.length > 50) return "Password must be less than 50 characters";
-            if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-                return "Password must contain at least one uppercase letter, one lowercase letter, and one number";
-            }
+            if (password.length < 6) return "Password must be at least 6 characters";
+            // if (password.length > 50) return "Password must be less than 50 characters";
+            // if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+            //     return "Password must contain at least one uppercase letter, one lowercase letter, and one number";
+            // }
         }
         return null;
     }, []);
