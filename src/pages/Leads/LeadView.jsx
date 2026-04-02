@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     User,
     Phone,
@@ -100,6 +100,40 @@ function LeadView() {
     const [activeTab, setActiveTab] = useState("remarks");
     const [selectedRemarkForHistory, setSelectedRemarkForHistory] = useState(null);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    const [openId, setOpenId] = useState(null);
+
+    // import { useRef, useEffect } from "react";
+
+    const dropdownRef = useRef(null);
+
+
+    // useEffect(() => {
+    //     const handleClickOutside = (event) => {
+    //         if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    //             setOpenId(null);
+    //         }
+    //     };
+
+    //     document.addEventListener("mousedown", handleClickOutside);
+
+    //     return () => {
+    //         document.removeEventListener("mousedown", handleClickOutside);
+    //     };
+    // }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setOpenId(null);
+            }
+        };
+
+        document.addEventListener("click", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
 
 
 
@@ -118,7 +152,7 @@ function LeadView() {
     const executives = Executive || [];
 
     // Fetch remarks for selected lead
-    const { data: remarksData, refetch: refetchRemarks } = useGetLeadRemarksQuery(viewLead?._id, {
+    const { data: remarksData, refetch: refetchRemarks, isLoading: remarksLoading } = useGetLeadRemarksQuery(viewLead?._id, {
         skip: !viewLead?._id
     });
 
@@ -153,16 +187,19 @@ function LeadView() {
     const filteredLeads = leads;
 
     const handleStatusChange = async (id, newStatus) => {
+        const toastId = toast.loading("Updating status..."); // 🔥 id store karo
+
         try {
             const res = await updateLead({ id, status: newStatus });
+
             if (res?.data?.success) {
-                toast.success("Status updated successfully");
+                toast.success("Status updated successfully", { id: toastId }); // ✅ replace loading
                 refetchLeads();
             } else {
-                toast.error("Failed to update status");
+                toast.error("Failed to update status", { id: toastId }); // ✅ replace loading
             }
         } catch (error) {
-            toast.error("Error updating status");
+            toast.error("Error updating status", { id: toastId }); // ✅ replace loading
         }
     };
 
@@ -182,6 +219,7 @@ function LeadView() {
     };
 
     const handleModalFieldSave = async (field, value) => {
+        console.log('if')
         if (!viewLead) return;
         setModalSaving(true);
         try {
@@ -200,6 +238,8 @@ function LeadView() {
             setConfirmAssignId(null);
         }
     };
+
+    // console.log(modalSaving)
 
     const handleAddRemark = async () => {
         if (!newRemark.trim() || !viewLead) return;
@@ -469,7 +509,7 @@ function LeadView() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         {/* Won Leads Card */}
                         <div
-                            onClick={() => setActiveSideTab('won')}
+                            // onClick={() => setActiveSideTab('won')}
                             className={`cursor-pointer bg-white rounded-2xl shadow-sm p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'won'
                                 ? 'border-emerald-500 bg-emerald-50/30 shadow-md'
                                 : 'border-gray-100 hover:border-emerald-200'
@@ -487,7 +527,7 @@ function LeadView() {
 
                         {/* Active Leads Card */}
                         <div
-                            onClick={() => setActiveSideTab('active')}
+                            // onClick={() => setActiveSideTab('active')}
                             className={`cursor-pointer bg-white rounded-2xl shadow-sm p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'active'
                                 ? 'border-blue-500 bg-blue-50/30 shadow-md'
                                 : 'border-gray-100 hover:border-blue-200'
@@ -505,7 +545,7 @@ function LeadView() {
 
                         {/* Lost Leads Card */}
                         <div
-                            onClick={() => setActiveSideTab('lost')}
+                            // onClick={() => setActiveSideTab('lost')}
                             className={`cursor-pointer bg-white rounded-2xl shadow-sm p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'lost'
                                 ? 'border-red-500 bg-red-50/30 shadow-md'
                                 : 'border-gray-100 hover:border-red-200'
@@ -523,7 +563,7 @@ function LeadView() {
 
                         {/* Pending Leads Card */}
                         <div
-                            onClick={() => setActiveSideTab('pending')}
+                            // onClick={() => setActiveSideTab('pending')}
                             className={`cursor-pointer bg-white rounded-2xl shadow-sm p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'pending'
                                 ? 'border-yellow-500 bg-yellow-50/30 shadow-md'
                                 : 'border-gray-100 hover:border-yellow-200'
@@ -702,6 +742,9 @@ function LeadView() {
                                                 </div>
                                             </div>
                                         </td>
+
+
+
                                         <td className="px-4 py-3">
                                             {/* <div className="relative inline-block"> */}
                                             <div className="relative inline-block w-[108px]">
@@ -720,7 +763,9 @@ function LeadView() {
 
                                                 {/* Hidden Select (overlay) */}
                                                 <select
-                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    className="absolute inset-0 w-full h-full cursor-pointer 
+                                                     appearance-none bg-transparent text-transparent pl-2 
+                                                     focus:outline-none"
                                                     value={lead.status}
                                                     onChange={async (e) => {
                                                         const newStatus = e.target.value;
@@ -728,13 +773,20 @@ function LeadView() {
                                                     }}
                                                 >
                                                     {leadStatus?.map((status) => (
-                                                        <option key={status.value} value={status.value}>
+                                                        <option
+                                                            key={status.value}
+                                                            value={status.value}
+                                                            className="text-gray-800 bg-white text-[10px]"
+                                                        >
                                                             {status.label || status.value}
                                                         </option>
                                                     ))}
                                                 </select>
                                             </div>
                                         </td>
+
+
+
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
                                                 {lead.assignedTo ? (
@@ -750,8 +802,8 @@ function LeadView() {
                                                 {formatDate(lead.followUpDate)}
                                             </div>
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center gap-1">
+                                        <td className="px-4 py-3 ">
+                                            <div onClick={() => { setViewLead(lead); setActiveTab('history') }} className="flex items-center gap-1 cursor-pointer">
                                                 <MessageCircle size={12} className="text-gray-400" />
                                                 <span className="text-xs text-gray-600">
                                                     {lead.remarksCount || 0} remarks
@@ -886,7 +938,7 @@ function LeadView() {
                                 >
                                     <div className="flex items-center gap-2">
                                         <MessageCircle size={16} />
-                                        Remarks ({remarksData?.remarks?.length || 0})
+                                        Details
                                     </div>
                                 </button>
                                 <button
@@ -897,7 +949,8 @@ function LeadView() {
                                 >
                                     <div className="flex items-center gap-2">
                                         <History size={16} />
-                                        History
+
+                                        Remarks ({remarksData?.remarks?.length || 0})
                                     </div>
                                 </button>
                             </div>
@@ -992,9 +1045,15 @@ function LeadView() {
                                                     <Calendar size={15} className="text-[#9ca3af]" />
                                                     <input
                                                         type="date"
-                                                        defaultValue={viewLead.followUpDate ? new Date(viewLead.followUpDate).toISOString().split('T')[0] : ''}
-                                                        onBlur={e => {
-                                                            if (e.target.value) handleModalFieldSave('followUpDate', e.target.value);
+                                                        value={
+                                                            viewLead.followUpDate
+                                                                ? new Date(viewLead.followUpDate).toISOString().split("T")[0]
+                                                                : ""
+                                                        }
+                                                        onChange={(e) => {
+                                                            if (e.target.value) {
+                                                                handleModalFieldSave("followUpDate", e.target.value);
+                                                            }
                                                         }}
                                                         className="flex-1 border-none outline-none text-sm text-[#1a1a2e] bg-transparent"
                                                     />
@@ -1120,20 +1179,38 @@ function LeadView() {
 
                                         {/* Remarks List */}
                                         <div className="remarks-list space-y-3">
-                                            {remarksData?.remarks?.length > 0 ? (
+                                            {remarksLoading ? (
+                                                // 🔄 Loading State
+                                                <div className="text-center py-8 text-sm text-gray-500">
+                                                    Loading remarks...
+                                                </div>
+                                            ) : remarksData?.remarks?.length > 0 ? (
+                                                // ✅ Data State
                                                 remarksData.remarks.map((remark) => (
-                                                    <div key={remark._id} className="remark-item bg-white border border-[#f0f2f5] rounded-lg p-4 hover:shadow-sm transition-shadow">
+                                                    <div
+                                                        key={remark._id}
+                                                        className="remark-item bg-white border border-[#f0f2f5] rounded-lg p-4 hover:shadow-sm transition-shadow"
+                                                    >
                                                         <div className="flex items-start justify-between gap-2">
                                                             <div className="remark-content flex-1">
-                                                                <p className="text-sm text-[#1a1a2e] whitespace-pre-wrap">{remark.text}</p>
+                                                                <p className="text-sm text-[#1a1a2e] whitespace-pre-wrap">
+                                                                    {remark.text}
+                                                                </p>
+
                                                                 <div className="flex items-center gap-2 mt-2">
                                                                     <span className="text-xs text-[#7a8394]">
-                                                                        By: <span className="font-medium text-[#4f46e5]">{remark.createdByName}</span>
+                                                                        By:{" "}
+                                                                        <span className="font-medium text-[#4f46e5]">
+                                                                            {remark.createdByName}
+                                                                        </span>
                                                                     </span>
+
                                                                     <span className="text-xs text-[#7a8394]">•</span>
+
                                                                     <span className="text-xs text-[#7a8394]">
                                                                         {formatDate(remark.createdAt)}
                                                                     </span>
+
                                                                     {remark.isEdited && (
                                                                         <>
                                                                             <span className="text-xs text-[#7a8394]">•</span>
@@ -1145,6 +1222,7 @@ function LeadView() {
                                                                     )}
                                                                 </div>
                                                             </div>
+
                                                             <div className="remark-actions flex items-center gap-1">
                                                                 <button
                                                                     onClick={() => {
@@ -1153,21 +1231,20 @@ function LeadView() {
                                                                         setShowAddRemark(false);
                                                                     }}
                                                                     className="p-1.5 text-gray-400 hover:text-[#4f46e5] hover:bg-[#ede9fe] rounded-md transition-colors"
-                                                                    title="Edit remark"
                                                                 >
                                                                     <Edit2 size={14} />
                                                                 </button>
+
                                                                 <button
                                                                     onClick={() => handleDeleteRemark(remark._id)}
                                                                     className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                                                    title="Delete remark"
                                                                 >
                                                                     <Trash2 size={14} />
                                                                 </button>
+
                                                                 <button
                                                                     onClick={() => setSelectedRemarkForHistory(remark)}
                                                                     className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-colors"
-                                                                    title="View history"
                                                                 >
                                                                     <History size={14} />
                                                                 </button>
@@ -1176,13 +1253,18 @@ function LeadView() {
                                                     </div>
                                                 ))
                                             ) : (
+                                                // ❌ Empty State
                                                 <div className="empty-remarks text-center py-8">
                                                     <MessageCircle size={32} className="text-[#9ca3af] mx-auto mb-2" />
                                                     <p className="text-sm text-[#7a8394]">No remarks yet</p>
-                                                    <p className="text-xs text-[#9ca3af] mt-1">Click "Add New Remark" to add your first note</p>
+                                                    <p className="text-xs text-[#9ca3af] mt-1">
+                                                        Click "Add New Remark" to add your first note
+                                                    </p>
                                                 </div>
                                             )}
                                         </div>
+
+
                                         <div className="flex justify-end mb-4">
                                             <button
                                                 onClick={handleDownloadPDF}

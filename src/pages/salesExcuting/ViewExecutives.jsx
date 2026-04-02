@@ -16,7 +16,7 @@ import {
     Calendar,
 
     CheckCircle,
-   
+
 
     Target,
 
@@ -29,6 +29,7 @@ import Loading from "../../components/Loading";
 import { Chip } from "@mui/material";
 import ConfirmModal from "../../components/ConfirmModal";
 import ExcelButton from "../../components/ExcelButton";
+import toast from "react-hot-toast";
 
 function ViewExecutives() {
     const navigate = useNavigate();
@@ -68,12 +69,12 @@ function ViewExecutives() {
             setDeleteConfirmId(null);
             toast.success("User deleted successfully");
 
-            if (res?.success) {
+            // if (res?.success) {
 
-                // refetch();
-            } else {
-                toast.error("Failed to delete User");
-            }
+            //     // refetch();
+            // } else {
+            //     toast.error("Failed to delete User");
+            // }
         } catch (error) {
             toast.error("Error deleting User");
         }
@@ -181,6 +182,7 @@ function ViewExecutives() {
             }).unwrap();
 
             setDeleteConfirmStatus(null); // close modal
+            toast.success('Executive status updated successfully')
             refetch();
         } catch (error) {
             console.error("Error toggling status:", error);
@@ -287,7 +289,7 @@ function ViewExecutives() {
                             value={usersData?.pagination?.totalItems}
                             icon={Users}
                             color="from-blue-500 to-blue-600"
-                            // trend={`${stats.active} active now`}
+                        // trend={`${stats.active} active now`}
 
                         />
                         <StatCard
@@ -583,7 +585,7 @@ function ViewExecutives() {
                         </div>
 
                         {/* Pagination */}
-                      
+
                     </div>
 
                     {/* Performance Modal */}
@@ -812,7 +814,7 @@ function ViewExecutives() {
                     {/* Desktop view */}
                     <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-end">
                         {/* Info section */}
-                       
+
 
                         {/* Pagination buttons */}
                         <div className="flex items-center space-x-2">

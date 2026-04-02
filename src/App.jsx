@@ -28,7 +28,15 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Toaster />
+
+      <Toaster
+        // position="ce"
+        toastOptions={{
+          style: {
+            zIndex: 9999,
+          },
+        }}
+      />
 
       <Routes>
 

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCreateUserMutation, useUpdateUserMutation, useGetUserByIdQuery } from "../../redux/api";
+import toast from "react-hot-toast";
 
 function AddEditExecutive() {
     const navigate = useNavigate();
@@ -261,10 +262,11 @@ function AddEditExecutive() {
             }
 
             setShowSuccess(true);
-             navigate("/ViewExecutives");
+            toast.success(isEditMode ? "Executive updated successfully!" : "Executive added successfully!");
+            navigate("/ViewExecutives");
 
             // setTimeout(() => {
-               
+
             // }, 1500);
 
         } catch (error) {

@@ -262,7 +262,7 @@ function LeadTimelineDetail() {
                 <div className="relative mb-8">
                     <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl blur-xl opacity-30"></div>
                     <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden">
-                        <div className="relative h-32 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
+                        {/* <div className="relative h-32 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
                             <div className="absolute inset-0 bg-black/20"></div>
                             <div className="absolute -bottom-12 left-8">
                                 <div className="relative">
@@ -273,10 +273,10 @@ function LeadTimelineDetail() {
                                 </div>
                             </div>
 
-                        </div>
+                        </div> */}
 
                         {/* {console.log(data?.lead)} */}
-                        <div className="pt-14 pb-6 px-8">
+                        <div className="pt-6 pb-6 px-8">
                             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                 <div>
                                     <h1 className="text-2xl font-bold text-gray-800">{data?.lead?.name}</h1>
