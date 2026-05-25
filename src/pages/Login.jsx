@@ -35,15 +35,7 @@ const Login = () => {
 
 
 
-    // useEffect(() => {
-    //     let value = localStorage.getItem('token')
-    //     if (value) {
-    //         navigate(-1)
-    //     }
-
-    // }, [])
-
-    // use2
+    
 
     const validateForm = () => {
         const newErrors = {};
@@ -80,18 +72,21 @@ const Login = () => {
                     password: password
                 };
 
-                const res = await login(body);
+                // const res = await login(body);
+                const res = await login(body).unwrap();
 
-                console.log();
+                console.log(res);
 
-                if (res?.data?.token) {
+                if (res?.token) {
 
-                    localStorage.setItem("token", res.data.token);
+                    localStorage.setItem("token", res.token);
+
+                    console.log("user data", res?.token)
 
                     // ✅ ADD THIS
-                    localStorage.setItem("user", JSON.stringify(res.data.user));
+                    localStorage.setItem("user", JSON.stringify(res.user?.role));
 
-                    if (res?.data?.user?.role === "admin") {
+                    if (res?.user?.role === "admin") {
                         navigate('/');
                     } else {
                         navigate('/Leads');

@@ -86,10 +86,19 @@ const MainLayout = () => {
         setAnchorEl(null);
     };
 
+    // const handleLogout = () => {
+    //     localStorage.removeItem('token');
+    //     navigate('/login');
+    //     window.location.reload();
+    // };
+
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-        window.location.reload();
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        navigate("/login", { replace: true });
+
     };
 
 

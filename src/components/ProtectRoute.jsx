@@ -5,27 +5,44 @@ import Loading from "./Loading";
 
 function ProtectRoute() {
 
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
 
-    const { data, isLoading } = useGetProfileQuery(undefined, {
+    // Skip API if no token
+    const {
+        data,
+        isLoading,
+        isFetching,
+        isError,
+        error
+    } = useGetProfileQuery(undefined, {
         skip: !token
-    })
+    });
 
+    // No token
     if (!token) {
-        return <Navigate to="/login" replace />
+        return <Navigate to="/login" replace />;
     }
 
-    if (isLoading) {
-        return (
-            <Loading data={'Screen'} />
-        )
+    // Loading
+    if (isLoading || isFetching) {
+        return <Loading data="Screen" />;
     }
 
-    if (!data) {
-        return <Navigate to="/login" replace />
+    // Invalid token
+    if (
+        isError ||
+        error?.status === 401 ||
+        !data
+    ) {
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        return <Navigate to="/login" replace />;
     }
 
-    return <Outlet />
+    // Authorized
+    return <Outlet />;
 }
 
-export default ProtectRoute
+export default ProtectRoute;

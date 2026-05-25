@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Phone,
     Mail,
@@ -60,6 +60,18 @@ function ViewExecutives() {
     // console.log()
     const [updateExecutive] = useUpdateUserMutation();
     const [deleteUser] = useDeleteUserMutation();
+
+    // const { data } = useGetProfileQuery()
+
+    useEffect(() => {
+        if (error && error.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+
+            // optional: reload or redirect
+            window.location.href = "/login";
+        }
+    }, [error]);
 
 
     const handleDeleteLead = async (id) => {
