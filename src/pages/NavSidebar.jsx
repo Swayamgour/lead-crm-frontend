@@ -28,7 +28,7 @@ import {
 import { sidebarSections } from "../../sidebarConfig";
 // import { sidebarSections } from "../config/sidebarConfig"; // Import your config
 import logo from '../assets/logo.png'
-import { useGetMenuQuery } from "../redux/api";
+import { useGetProfileQuery } from "../redux/api";
 
 function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenuOpen }) {
     const location = useLocation();
@@ -38,7 +38,7 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
     // Get user role from localStorage or context
     // Replace with actual role from auth
 
-    const { data } = useGetMenuQuery()
+    const { data } = useGetProfileQuery()
 
     // console.log(data?.role)
 

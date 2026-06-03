@@ -16,7 +16,7 @@ import {
     Mail as MailIcon,
     Chrome
 } from 'lucide-react';
-import {  useLoginMutation } from '../redux/api';
+import { useGetProductsQuery, useLoginMutation } from '../redux/api';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 import logo from "../assets/logo.png";
@@ -110,15 +110,15 @@ const Login = () => {
 
 
     const token = localStorage.getItem("token");
-    // const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user"));
 
-    // if (token && user) {
-    //     if (user.role === "admin") {
-    //         return <Navigate to="/" replace />;
-    //     } else {
-    //         return <Navigate to="/Leads" replace />;
-    //     }
-    // }
+    if (token && user) {
+        if (user.role === "admin") {
+            return <Navigate to="/" replace />;
+        } else {
+            return <Navigate to="/Leads" replace />;
+        }
+    }
 
     return (
         <div className="min-h-screen  bg-gradient-to-br from-blue-600 to-purple-700">

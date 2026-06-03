@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useGetMenuQuery } from "../redux/api.jsx";
+import { useGetProfileQuery } from "../redux/api.jsx";
 import {
     Box,
     Drawer,
@@ -53,7 +53,7 @@ const MainLayout = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
 
-    const { data: profile } = useGetMenuQuery();
+    const { data: profile } = useGetProfileQuery();
 
     // Handle responsive sidebar
     useEffect(() => {
