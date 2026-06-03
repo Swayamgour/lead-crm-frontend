@@ -1,517 +1,249 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const BASE_URL = "https://daryoo.lead.crm.amaxjobs.com/api";
-// const BASE_URL = "http://localhost:5001/api";
-
-const baseQuery = fetchBaseQuery({
-    baseUrl: BASE_URL,
-    prepareHeaders: (headers) => {
-
-        const token =
-            localStorage.getItem("token") ||
-            sessionStorage.getItem("token");
-
-        if (token) {
-            headers.set("authorization", `Bearer ${token}`);
-        }
-
-        headers.set("Content-Type", "application/json");
-
-        return headers;
-    },
-});
+const BASE_URL = 'http://localhost:5000/api'; // your backend URL
 
 export const api = createApi({
-    reducerPath: "api",
-    baseQuery,
-    tagTypes: [
-        "Auth",
-        "Users",
-        "Leads",
-        "Followups",
-        "Customers",
-        "Products",
-        "Quotations",
-        "Dashboard",
-        "Timeline",
-        "Remarks"
-    ],
-
+    reducerPath: 'api',
+    baseQuery: fetchBaseQuery({
+        baseUrl: BASE_URL,
+        prepareHeaders: (headers) => {
+            // If you have token stored in localStorage
+            const token = localStorage.getItem('token');
+            if (token) {
+                headers.set('authorization', `Bearer ${token}`);
+            }
+            return headers;
+        },
+    }),
+    tagTypes: ['Category'],
     endpoints: (builder) => ({
 
-        // ================= AUTH =================
 
         login: builder.mutation({
-            query: (data) => ({
-                url: "/auth/login",
-                method: "POST",
-                body: data,
+            query: (credentials) => ({
+                url: '/auth/login',
+                method: 'POST',
+                body: credentials,
             }),
+            invalidatesTags: ['Category'],
         }),
 
-        register: builder.mutation({
-            query: (data) => ({
-                url: "/auth/register",
-                method: "POST",
-                body: data,
+
+        // Add to your existing api.js
+
+        // Banner endpoints
+        getBanners: builder.query({
+            query: () => '/banners',
+            providesTags: ['Banner'],
+            transformResponse: (response) => response,
+        }),
+
+        getActiveBanners: builder.query({
+            query: () => '/banners/active',
+            providesTags: ['Banner'],
+            transformResponse: (response) => response,
+        }),
+
+        getBannerById: builder.query({
+            query: (id) => `/banners/${id}`,
+            providesTags: ['Banner'],
+            transformResponse: (response) => response,
+        }),
+
+        createBanner: builder.mutation({
+            query: (bannerData) => ({
+                url: '/banners',
+                method: 'POST',
+                body: bannerData,
             }),
+            invalidatesTags: ['Banner'],
         }),
 
-        getProfile: builder.query({
-            query: () => "/auth/profile",
-            providesTags: ["Auth"],
-        }),
-
-        // ================= USERS =================
-
-        // getUsers: builder.query({
-        //     query: () => "/users",
-        //     providesTags: ["Users"],
-        // }),
-
-        // In your API slice
-        getUsers: builder.query({
-            query: ({ page = 1, limit = 10 } = {}) => `/users?page=${page}&limit=${limit}`,
-            providesTags: ["Users"],
-        }),
-
-        getUserById: builder.query({
-            query: (id) => `/users/${id}`,
-            providesTags: ["Users"],
-        }),
-
-        createUser: builder.mutation({
-            query: (data) => ({
-                url: "/users",
-                method: "POST",
-                body: data,
-            }),
-            invalidatesTags: ["Users"],
-        }),
-
-        updateUser: builder.mutation({
-            query: ({ id, data }) => ({
-                url: `/users/${id}`,
-                method: "PUT",
-                body: data,
-            }),
-            invalidatesTags: ["Users"],
-        }),
-        deleteUser: builder.mutation({
-            query: (id) => ({
-                url: `/users/${id}`,
-                method: "DELETE",
-            }),
-            invalidatesTags: ["Users"],
-        }),
-
-        // ================= LEADS =================
-
-        getLeads: builder.query({
-            query: () => "/leads",
-            providesTags: ["Leads"],
-        }),
-
-
-        getLeadsPaginated: builder.query({
-            query: ({ page, limit, status, search, startDate, endDate }) => ({
-                url: "/leads/paginated",
-                params: {
-                    page,
-                    limit,
-                    status,
-                    search,
-                    startDate,
-                    endDate
-                }
-            }),
-            providesTags: ["Leads"],
-
-        }),
-
-        getLeadById: builder.query({
-            query: (id) => `/leads/${id}`,
-        }),
-
-        createLead: builder.mutation({
-            query: (data) => ({
-                url: "/leads",
-                method: "POST",
-                body: data,
-            }),
-            invalidatesTags: ["Leads"],
-        }),
-
-        updateLead: builder.mutation({
+        updateBanner: builder.mutation({
             query: ({ id, ...data }) => ({
-                url: `/leads/${id}`,
-                method: "PUT",
+                url: `/banners/${id}`,
+                method: 'PUT',
                 body: data,
             }),
-            invalidatesTags: ["Leads"],
+            invalidatesTags: ['Banner'],
         }),
 
-        deleteLead: builder.mutation({
+        deleteBanner: builder.mutation({
             query: (id) => ({
-                url: `/leads/${id}`,
-                method: "DELETE",
+                url: `/banners/${id}`,
+                method: 'DELETE',
             }),
-            invalidatesTags: ["Leads"],
+            invalidatesTags: ['Banner'],
         }),
 
-        changeLeadStatus: builder.mutation({
-            query: ({ id, status }) => ({
-                url: `/leads/${id}/status`,
-                method: "PUT",
-                body: { status },
+
+
+        // Get nested menu (tree)
+        getMenu: builder.query({
+            query: () => '/category/menu',
+            providesTags: ['Category'],
+            transformResponse: (response) => response.data,
+        }),
+        // Get flat list for dropdown parent selection
+        getFlatList: builder.query({
+            query: () => '/category/flat',
+            providesTags: ['Category'],
+            transformResponse: (response) => response.data,
+        }),
+        // Create category
+        createCategory: builder.mutation({
+            query: (newCategory) => ({
+                url: '/category',
+                method: 'POST',
+                body: newCategory,
             }),
-            invalidatesTags: ["Leads"],
+            invalidatesTags: ['Category'],
         }),
-
-        // ================= FOLLOWUPS =================
-
-        getFollowUps: builder.query({
-            query: () => "/followups",
-            providesTags: ["Followups", "Leads"],
-        }),
-
-        getTodayFollowUps: builder.query({
-            query: () => "/followups/today",
-            providesTags: ["Followups"],
-        }),
-
-        createFollowUp: builder.mutation({
-            query: (data) => ({
-                url: "/followups",
-                method: "POST",
-                body: data,
-            }),
-            invalidatesTags: ["Followups"],
-        }),
-
-        updateFollowUp: builder.mutation({
+        // Update category
+        updateCategory: builder.mutation({
             query: ({ id, ...data }) => ({
-                url: `/followups/${id}`,
-                method: "PUT",
+                url: `/category/${id}`,
+                method: 'PUT',
                 body: data,
             }),
-            invalidatesTags: ["Followups"],
+            invalidatesTags: ['Category'],
         }),
-
-        deleteFollowUp: builder.mutation({
+        // Delete category
+        deleteCategory: builder.mutation({
             query: (id) => ({
-                url: `/followups/${id}`,
-                method: "DELETE",
+                url: `/category/${id}`,
+                method: 'DELETE',
             }),
-            invalidatesTags: ["Followups"],
+            invalidatesTags: ['Category'],
         }),
-
-        // ================= CUSTOMERS =================
-
-        getCustomers: builder.query({
-            query: () => "/customers",
-            providesTags: ["Customers"],
-        }),
-
-        getCustomerById: builder.query({
-            query: (id) => `/customers/${id}`,
-        }),
-
-        createCustomer: builder.mutation({
-            query: (data) => ({
-                url: "/customers",
-                method: "POST",
-                body: data,
+        // Reorder categories (bulk)
+        reorderCategories: builder.mutation({
+            query: (updates) => ({
+                url: '/category/reorder',
+                method: 'POST',
+                body: { updates },
             }),
-            invalidatesTags: ["Customers"],
+            invalidatesTags: ['Category'],
         }),
 
-        updateCustomer: builder.mutation({
-            query: ({ id, ...data }) => ({
-                url: `/customers/${id}`,
-                method: "PUT",
-                body: data,
-            }),
-            invalidatesTags: ["Customers"],
-        }),
 
-        deleteCustomer: builder.mutation({
-            query: (id) => ({
-                url: `/customers/${id}`,
-                method: "DELETE",
-            }),
-            invalidatesTags: ["Customers"],
-        }),
+        // ==========================
+        // PRODUCTS
+        // ==========================
 
-        // ================= PRODUCTS =================
-
+        // Get All Products
         getProducts: builder.query({
-            query: () => "/products",
-            providesTags: ["Products"],
+            query: (params = {}) => ({
+                url: '/products',
+                params,
+            }),
+            providesTags: ['Product'],
         }),
 
+        // Featured Products
+        getFeaturedProducts: builder.query({
+            query: () => '/products/featured',
+            providesTags: ['Product'],
+        }),
+
+        // Product By Slug
+        getProductBySlug: builder.query({
+            query: (slug) => `/products/slug/${slug}`,
+            providesTags: ['Product'],
+        }),
+
+        // Product By Id
+        getProductById: builder.query({
+            query: (id) => `/products/${id}`,
+            providesTags: ['Product'],
+        }),
+
+        // Related Products
+        getRelatedProducts: builder.query({
+            query: (id) => `/products/${id}/related`,
+            providesTags: ['Product'],
+        }),
+
+        // Create Product
         createProduct: builder.mutation({
-            query: (data) => ({
-                url: "/products",
-                method: "POST",
-                body: data,
+            query: (formData) => ({
+                url: '/products',
+                method: 'POST',
+                body: formData,
             }),
-            invalidatesTags: ["Products"],
+            invalidatesTags: ['Product'],
         }),
 
+        // Update Product
         updateProduct: builder.mutation({
-            query: ({ id, ...data }) => ({
+            query: ({ id, formData }) => ({
                 url: `/products/${id}`,
-                method: "PUT",
-                body: data,
+                method: 'PUT',
+                body: formData,
             }),
-            invalidatesTags: ["Products"],
+            invalidatesTags: ['Product'],
         }),
 
+        // Delete Product
         deleteProduct: builder.mutation({
             query: (id) => ({
                 url: `/products/${id}`,
-                method: "DELETE",
+                method: 'DELETE',
             }),
-            invalidatesTags: ["Products"],
+            invalidatesTags: ['Product'],
         }),
 
-        // ================= QUOTATIONS =================
-
-        getQuotations: builder.query({
-            query: () => "/quotations",
-            providesTags: ["Quotations"],
+        // Product Reviews
+        getProductReviews: builder.query({
+            query: (id) => `/products/${id}/reviews`,
+            providesTags: ['Review'],
         }),
 
-        getQuotationById: builder.query({
-            query: (id) => `/quotations/${id}`,
-        }),
-
-        createQuotation: builder.mutation({
-            query: (data) => ({
-                url: "/quotations",
-                method: "POST",
-                body: data,
+        // Add Review
+        addReview: builder.mutation({
+            query: ({ id, rating, comment }) => ({
+                url: `/products/${id}/review`,
+                method: 'POST',
+                body: {
+                    rating,
+                    comment,
+                },
             }),
-            invalidatesTags: ["Quotations"],
-        }),
-
-        updateQuotation: builder.mutation({
-            query: ({ id, ...data }) => ({
-                url: `/quotations/${id}`,
-                method: "PUT",
-                body: data,
-            }),
-            invalidatesTags: ["Quotations"],
-        }),
-
-        deleteQuotation: builder.mutation({
-            query: (id) => ({
-                url: `/quotations/${id}`,
-                method: "DELETE",
-            }),
-            invalidatesTags: ["Quotations"],
-        }),
-
-        // ================= DASHBOARD =================
-
-        getDashboardStats: builder.query({
-            query: () => "/dashboard/stats",
-            providesTags: ["Dashboard"],
-        }),
-
-        // ================= TIMELINE =================
-
-        getTimeline: builder.query({
-            query: () => `/TimeLine`,
-            providesTags: ["Timeline"],
-        }),
-        getTimelineGrouped: builder.query({
-            query: () => `/TimeLine/Grouped`,
-            providesTags: ["Timeline", "Leads"],
-        }),
-
-        getTimelineGroupedById: builder.query({
-            query: (id) => `/TimeLine/lead/${id}`,
-            providesTags: ["Timeline", "Leads"],
-        }),
-
-
-        // report 
-
-        getLeadReport: builder.query({
-            query: () => `/reports/leads`,
-            providesTags: ["Leads"],
-        }),
-
-        // ================= SALES REPORT =================
-
-        getSalesReport: builder.query({
-            query: () => `/reports/sales`,
-            providesTags: ["Leads", "Timeline"],
-        }),
-
-        // ================= CONVERSION REPORT =================
-
-        getConversionReport: builder.query({
-            query: () => `/reports/conversion`,
-            providesTags: ["Leads"],
-        }),
-
-        // ================= SALES PERFORMANCE =================
-
-        getSalesPerformance: builder.query({
-            query: () => `/reports/sales-performance`,
-            providesTags: ["Leads", "Users"],
-        }),
-
-        // ================= EXECUTIVE SALES REPORT =================
-
-        getExecutiveSalesReport: builder.query({
-            query: () => `/reports/executive-sales`,
-            providesTags: ["Leads", "Users"],
-        }),
-
-        // getWhSalesReport: builder.query({
-        //     query: () => `/reports/sales`,
-        //     providesTags: ["Timeline", "Leads"],
-        // }),
-
-
-        // Remark
-
-        // getQuotations: builder.query({
-        //     query: () => "/quotations",
-        //     providesTags: ["Quotations"],
-        // }),
-
-        // Correct way to write RTK Query endpoints for remarks
-
-        // If you have multiple remark endpoints
-        getLeadRemarks: builder.query({
-            query: (leadId) => `/leads/${leadId}/remarks`,
-            providesTags: (result, error, leadId) => [
-                { type: "Remarks", id: leadId },
-                ...(result?.remarks?.map(({ _id }) => ({ type: "Remarks", id: _id })) || [])
-            ],
-        }),
-
-
-
-        addRemark: builder.mutation({
-            query: ({ leadId, text }) => {
-                console.log("Sending remark:", { leadId, text }); // Debug log
-                return {
-                    url: `/leads/${leadId}/remarks`,
-                    method: "POST",
-                    body: { text }, // Send only text, backend adds createdBy
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                };
-            },
-            invalidatesTags: (result, error, { leadId }) => [
-                { type: "Remarks", id: leadId },
-                "Leads"
-            ],
-        }),
-
-        editRemark: builder.mutation({
-            query: ({ leadId, remarkId, text }) => ({
-                url: `/leads/${leadId}/remarks/${remarkId}`,
-                method: "PUT",
-                body: { text },
-            }),
-            invalidatesTags: (result, error, { leadId, remarkId }) => [
-                { type: "Remarks", id: leadId },
-                { type: "Remarks", id: remarkId }
-            ],
-        }),
-
-        deleteRemark: builder.mutation({
-            query: ({ leadId, remarkId }) => ({
-                url: `/leads/${leadId}/remarks/${remarkId}`,
-                method: "DELETE",
-            }),
-            invalidatesTags: (result, error, { leadId }) => [
-                { type: "Remarks", id: leadId }
-            ],
+            invalidatesTags: ['Review', 'Product'],
         }),
     }),
 });
 
 export const {
-
-    // AUTH
     useLoginMutation,
-    useRegisterMutation,
-    useGetProfileQuery,
 
-    // USERS
-    useGetUsersQuery,
-    useGetUserByIdQuery,
-    useCreateUserMutation,
-    useUpdateUserMutation,
-    useDeleteUserMutation,
+    useGetBannersQuery,
+    useGetActiveBannersQuery,
+    useGetBannerByIdQuery,
+    useCreateBannerMutation,
+    useUpdateBannerMutation,
+    useDeleteBannerMutation,
 
-    // LEADS
-    useGetLeadsQuery,
-    useGetLeadsPaginatedQuery,
-    useGetLeadByIdQuery,
-    useCreateLeadMutation,
-    useUpdateLeadMutation,
-    useDeleteLeadMutation,
-    useChangeLeadStatusMutation,
 
-    // FOLLOWUPS
-    useGetFollowUpsQuery,
-    useGetTodayFollowUpsQuery,
-    useCreateFollowUpMutation,
-    useUpdateFollowUpMutation,
-    useDeleteFollowUpMutation,
+    useGetMenuQuery,
+    useGetFlatListQuery,
+    useCreateCategoryMutation,
+    useUpdateCategoryMutation,
+    useDeleteCategoryMutation,
+    useReorderCategoriesMutation,
 
-    // CUSTOMERS
-    useGetCustomersQuery,
-    useGetCustomerByIdQuery,
-    useCreateCustomerMutation,
-    useUpdateCustomerMutation,
-    useDeleteCustomerMutation,
 
-    // PRODUCTS
     useGetProductsQuery,
+    useGetFeaturedProductsQuery,
+    useGetProductBySlugQuery,
+    useGetProductByIdQuery,
+    useGetRelatedProductsQuery,
+
     useCreateProductMutation,
     useUpdateProductMutation,
     useDeleteProductMutation,
 
-    // QUOTATIONS
-    useGetQuotationsQuery,
-    useGetQuotationByIdQuery,
-    useCreateQuotationMutation,
-    useUpdateQuotationMutation,
-    useDeleteQuotationMutation,
-
-    // DASHBOARD
-    useGetDashboardStatsQuery,
-
-    // TIMELINE
-    useGetTimelineQuery,
-    useGetTimelineGroupedQuery,
-    useGetTimelineGroupedByIdQuery,
-
-    // report
-    useGetLeadReportQuery,
-    useGetSalesReportQuery,
-    useGetConversionReportQuery,
-    useGetSalesPerformanceQuery,
-    useGetExecutiveSalesReportQuery,
-
-
-
-    useDeleteRemarkMutation,
-    useEditRemarkMutation,
-    useAddRemarkMutation,
-    useGetLeadRemarksQuery,
-
-
-
+    // Reviews
+    useGetProductReviewsQuery,
+    useAddReviewMutation,
 } = api;

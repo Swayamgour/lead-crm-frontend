@@ -27,80 +27,32 @@ import {
 
 export const sidebarSections = [
     {
-        title: "Sales Executives",
-        icon: Users,
-        key: "salesExecutives",
-        color: "from-green-500 to-emerald-600",
-        path: ["/executives", "/addExecutive", "/editExecutive"],
-        role: ["admin"],
-        submenu: [
-            {
-                title: "All Executives",
-                icon: Users,
-                path: ["/ViewExecutives"]
-            },
-            {
-                title: "Add Executive",
-                icon: UserPlus,
-                path: ["/addExecutive"]
-            }
-        ]
-    },
-    {
-        title: "Lead",
-        icon: Database,
-        key: "leadSources",
-        color: "from-purple-500 to-purple-600",
-        path: ["/leads", "/addLeads", "/editLead"],
-        role: ["admin", "executive"],
-        submenu: [
-            {
-                title: "All Leads",
-                icon: Database,
-                path: ["/leads"]
-            },
-            {
-                title: "Add Lead",
-                icon: UserPlus,
-                path: ["/addLeads"]
-            }
-        ]
-    },
-    {
-        title: "Follow Up",
-        icon: PhoneCall,
-        key: "followUps",
-        path: ["/followUps"],
-        color: "from-yellow-500 to-amber-600",
-        role: ["admin", "executive"]
-    },
-    {
-        title: "Lead Timeline",
-        icon: Activity,
-        key: "leadTimeline",
-        path: ["/LeadTimeline"],
-        color: "from-indigo-500 to-indigo-600",
-        role: ["admin", "executive"]
-    },
-    {
-        title: "Lead Pipeline",
-        icon: GitBranch,
+        title: "Banner",
+        icon: BarChart3,
         key: "leadPipeline",
-        path: ["/LeadPipeline"],
+        path: ["/"],
         color: "from-pink-500 to-rose-600",
         role: ["admin", "executive"]
     },
     {
-        title: "Report",
-        icon: BarChart3,
-        key: "reports",
-        path: ["/Report"],
-        color: "from-indigo-400 to-indigo-900",
-        role: ["admin", "executive"],
-        submenu: [
-           
-        ]
-    }
+        title: "Category",
+        icon: GitBranch,
+        key: "leadPipeline",
+        path: ["/Category"],
+        color: "from-pink-500 to-rose-600",
+        role: ["admin", "executive"]
+    },
+   
+    {
+        title: "Products",
+        icon: Activity,
+        key: "leadTimeline",
+        path: ["/Products"],
+        color: "from-indigo-500 to-indigo-600",
+        role: ["admin", "executive"]
+    },
+    
+   
 ];
 
 // Optional: Additional configuration for user roles
