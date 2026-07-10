@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useGetProfileQuery } from "../redux/api.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, selectCurrentUser } from "../redux/slices/authSlice";
 import {
     Box,
     Drawer,
@@ -54,6 +56,8 @@ const MainLayout = () => {
     const [anchorEl, setAnchorEl] = useState(null);
 
     const { data: profile } = useGetProfileQuery();
+    const dispatch = useDispatch();
+    const reduxUser = useSelector(selectCurrentUser);
 
     // Handle responsive sidebar
     useEffect(() => {
@@ -93,12 +97,8 @@ const MainLayout = () => {
     // };
 
     const handleLogout = () => {
-
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-
+        dispatch(logout());
         navigate("/login", { replace: true });
-
     };
 
 
@@ -117,12 +117,12 @@ const MainLayout = () => {
             {/* App Bar */}
             <AppBar
                 position="fixed"
+                elevation={0}
                 sx={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(12px)',
-                    boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
+                    backgroundColor: 'rgba(255, 255, 255, 0.78)',
+                    backdropFilter: 'blur(16px) saturate(1.4)',
+                    boxShadow: '0 1px 0 0 rgba(20,26,46,0.06)',
+                    borderBottom: 'none',
                     zIndex: isMobile ? theme.zIndex.drawer - 1 : theme.zIndex.drawer + 1,
                     transition: theme.transitions.create(['width', 'margin'], {
                         easing: theme.transitions.easing.sharp,
@@ -138,20 +138,22 @@ const MainLayout = () => {
                     }),
                 }}
             >
-                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                <Toolbar sx={{ justifyContent: 'space-between', minHeight: '68px !important' }}>
                     {/* Left Section */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                         <IconButton
                             color="inherit"
                             aria-label="toggle drawer"
                             onClick={handleDrawerToggle}
                             edge="start"
-                            sx={{ color: 'text.secondary' }}
+                            sx={{
+                                color: 'text.secondary',
+                                bgcolor: 'rgba(20,26,46,0.04)',
+                                '&:hover': { bgcolor: 'rgba(38,83,239,0.08)', color: 'primary.main' },
+                            }}
                         >
                             <MenuIcon />
                         </IconButton>
-
-
                     </Box>
 
                     {/* Right Section */}
@@ -163,11 +165,12 @@ const MainLayout = () => {
                                 size="small"
                                 sx={{
                                     p: 0.5,
-                                    borderRadius: 2,
+                                    pr: { xs: 0.5, md: 1 },
+                                    borderRadius: 3,
+                                    border: '1px solid rgba(20,26,46,0.06)',
                                     '&:hover': {
                                         backgroundColor: 'action.hover',
                                     },
-                                    // width:'full'
                                 }}
                             >
                                 <Avatar
@@ -175,17 +178,19 @@ const MainLayout = () => {
                                         width: 36,
                                         height: 36,
                                         bgcolor: 'primary.main',
-                                        background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                                        background: 'var(--gradient-brand)',
+                                        fontWeight: 700,
+                                        boxShadow: '0 4px 12px rgba(38,83,239,0.3)',
                                     }}
                                 >
-                                    {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
+                                    {(profile?.name || reduxUser?.name)?.charAt(0)?.toUpperCase() || 'U'}
                                 </Avatar>
                                 <Box sx={{ display: { xs: 'none', md: 'block' }, ml: 1.5, mr: 0.5, textAlign: 'left' }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                                        {profile?.name || 'User'}
+                                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
+                                        {profile?.name || reduxUser?.name || 'User'}
                                     </Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        {profile?.role || 'Employee'}
+                                        {profile?.role || reduxUser?.role || 'Employee'}
                                     </Typography>
                                 </Box>
                                 <KeyboardArrowDownIcon sx={{ color: 'text.secondary', fontSize: 20, display: { xs: 'none', md: 'block' } }} />
@@ -201,9 +206,9 @@ const MainLayout = () => {
                                     sx: {
                                         mt: 1.5,
                                         minWidth: 240,
-                                        borderRadius: 2,
+                                        borderRadius: 3,
                                         overflow: 'visible',
-                                        filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.1))',
+                                        filter: 'drop-shadow(0 12px 28px rgba(15,23,42,0.16))',
                                         '&:before': {
                                             content: '""',
                                             position: 'absolute',
@@ -218,42 +223,42 @@ const MainLayout = () => {
                                     },
                                 }}
                             >
-                                <Box sx={{ p: 2, bgcolor: 'grey.50' }}>
+                                <Box sx={{ p: 2, background: 'var(--gradient-navy)', borderRadius: '12px 12px 0 0' }}>
                                     <Stack direction="row" spacing={2} alignItems="center">
                                         <Avatar
                                             sx={{
                                                 width: 48,
                                                 height: 48,
                                                 bgcolor: 'primary.main',
-                                                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                                                background: 'var(--gradient-amber)',
+                                                color: '#0a0f1e',
+                                                fontWeight: 800,
                                             }}
                                         >
-                                            {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
+                                            {(profile?.name || reduxUser?.name)?.charAt(0)?.toUpperCase() || 'U'}
                                         </Avatar>
                                         <Box>
-                                            <Typography variant="subtitle1" fontWeight={600}>
-                                                {profile?.name || 'User'}
+                                            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#fff' }}>
+                                                {profile?.name || reduxUser?.name || 'User'}
                                             </Typography>
-                                            <Typography variant="caption" color="text.secondary">
-                                                {profile?.email || 'user@example.com'}
+                                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.65)' }}>
+                                                {profile?.email || reduxUser?.email || 'user@example.com'}
                                             </Typography>
                                         </Box>
                                     </Stack>
                                 </Box>
                                 <Divider />
 
-                                <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                                <MenuItem onClick={handleLogout} sx={{ color: 'error.main', py: 1.3, mx: 0.5, my: 0.5, borderRadius: 2 }}>
                                     <ListItemIcon>
                                         <LogoutIcon fontSize="small" color="error" />
                                     </ListItemIcon>
-                                    <ListItemText>Logout</ListItemText>
+                                    <ListItemText primaryTypographyProps={{ fontWeight: 600 }}>Logout</ListItemText>
                                 </MenuItem>
                             </Menu>
                         </Box>
                     </Box>
                 </Toolbar>
-
-
             </AppBar>
 
             {/* Sidebar Drawer */}
@@ -296,8 +301,7 @@ const MainLayout = () => {
                             width: sidebarOpen ? drawerWidth : collapsedDrawerWidth,
                             boxSizing: 'border-box',
                             border: 'none',
-                            borderRight: '1px solid',
-                            borderColor: 'divider',
+                            boxShadow: '4px 0 24px rgba(10,15,30,0.18)',
                             backgroundColor: 'background.paper',
                             transition: theme.transitions.create('width', {
                                 easing: theme.transitions.easing.sharp,
@@ -317,10 +321,10 @@ const MainLayout = () => {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: isMobile ? 0 : 3,
+                    p: isMobile ? 1.5 : 3,
                     width: '100%',
                     minHeight: '100vh',
-                    backgroundColor: 'grey.50',
+                    background: 'radial-gradient(1200px 600px at 100% -10%, rgba(38,83,239,0.05), transparent), #f5f6fa',
                     transition: theme.transitions.create('margin', {
                         easing: theme.transitions.easing.sharp,
                         duration: theme.transitions.duration.leavingScreen,
@@ -338,10 +342,17 @@ const MainLayout = () => {
                 <Toolbar sx={{ display: { xs: 'none', sm: 'block' } }} />
 
                 {/* Page Content */}
-                <Box sx={{ maxWidth: '100%' }}>
+                <Box sx={{ maxWidth: '100%', animation: 'fadeInUp 0.35s ease' }}>
                     <Outlet />
                 </Box>
             </Box>
+
+            <style>{`
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(8px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
         </Box>
     );
 };

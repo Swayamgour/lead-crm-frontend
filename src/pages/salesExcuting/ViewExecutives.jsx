@@ -207,7 +207,8 @@ function ViewExecutives() {
     };
 
     const StatCard = ({ title, value, icon: Icon, color, trend, subtext }) => (
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div className="relative bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 hover:shadow-[0_10px_28px_rgba(15,23,42,0.1)] transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+            <div className={`absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r ${color}`} />
             <div className="flex items-center justify-between">
                 <div>
                     <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
@@ -222,7 +223,7 @@ function ViewExecutives() {
                         <p className="text-xs text-gray-500 mt-2">{subtext}</p>
                     )}
                 </div>
-                <div className={`w-14 h-14 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center shadow-lg`}>
+                <div className={`w-14 h-14 bg-gradient-to-br ${color} rounded-2xl flex items-center justify-center shadow-lg`}>
                     <Icon className="text-white" size={24} />
                 </div>
             </div>
@@ -248,22 +249,21 @@ function ViewExecutives() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-transparent">
             {/* Header with gradient background */}
             <div className="max-w-7xl mx-auto p-6">
 
-                {/* <div className=""> */}
-
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 px-6 py-5 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#2653ef] to-[#f5a524]" />
                     <div>
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent flex items-center gap-2">
-                            <Users className="text-[#4f46e5]" size={32} />
+                        <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+                            <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2653ef] to-[#1d40c9] flex items-center justify-center shadow-[0_6px_16px_rgba(38,83,239,0.3)]">
+                                <Users className="text-white" size={22} />
+                            </span>
                             Sales Executive
                         </h1>
-
+                        <p className="text-sm text-gray-500 mt-1 ml-14">Track team performance and manage your sales force</p>
                     </div>
-
-
 
                     {/* Add Lead Button */}
 
@@ -279,7 +279,7 @@ function ViewExecutives() {
 
                         <button
                             onClick={() => navigate("/addExecutive")}
-                            className="flex items-center gap-2 bg-gradient-to-r from-[#4f46e5] to-[#6366f1] text-white px-6 py-2.5 rounded-lg hover:shadow-lg transition-all text-sm font-semibold"
+                            className="flex items-center gap-2 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] text-white px-6 py-2.5 rounded-xl hover:shadow-[0_8px_20px_rgba(38,83,239,0.35)] hover:-translate-y-0.5 transition-all duration-200 text-sm font-semibold"
                         >
                             <Plus size={18} />
                             Add Executive
@@ -287,7 +287,6 @@ function ViewExecutives() {
                     </div>
 
                 </div>
-                {/* </div> */}
 
 
 
@@ -340,7 +339,7 @@ function ViewExecutives() {
                                     placeholder="Search by name, email or phone..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 hover:bg-white transition-colors"
+                                    className="w-full pl-12 pr-4 py-3 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 hover:bg-white transition-colors"
                                 />
                             </div>
 
@@ -348,7 +347,7 @@ function ViewExecutives() {
                                 <select
                                     value={filterStatus}
                                     onChange={(e) => setFilterStatus(e.target.value)}
-                                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 hover:bg-white transition-colors"
+                                    className="px-4 py-3 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 hover:bg-white transition-colors"
                                 >
                                     <option value="all">All Status</option>
                                     <option value="active">Active</option>
@@ -358,7 +357,7 @@ function ViewExecutives() {
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value)}
-                                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 hover:bg-white transition-colors"
+                                    className="px-4 py-3 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 hover:bg-white transition-colors"
                                 >
                                     <option value="name">Sort by: Name</option>
                                     <option value="leads">Sort by: Total Leads</option>
@@ -374,27 +373,27 @@ function ViewExecutives() {
 
                         {/* Advanced Filters */}
                         {showFilters && (
-                            <div className="mt-4 pt-4 border-t border-gray-200">
+                            <div className="mt-4 pt-4 border-t border-gray-100">
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <select className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option>Min Accuracy: Any</option>
                                         <option>Min Accuracy: 80%+</option>
                                         <option>Min Accuracy: 50%+</option>
                                         <option>Min Accuracy: Below 50%</option>
                                     </select>
-                                    <select className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option>Min Leads: Any</option>
                                         <option>Min Leads: 5+</option>
                                         <option>Min Leads: 10+</option>
                                         <option>Min Leads: 20+</option>
                                     </select>
-                                    <select className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option>Team: All Teams</option>
                                         <option>Team A</option>
                                         <option>Team B</option>
                                         <option>Team C</option>
                                     </select>
-                                    <select className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option>Location: All</option>
                                         <option>North</option>
                                         <option>South</option>
@@ -408,10 +407,10 @@ function ViewExecutives() {
 
                     {/* Bulk Actions */}
                     {selectedExecutives.length > 0 && (
-                        <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200 animate-slideDown">
+                        <div className="mb-6 p-4 bg-blue-50 rounded-2xl border border-blue-200 animate-slideDown">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <div className="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
                                         <CheckCircle size={18} className="text-blue-600" />
                                     </div>
                                     <span className="text-blue-700 font-medium">
@@ -419,12 +418,12 @@ function ViewExecutives() {
                                     </span>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                                    <button className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors">
                                         Bulk Action
                                     </button>
                                     <button
                                         onClick={() => setSelectedExecutives([])}
-                                        className="px-4 py-2 bg-white text-gray-700 rounded-lg text-sm hover:bg-gray-100 transition-colors"
+                                        className="px-4 py-2 bg-white text-gray-700 rounded-xl text-sm hover:bg-gray-100 transition-colors"
                                     >
                                         Clear
                                     </button>
@@ -434,47 +433,47 @@ function ViewExecutives() {
                     )}
 
                     {/* Main Content - Table with Performance Data */}
-                    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+                    <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] overflow-hidden border border-gray-100">
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead>
-                                    <tr className="bg-gray-50 border-b border-gray-200">
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    <tr className="bg-[#fafbfd] border-b border-gray-100">
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                             Executive
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                             Contact
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                             Performance
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                             Status
                                         </th>
-                                        <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200">
+                                <tbody className="divide-y divide-gray-100">
                                     {paginatedExecutives.map((exec, index) => {
                                         const PerformanceIcon = getPerformanceBadge(exec.accuracy).icon;
                                         return (
                                             <tr
                                                 key={exec._id || index}
-                                                className="hover:bg-gray-50 transition-colors group"
+                                                className="hover:bg-[#2653ef]/[0.03] transition-colors group"
                                             >
                                                 {/* <td className="px-6 py-4">
                                                 <input
                                                     type="checkbox"
-                                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                    className="rounded border-gray-200 text-blue-600 focus:ring-blue-500"
                                                     checked={selectedExecutives.includes(exec._id)}
                                                     onChange={() => toggleSelectExecutive(exec._id)}
                                                 />
                                             </td> */}
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-4">
-                                                        {/* <div className={`w-12 h-12 bg-gradient-to-br ${getRandomColor(exec.name)} rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md transform group-hover:scale-110 transition-transform`}>
+                                                        {/* <div className={`w-12 h-12 bg-gradient-to-br ${getRandomColor(exec.name)} rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-md transform group-hover:scale-110 transition-transform`}>
                                                         {getInitials(exec.name)}
                                                     </div> */}
                                                         <div>
@@ -564,20 +563,20 @@ function ViewExecutives() {
                                                     <div className="flex items-center justify-center gap-2">
                                                         <button
                                                             onClick={() => viewPerformance(exec)}
-                                                            className="p-2 hover:bg-blue-50 rounded-lg transition-colors group"
+                                                            className="p-2 hover:bg-blue-50 rounded-xl transition-colors group"
                                                             title="View Performance"
                                                         >
                                                             <Eye size={18} className="text-blue-600 group-hover:scale-110 transition-transform" />
                                                         </button>
                                                         <button
                                                             onClick={() => navigate(`/editExecutive/${exec._id}`)}
-                                                            className="p-2 hover:bg-green-50 rounded-lg transition-colors group"
+                                                            className="p-2 hover:bg-green-50 rounded-xl transition-colors group"
                                                             title="Edit"
                                                         >
                                                             <Edit3 size={18} className="text-green-600 group-hover:scale-110 transition-transform" />
                                                         </button>
                                                         <button
-                                                            className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
+                                                            className="p-2 hover:bg-red-50 rounded-xl transition-colors group"
                                                             title="Delete"
                                                             onClick={() => {
                                                                 // if (window.confirm('Are you sure you want to delete this executive?')) {
@@ -607,7 +606,7 @@ function ViewExecutives() {
                                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
-                                            <div className={`w-16 h-16 bg-gradient-to-br ${getRandomColor(selectedExecutive.name)} rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg`}>
+                                            <div className={`w-16 h-16 bg-gradient-to-br ${getRandomColor(selectedExecutive.name)} rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg`}>
                                                 {getInitials(selectedExecutive.name)}
                                             </div>
                                             <div>
@@ -617,7 +616,7 @@ function ViewExecutives() {
                                         </div>
                                         <button
                                             onClick={() => setShowPerformanceModal(false)}
-                                            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                                            className="p-2 hover:bg-white/10 rounded-xl transition-colors"
                                         >
                                             <X size={20} className="text-white" />
                                         </button>
@@ -627,22 +626,22 @@ function ViewExecutives() {
                                 <div className="p-6 space-y-6">
                                     {/* Performance Metrics */}
                                     <div className="grid grid-cols-3 gap-4">
-                                        <div className="bg-blue-50 p-4 rounded-xl text-center">
+                                        <div className="bg-blue-50 p-4 rounded-2xl text-center">
                                             <p className="text-xs text-blue-600 mb-1">Total Leads</p>
                                             <p className="text-2xl font-bold text-gray-800">{selectedExecutive.totalLeads}</p>
                                         </div>
-                                        <div className="bg-green-50 p-4 rounded-xl text-center">
+                                        <div className="bg-green-50 p-4 rounded-2xl text-center">
                                             <p className="text-xs text-green-600 mb-1">Won Leads</p>
                                             <p className="text-2xl font-bold text-gray-800">{selectedExecutive.wonLeads}</p>
                                         </div>
-                                        <div className="bg-purple-50 p-4 rounded-xl text-center">
+                                        <div className="bg-purple-50 p-4 rounded-2xl text-center">
                                             <p className="text-xs text-purple-600 mb-1">Accuracy</p>
                                             <p className="text-2xl font-bold text-gray-800">{selectedExecutive.accuracy}%</p>
                                         </div>
                                     </div>
 
                                     {/* Progress Chart */}
-                                    <div className="bg-gray-50 p-6 rounded-xl">
+                                    <div className="bg-gray-50 p-6 rounded-2xl">
                                         <h4 className="font-semibold text-gray-800 mb-4">Performance Overview</h4>
                                         <div className="space-y-4">
                                             <div>
@@ -679,7 +678,7 @@ function ViewExecutives() {
                                     <div className="space-y-3">
                                         <h4 className="font-semibold text-gray-800">Performance Insights</h4>
                                         {selectedExecutive.accuracy >= 80 ? (
-                                            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                                                 <div className="flex items-start gap-3">
                                                     <Crown size={20} className="text-yellow-600 flex-shrink-0" />
                                                     <div>
@@ -692,7 +691,7 @@ function ViewExecutives() {
                                                 </div>
                                             </div>
                                         ) : selectedExecutive.accuracy >= 50 ? (
-                                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                                                 <div className="flex items-start gap-3">
                                                     <TrendingUp size={20} className="text-blue-600 flex-shrink-0" />
                                                     <div>
@@ -704,7 +703,7 @@ function ViewExecutives() {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                                            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
                                                 <div className="flex items-start gap-3">
                                                     <Target size={20} className="text-orange-600 flex-shrink-0" />
                                                     <div>
@@ -719,15 +718,15 @@ function ViewExecutives() {
                                     </div>
                                 </div>
 
-                                <div className="p-6 border-t border-gray-200 bg-gray-50">
+                                <div className="p-6 border-t border-gray-100 bg-gray-50">
                                     <div className="flex justify-end gap-3">
                                         <button
                                             onClick={() => setShowPerformanceModal(false)}
-                                            className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 transition-colors"
+                                            className="px-4 py-2 border border-gray-200 rounded-xl text-sm hover:bg-gray-100 transition-colors"
                                         >
                                             Close
                                         </button>
-                                        {/* <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                                        {/* <button className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors">
                                         View Detailed Report
                                     </button> */}
                                     </div>
@@ -746,7 +745,7 @@ function ViewExecutives() {
                             <p className="text-gray-500 mb-6">Try adjusting your search or add a new executive</p>
                             <button
                                 onClick={() => navigate("/addExecutive")}
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                             >
                                 <Plus size={18} />
                                 Add Executive
@@ -786,17 +785,17 @@ function ViewExecutives() {
 
 
             {usersData?.pagination && (
-                <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6 rounded-b-xl">
+                <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-100 sm:px-6 rounded-b-xl">
                     {/* Mobile view */}
                     <div className="flex justify-between flex-1 sm:hidden">
                         <button
                             onClick={() => setCurrentPage(prev => prev - 1)}
                             disabled={!usersData?.pagination.hasPrevPage || isFetching}
                             className={`
-                    relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                    relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200
                     ${!usersData?.pagination.hasPrevPage || isFetching
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm'
+                                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]'
                                 }
                 `}
                         >
@@ -809,10 +808,10 @@ function ViewExecutives() {
                             onClick={() => setCurrentPage(prev => prev + 1)}
                             disabled={!usersData?.pagination.hasNextPage || isFetching}
                             className={`
-                    relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                    relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200
                     ${!usersData?.pagination.hasNextPage || isFetching
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm'
+                                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]'
                                 }
                 `}
                         >
@@ -835,10 +834,10 @@ function ViewExecutives() {
                                 onClick={() => setCurrentPage(1)}
                                 disabled={!usersData?.pagination.hasPrevPage || isFetching}
                                 className={`
-                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-xl transition-all duration-200
                         ${!usersData?.pagination.hasPrevPage || isFetching
                                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                        : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] hover:shadow'
                                     }
                     `}
                                 title="First Page"
@@ -853,10 +852,10 @@ function ViewExecutives() {
                                 onClick={() => setCurrentPage(prev => prev - 1)}
                                 disabled={!usersData?.pagination.hasPrevPage || isFetching}
                                 className={`
-                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200
                         ${!usersData?.pagination.hasPrevPage || isFetching
                                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                        : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] hover:shadow'
                                     }
                     `}
                             >
@@ -892,7 +891,7 @@ function ViewExecutives() {
                                                     <button
                                                         onClick={() => setCurrentPage(1)}
                                                         disabled={isFetching}
-                                                        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                                                        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-200 transition-all duration-200"
                                                     >
                                                         1
                                                     </button>
@@ -909,10 +908,10 @@ function ViewExecutives() {
                                                     onClick={() => setCurrentPage(page)}
                                                     disabled={isFetching}
                                                     className={`
-                                            relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                                            relative px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200
                                             ${currentPage === page
                                                             ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md transform scale-105'
-                                                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm'
+                                                            : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 hover:shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]'
                                                         }
                                             ${isFetching ? 'cursor-wait opacity-50' : 'cursor-pointer'}
                                         `}
@@ -930,7 +929,7 @@ function ViewExecutives() {
                                                     <button
                                                         onClick={() => setCurrentPage(totalPages)}
                                                         disabled={isFetching}
-                                                        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                                                        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-200 transition-all duration-200"
                                                     >
                                                         {totalPages}
                                                     </button>
@@ -946,10 +945,10 @@ function ViewExecutives() {
                                 onClick={() => setCurrentPage(prev => prev + 1)}
                                 disabled={!usersData?.pagination.hasNextPage || isFetching}
                                 className={`
-                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200
                         ${!usersData?.pagination.hasNextPage || isFetching
                                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                        : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] hover:shadow'
                                     }
                     `}
                             >
@@ -964,10 +963,10 @@ function ViewExecutives() {
                                 onClick={() => setCurrentPage(usersData?.pagination.totalPages)}
                                 disabled={!usersData?.pagination.hasNextPage || isFetching}
                                 className={`
-                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-xl transition-all duration-200
                         ${!usersData?.pagination.hasNextPage || isFetching
                                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                        : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] hover:shadow'
                                     }
                     `}
                                 title="Last Page"
@@ -982,7 +981,7 @@ function ViewExecutives() {
                     {/* Loading indicator */}
                     {isFetching && (
                         <div className="absolute left-1/2 transform -translate-x-1/2 -top-10">
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full shadow-lg border border-gray-200">
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full shadow-lg border border-gray-100">
                                 <svg className="animate-spin h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

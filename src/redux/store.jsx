@@ -1,19 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { api } from './api';
-// import authReducer from './slices/authSlice';
-// import uiReducer from './slices/uiSlice';
-// import filterReducer from './slices/filterSlice';
+import authReducer from './slices/authSlice';
 
 export const store = configureStore({
     reducer: {
         // RTK Query reducer
         [api.reducerPath]: api.reducer,
 
-        // // Local state reducers
-        // auth: authReducer,
-        // ui: uiReducer,
-        // filters: filterReducer,
+        // Local state reducers
+        auth: authReducer,
     },
 
     middleware: (getDefaultMiddleware) =>

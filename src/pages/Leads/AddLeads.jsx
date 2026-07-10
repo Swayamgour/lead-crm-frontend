@@ -328,7 +328,7 @@ function AddLead() {
         if (isValid) {
             return "border-green-300 focus:ring-green-200 bg-green-50";
         }
-        return "border-gray-200 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-300";
+        return "border-gray-100 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-200";
     };
 
     // Get status badge color
@@ -361,7 +361,7 @@ function AddLead() {
             <div className="max-w-5xl mx-auto px-4">
                 {/* Success Message */}
                 {showSuccess && (
-                    <div className="mb-6 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3 animate-slideDown shadow-lg">
+                    <div className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3 animate-slideDown shadow-lg">
                         <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                             <CheckCircle className="text-green-600" size={18} />
                         </div>
@@ -374,7 +374,7 @@ function AddLead() {
 
                 {/* Error Message */}
                 {errors.submit && (
-                    <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                    <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
                         <AlertCircle className="text-red-600" size={18} />
                         <p className="text-red-800">{errors.submit}</p>
                     </div>
@@ -385,7 +385,7 @@ function AddLead() {
                     {/* Form Header */}
                     <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-6">
                         <div className="flex items-center gap-4">
-                            <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                            <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
                                 <ClipboardList className="text-white" size={28} />
                             </div>
                             <div>
@@ -417,7 +417,7 @@ function AddLead() {
                                             onChange={handleChange}
                                             onBlur={() => handleBlur('name')}
                                             placeholder="Enter customer full name"
-                                            className={`w-full pl-10 pr-3 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('name')}`}
+                                            className={`w-full pl-10 pr-3 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('name')}`}
                                         />
                                     </div>
 
@@ -453,7 +453,7 @@ function AddLead() {
                                             onBlur={() => handleBlur('phone')}
                                             placeholder="10-digit mobile number"
                                             maxLength="10"
-                                            className={`w-full pl-10 pr-3 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('phone')}`}
+                                            className={`w-full pl-10 pr-3 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('phone')}`}
                                         />
                                     </div>
 
@@ -488,7 +488,7 @@ function AddLead() {
                                             onChange={handleChange}
                                             onBlur={() => handleBlur('email')}
                                             placeholder="customer@example.com"
-                                            className={`w-full pl-10 pr-3 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('email')}`}
+                                            className={`w-full pl-10 pr-3 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('email')}`}
                                         />
                                     </div>
 
@@ -520,7 +520,7 @@ function AddLead() {
                                         value={lead.source}
                                         onChange={handleChange}
                                         onBlur={() => handleBlur('source')}
-                                        className={`w-full pl-10 pr-8 py-3 border rounded-xl appearance-none ${getInputClassName('source')}`}
+                                        className={`w-full pl-10 pr-8 py-3 border rounded-2xl appearance-none ${getInputClassName('source')}`}
                                     >
                                         <option value="">Select Source</option>
                                         {leadSources.map((src) => (
@@ -557,7 +557,7 @@ function AddLead() {
                                         value={lead.status}
                                         onChange={handleChange}
                                         onBlur={() => handleBlur('status')}
-                                        className={`w-full pl-10 pr-8 py-3 border rounded-xl appearance-none ${getInputClassName('status')}`}
+                                        className={`w-full pl-10 pr-8 py-3 border rounded-2xl appearance-none ${getInputClassName('status')}`}
                                     >
                                         <option value="">Select Status</option>
                                         {leadStatus.map((status) => (
@@ -594,7 +594,7 @@ function AddLead() {
                                         name="assignedTo"
                                         value={lead.assignedTo || ""}
                                         onChange={handleChange}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     >
                                         <option value="">Select Sales Executive</option>
 
@@ -640,7 +640,7 @@ function AddLead() {
                                         onChange={handleChange}
                                         onBlur={() => handleBlur('followUpDate')}
                                         min={new Date().toISOString().split('T')[0]}
-                                        className={`w-full pl-10 pr-3 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('followUpDate')}`}
+                                        className={`w-full pl-10 pr-3 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('followUpDate')}`}
                                     />
                                     {touched.followUpDate && errors.followUpDate && (
                                         <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
@@ -673,7 +673,7 @@ function AddLead() {
                                         placeholder="Enter amount"
                                         min="0"
                                         step="1000"
-                                        className={`w-full pl-8 pr-3 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('expectedValue')}`}
+                                        className={`w-full pl-8 pr-3 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('expectedValue')}`}
                                     />
                                     {touched.expectedValue && errors.expectedValue && (
                                         <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
@@ -711,7 +711,7 @@ function AddLead() {
                             <button
                                 type="button"
                                 onClick={handleReset}
-                                className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all text-gray-700 font-medium"
+                                className="flex items-center gap-2 px-5 py-2.5 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all text-gray-700 font-medium"
                             >
                                 <RotateCcwIcon size={16} />
                                 Reset
@@ -719,7 +719,7 @@ function AddLead() {
 
                             <button
                                 type="submit"
-                                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium"
+                                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium"
                                 disabled={result?.isLoading}
                             >
                                 <SaveAll size={16} />

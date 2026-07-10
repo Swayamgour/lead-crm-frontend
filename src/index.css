@@ -1,4 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+
+/* Re-theme the whole app in one place: every existing `indigo-*`,
+   `purple-*` and `violet-*` utility class (bg-, text-, border-,
+   from-, to-, ring- ...) now resolves to the Cobalt & Signal
+   brand palette instead of Tailwind's defaults. */
+@theme {
+  --color-indigo-50: #eaf0ff;
+  --color-indigo-100: #d6e3fe;
+  --color-indigo-200: #b3ccfd;
+  --color-indigo-300: #85acfa;
+  --color-indigo-400: #5c8ff8;
+  --color-indigo-500: #3b6cf6;
+  --color-indigo-600: #2653ef;
+  --color-indigo-700: #1d40c9;
+  --color-indigo-800: #1a3499;
+  --color-indigo-900: #172b70;
+  --color-indigo-950: #0d1526;
+
+  --color-purple-50: #eef1f6;
+  --color-purple-100: #d7deea;
+  --color-purple-200: #b0bed4;
+  --color-purple-300: #8497bb;
+  --color-purple-400: #5c729e;
+  --color-purple-500: #3c5480;
+  --color-purple-600: #1b2740;
+  --color-purple-700: #131d33;
+  --color-purple-800: #0d1526;
+  --color-purple-900: #0a0f1e;
+  --color-purple-950: #06090f;
+
+  --color-violet-50: #eef1f6;
+  --color-violet-100: #d7deea;
+  --color-violet-200: #b0bed4;
+  --color-violet-300: #8497bb;
+  --color-violet-400: #5c729e;
+  --color-violet-500: #3c5480;
+  --color-violet-600: #1b2740;
+  --color-violet-700: #131d33;
+  --color-violet-800: #0d1526;
+  --color-violet-900: #0a0f1e;
+  --color-violet-950: #06090f;
+}
+
+:root {
+  /* Brand tokens — "Cobalt & Signal" */
+  --brand-navy-950: #0a0f1e;
+  --brand-navy-900: #0d1526;
+  --brand-navy-800: #131d33;
+  --brand-navy-700: #1b2740;
+  --brand-blue-600: #2653ef;
+  --brand-blue-500: #3b6cf6;
+  --brand-blue-400: #6d93f9;
+  --brand-amber-500: #f5a524;
+  --brand-amber-400: #ffbb4d;
+  --brand-emerald-500: #17b378;
+  --brand-slate-50: #f6f7fb;
+  --brand-slate-100: #eef0f7;
+
+  --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  /* Elevation & surface tokens — used app-wide for a consistent,
+     modern "soft UI" feel (cards, panels, headers). */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 6px 20px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12);
+  --shadow-glow-blue: 0 8px 24px rgba(38, 83, 239, 0.22);
+  --shadow-glow-amber: 0 8px 24px rgba(245, 165, 36, 0.25);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  --gradient-brand: linear-gradient(135deg, var(--brand-blue-600) 0%, #1d40c9 100%);
+  --gradient-navy: linear-gradient(160deg, var(--brand-navy-950) 0%, var(--brand-navy-800) 100%);
+  --gradient-amber: linear-gradient(135deg, var(--brand-amber-400) 0%, var(--brand-amber-500) 100%);
+  --surface-glass: rgba(255, 255, 255, 0.72);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--brand-slate-50);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
+
+/* ===== Shared modern UI primitives (opt-in utility classes) =====
+   Any page/component can use these class names to pick up the new
+   "elevated card / soft UI" look without needing MUI. */
+
+.ui-card {
+  background: #ffffff;
+  border: 1px solid rgba(20, 26, 46, 0.06);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.ui-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.ui-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.ui-stat-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(20, 26, 46, 0.06);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ui-stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--gradient-brand);
+}
+
+.ui-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  background: var(--gradient-brand);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-glow-blue);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.ui-btn-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(38, 83, 239, 0.1);
+  color: var(--brand-blue-600);
+}
+
+.ui-page-header {
+  background: #ffffff;
+  border: 1px solid rgba(20, 26, 46, 0.06);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 24px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(20, 26, 46, 0.18);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(20, 26, 46, 0.3);
+}
 
 /* Add to your existing index.css */
 @keyframes float {

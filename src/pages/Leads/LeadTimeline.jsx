@@ -260,7 +260,7 @@ function LeadOverview() {
                                 <input
                                     type="text"
                                     placeholder="Search leads by name, phone, email or company..."
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 transition-all bg-gray-50/50 hover:bg-white"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 transition-all bg-gray-50/50 hover:bg-white"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -268,22 +268,22 @@ function LeadOverview() {
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
-                                    className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all flex items-center gap-2"
+                                    className="px-4 py-2.5 rounded-2xl border border-gray-100 bg-white hover:bg-gray-50 transition-all flex items-center gap-2"
                                 >
                                     <FilterIcon size={16} />
                                     <span className="text-sm">Filters</span>
                                     {showFilters ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                                 </button>
-                                <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+                                <div className="flex gap-1 bg-gray-100 rounded-2xl p-1">
                                     <button
                                         onClick={() => setViewMode("grid")}
-                                        className={`px-3 py-1.5 rounded-lg transition-all ${viewMode === "grid" ? "bg-white shadow-md text-indigo-600" : "text-gray-500"}`}
+                                        className={`px-3 py-1.5 rounded-xl transition-all ${viewMode === "grid" ? "bg-white shadow-md text-indigo-600" : "text-gray-500"}`}
                                     >
                                         <Grid size={18} />
                                     </button>
                                     <button
                                         onClick={() => setViewMode("list")}
-                                        className={`px-3 py-1.5 rounded-lg transition-all ${viewMode === "list" ? "bg-white shadow-md text-indigo-600" : "text-gray-500"}`}
+                                        className={`px-3 py-1.5 rounded-xl transition-all ${viewMode === "list" ? "bg-white shadow-md text-indigo-600" : "text-gray-500"}`}
                                     >
                                         <List size={18} />
                                     </button>
@@ -300,7 +300,7 @@ function LeadOverview() {
                                         <select
                                             value={filterStatus}
                                             onChange={(e) => setFilterStatus(e.target.value)}
-                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                            className="w-full px-3 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 text-sm"
                                         >
                                             <option value="all">All Leads</option>
                                             <option value="active">Active (8+ activities)</option>
@@ -313,7 +313,7 @@ function LeadOverview() {
                                         <select
                                             value={sortBy}
                                             onChange={(e) => setSortBy(e.target.value)}
-                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                            className="w-full px-3 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 text-sm"
                                         >
                                             <option value="activity">Most Active</option>
                                             <option value="recent">Recently Active</option>
@@ -326,7 +326,7 @@ function LeadOverview() {
                                         <select
                                             value={dateRange}
                                             onChange={(e) => setDateRange(e.target.value)}
-                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                            className="w-full px-3 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 text-sm"
                                         >
                                             <option value="all">All Time</option>
                                             <option value="today">Today</option>
@@ -377,7 +377,7 @@ const EnhancedStatCard = ({ title, value, icon, gradient, trend, description }) 
                         </div>
                     )}
                 </div>
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-r ${gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                     <div className="text-white">{icon}</div>
                 </div>
             </div>
@@ -397,8 +397,8 @@ const MiniStatCard = ({ title, value, icon, color }) => {
     };
 
     return (
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center hover:shadow-md transition-all group">
-            <div className={`w-8 h-8 rounded-lg ${colors[color]} flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform`}>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-3 text-center hover:shadow-md transition-all group">
+            <div className={`w-8 h-8 rounded-xl ${colors[color]} flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform`}>
                 {icon}
             </div>
             <p className="text-lg font-bold text-gray-800">{value}</p>
@@ -428,8 +428,8 @@ const EnhancedLeadCard = ({ lead, formatDate }) => {
                     <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
                             <div className="relative">
-                                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl blur opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                                <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
                                     <span className="text-white font-bold text-lg">{initials}</span>
                                 </div>
                             </div>
@@ -443,7 +443,7 @@ const EnhancedLeadCard = ({ lead, formatDate }) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg">
+                        <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-xl">
                             {trendIcon}
                             <span className="text-xs font-medium text-gray-600">{lead.recentActivityCount} recent</span>
                         </div>
@@ -490,11 +490,11 @@ const EnhancedLeadListItem = ({ lead, formatDate }) => {
 
     return (
         <Link to={`/lead-timeline/${lead._id}`} className="block group">
-            <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-4 hover:bg-gradient-to-r hover:from-white hover:to-indigo-50/30">
+            <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-4 hover:bg-gradient-to-r hover:from-white hover:to-indigo-50/30">
                 <div className="flex items-center gap-4">
                     <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl blur opacity-0 group-hover:opacity-50 transition-opacity"></div>
-                        <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity"></div>
+                        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                             <span className="text-white font-bold text-lg">{initials}</span>
                         </div>
                     </div>
@@ -559,7 +559,7 @@ const EnhancedEmptyState = () => (
             <p className="text-gray-500 max-w-md mx-auto">
                 Try adjusting your search or filters to find leads. You can also add new leads from the CRM dashboard.
             </p>
-            <button className="mt-6 px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all inline-flex items-center gap-2">
+            <button className="mt-6 px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl hover:shadow-lg transition-all inline-flex items-center gap-2">
                 <Sparkles size={16} />
                 Clear Filters
             </button>

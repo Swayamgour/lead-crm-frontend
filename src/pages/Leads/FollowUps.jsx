@@ -323,7 +323,7 @@ function FollowUps() {
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                                <div className="w-10 h-10 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
                                     <CalendarClock size={20} className="text-white" />
                                 </div>
                                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
@@ -346,14 +346,14 @@ function FollowUps() {
                     </div>
 
                     {/* FILTERS SECTION */}
-                    <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 backdrop-blur-sm">
+                    <div className="mt-6 bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 p-4 backdrop-blur-sm">
                         <div className="flex flex-col lg:flex-row gap-4">
                             <div className="flex-1 relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                                 <input
                                     type="text"
                                     placeholder="Search by name, phone or email..."
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 hover:bg-white"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 hover:bg-white"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -363,7 +363,7 @@ function FollowUps() {
                                 <select
                                     value={filterStatus}
                                     onChange={(e) => setFilterStatus(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
                                 >
                                     <option value="all">All Status</option>
                                     <option value="pending">Pending</option>
@@ -376,7 +376,7 @@ function FollowUps() {
                                 <select
                                     value={filterType}
                                     onChange={(e) => setFilterType(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
                                 >
                                     <option value="all">All Types</option>
                                     <option value="call">Call</option>
@@ -391,7 +391,7 @@ function FollowUps() {
                                     setFilterStatus("all");
                                     setFilterType("all");
                                 }}
-                                className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all text-gray-700 flex items-center gap-2 group"
+                                className="px-4 py-2.5 rounded-2xl bg-gray-100 hover:bg-gray-200 transition-all text-gray-700 flex items-center gap-2 group"
                             >
                                 <RefreshCw size={16} className="group-hover:rotate-180 transition-transform duration-300" />
                                 <span className="text-sm font-medium">Reset</span>
@@ -446,13 +446,13 @@ function FollowUps() {
    STAT CARD COMPONENT
 ====================== */
 const StatCard = ({ title, value, icon, bgColor, textColor, isUrgent }) => (
-    <div className={`bg-white rounded-2xl shadow-sm p-5 hover:shadow-lg transition-all duration-300 border border-gray-100 group ${isUrgent ? 'animate-pulse' : ''}`}>
+    <div className={`bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-5 hover:shadow-lg transition-all duration-300 border border-gray-100 group ${isUrgent ? 'animate-pulse' : ''}`}>
         <div className="flex items-center justify-between">
             <div className="flex-1">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{title}</p>
                 <p className="text-3xl font-bold text-gray-900">{value}</p>
             </div>
-            <div className={`w-12 h-12 ${bgColor} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+            <div className={`w-12 h-12 ${bgColor} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                 <div className={textColor}>{icon}</div>
             </div>
         </div>
@@ -500,10 +500,10 @@ const TableView = ({
     };
 
     return (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] overflow-hidden border border-gray-100">
             <div className="overflow-x-auto">
                 <table className="w-full">
-                    <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                    <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-100">
                         <tr>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">#</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Lead</th>
@@ -542,7 +542,7 @@ const TableView = ({
                                         </td>
                                         <td className="px-6 py-4">
                                             {console.log(item?.lead?.status)}
-                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${getLeadStatusColor(item?.lead?.status)}`}>
+                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-semibold ${getLeadStatusColor(item?.lead?.status)}`}>
                                                 <span className="w-1.5 h-1.5 rounded-full mr-1.5 bg-current opacity-60"></span>
                                                 {item.lead.status?.replace('-', ' ') || 'New'}
                                             </span>
@@ -568,14 +568,14 @@ const TableView = ({
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${statusConfig.color}`}>
+                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-semibold ${statusConfig.color}`}>
                                                 {statusConfig.icon}
                                                 {statusConfig.label}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
                                             {reminderDays && (
-                                                <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium ${reminderDays.color}`}>
+                                                <span className={`inline-flex items-center px-2 py-1 rounded-xl text-xs font-medium ${reminderDays.color}`}>
                                                     {reminderDays.icon}
                                                     {reminderDays.text}
                                                 </span>
@@ -604,7 +604,7 @@ const TableView = ({
    ACTION BUTTON COMPONENT
 ====================== */
 const ActionButton = ({ icon, onClick, href, target, color, tooltip, size = "md" }) => {
-    const baseClasses = `p-${size === "sm" ? "1.5" : "2"} rounded-lg transition-all duration-200 hover:scale-105`;
+    const baseClasses = `p-${size === "sm" ? "1.5" : "2"} rounded-xl transition-all duration-200 hover:scale-105`;
     const colorClasses = {
         green: "text-gray-500 hover:text-green-600 hover:bg-green-50",
         indigo: "text-gray-500 hover:text-indigo-600 hover:bg-indigo-50",
@@ -681,7 +681,7 @@ const EditLeadModal = ({
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex border-b border-gray-200 bg-gray-50">
+                <div className="flex border-b border-gray-100 bg-gray-50">
                     <button
                         onClick={() => setActiveTab("edit")}
                         className={`flex-1 py-3 px-4 text-sm font-medium transition-all relative ${activeTab === "edit"
@@ -722,7 +722,7 @@ const EditLeadModal = ({
                                 <select
                                     value={editFormData.status}
                                     onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white"
+                                    className="w-full px-4 py-2.5 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white"
                                 >
                                     {leadStatus?.map((status) => (
                                         <option key={status.value} value={status.value}>
@@ -741,7 +741,7 @@ const EditLeadModal = ({
                                 <select
                                     value={editFormData.assignedTo}
                                     onChange={(e) => setEditFormData({ ...editFormData, assignedTo: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white"
+                                    className="w-full px-4 py-2.5 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white"
                                 >
                                     <option value="">Select Executive</option>
                                     {executives?.data?.map((exec) => (
@@ -760,7 +760,7 @@ const EditLeadModal = ({
                                     type="date"
                                     value={editFormData.followUpDate}
                                     onChange={(e) => setEditFormData({ ...editFormData, followUpDate: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white"
+                                    className="w-full px-4 py-2.5 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white"
                                 />
                             </div>
 
@@ -768,14 +768,14 @@ const EditLeadModal = ({
                             <div className="flex gap-3 pt-4">
                                 <button
                                     onClick={() => setShowEditModal(false)}
-                                    className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+                                    className="flex-1 px-4 py-2.5 border border-gray-100 rounded-2xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleUpdateLead}
                                     disabled={saving}
-                                    className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
                                     {saving ? (
                                         <>
@@ -800,7 +800,7 @@ const EditLeadModal = ({
                             {!showAddRemark && (
                                 <button
                                     onClick={() => setShowAddRemark(true)}
-                                    className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-indigo-300 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 text-sm font-semibold cursor-pointer hover:from-indigo-100 hover:to-purple-100 hover:border-indigo-400 transition-all mb-6 group"
+                                    className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-indigo-300 rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 text-sm font-semibold cursor-pointer hover:from-indigo-100 hover:to-purple-100 hover:border-indigo-400 transition-all mb-6 group"
                                 >
                                     <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
                                     Add New Remark
@@ -809,7 +809,7 @@ const EditLeadModal = ({
 
                             {/* Add Remark Form */}
                             {showAddRemark && (
-                                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-5 mb-6 border border-indigo-200 shadow-sm">
+                                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-5 mb-6 border border-indigo-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]">
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center gap-2">
                                             <MessageSquare size={16} className="text-indigo-600" />
@@ -823,7 +823,7 @@ const EditLeadModal = ({
                                         </button>
                                     </div>
                                     <textarea
-                                        className="w-full p-3 border border-indigo-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none bg-white"
+                                        className="w-full p-3 border border-indigo-200 rounded-2xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none bg-white"
                                         placeholder="Write your remark..."
                                         value={newRemark}
                                         onChange={e => setNewRemark(e.target.value)}
@@ -832,7 +832,7 @@ const EditLeadModal = ({
                                     />
                                     <div className="flex justify-end gap-2 mt-3">
                                         <button
-                                            className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
+                                            className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-200 rounded-xl transition-colors"
                                             onClick={() => {
                                                 setShowAddRemark(false);
                                                 setNewRemark('');
@@ -841,7 +841,7 @@ const EditLeadModal = ({
                                             Cancel
                                         </button>
                                         <button
-                                            className="px-4 py-2 text-sm bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                            className="px-4 py-2 text-sm bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                             onClick={handleAddRemark}
                                             disabled={saving || !newRemark.trim()}
                                         >
@@ -867,7 +867,7 @@ const EditLeadModal = ({
                                     remarksData.remarks.map((remark, idx) => (
                                         <div
                                             key={remark._id}
-                                            className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all duration-300 animate-fadeIn"
+                                            className="bg-white border border-gray-100 rounded-2xl p-4 hover:shadow-md transition-all duration-300 animate-fadeIn"
                                             style={{ animationDelay: `${idx * 50}ms` }}
                                         >
                                             <div className="flex items-start gap-3">

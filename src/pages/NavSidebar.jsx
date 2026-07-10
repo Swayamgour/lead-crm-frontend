@@ -29,10 +29,13 @@ import { sidebarSections } from "../../sidebarConfig";
 // import { sidebarSections } from "../config/sidebarConfig"; // Import your config
 import logo from '../assets/logo.png'
 import { useGetProfileQuery } from "../redux/api";
+import { useDispatch } from "react-redux";
+import { logout } from "../redux/slices/authSlice";
 
 function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenuOpen }) {
     const location = useLocation();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [expandedMenus, setExpandedMenus] = useState({});
 
     // Get user role from localStorage or context
@@ -70,11 +73,8 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
     // };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userRole');
-
+        dispatch(logout());
         navigate('/login');
-        window.location.reload();
     };
 
     // Check if a section is active
@@ -106,22 +106,27 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
 
     return (
         <div className={`
-            h-full bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 
-            text-white flex flex-col shadow-2xl transition-all duration-300
+            h-full relative bg-gradient-to-b from-[var(--brand-navy-950)] via-[var(--brand-navy-900)] to-[var(--brand-navy-950)] 
+            text-white flex flex-col transition-all duration-300 overflow-hidden
             ${sidebarOpen ? 'w-72' : 'w-20'}
         `}>
+            {/* Decorative glow */}
+            <div className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 rounded-full bg-[var(--brand-blue-600)]/25 blur-3xl" />
+            <div className="pointer-events-none absolute bottom-0 -left-16 w-56 h-56 rounded-full bg-[var(--brand-amber-500)]/10 blur-3xl" />
+
             {/* Logo Section */}
             <div className={`
-                flex items-center justify-between p-5 border-b border-gray-700/50
+                relative flex items-center justify-between p-5 border-b border-white/10
                 ${!sidebarOpen && 'justify-center'}
             `}>
                 <div className="flex items-center gap-3">
-                    {/* <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                        <Target size={20} className="text-white" />
-                    </div> */}
-                    {sidebarOpen && (
+                    {sidebarOpen ? (
                         <div onClick={() => handelClickHome()} className="flex justify-center cursor-pointer">
-                            <img src={logo} alt="Logo" width={120} />
+                            <img src={logo} alt="Logo" width={120} className="drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]" />
+                        </div>
+                    ) : (
+                        <div onClick={() => handelClickHome()} className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--brand-blue-500)] to-[var(--brand-blue-600)] flex items-center justify-center shadow-lg cursor-pointer">
+                            <img src={logo} alt="Logo" width={22} className="object-contain" />
                         </div>
                     )}
                 </div>
@@ -137,7 +142,7 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
             </div>
 
             {/* Navigation Links */}
-            <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+            <nav className="relative flex-1 overflow-y-auto py-6 px-3 space-y-1.5 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.15)_transparent]">
                 {/* Dashboard - Always visible */}
 
 
@@ -155,18 +160,18 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
                                     onClick={() => toggleSubMenu(section.title)}
                                     className={`
                                         w-full flex items-center px-3 py-2.5 rounded-xl
-                                        transition-all duration-200 group
+                                        transition-all duration-200 group cursor-pointer
                                         ${sidebarOpen ? 'justify-between' : 'justify-center'}
-                                        hover:bg-white/10
-                                        ${isSubmenuActive(section) ? 'bg-white/5' : ''}
+                                        hover:bg-white/[0.08]
+                                        ${isSubmenuActive(section) ? 'bg-white/[0.06] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]' : ''}
                                     `}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className={`p-1 rounded-lg bg-gradient-to-r ${section.color} bg-opacity-20`}>
-                                            <Icon size={18} className="text-white" />
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <div className={`shrink-0 p-1.5 rounded-lg bg-gradient-to-r ${section.color} bg-opacity-20 shadow-sm`}>
+                                            <Icon size={17} className="text-white" />
                                         </div>
                                         {sidebarOpen && (
-                                            <span className={`text-sm font-medium ${isSubmenuActive(section) ? 'text-white' : 'text-gray-300'} group-hover:text-white`}>
+                                            <span className={`text-sm font-medium truncate ${isSubmenuActive(section) ? 'text-white' : 'text-gray-300'} group-hover:text-white`}>
                                                 {section.title}
                                             </span>
                                         )}
@@ -174,13 +179,16 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
                                     {sidebarOpen && (
                                         <ChevronDown
                                             size={16}
-                                            className={`text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                                            className={`text-gray-500 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-gray-300' : ''}`}
                                         />
                                     )}
                                 </button>
 
-                                {sidebarOpen && isExpanded && (
-                                    <div className="ml-9 mt-1 space-y-1">
+                                {sidebarOpen && (
+                                    <div
+                                        className="ml-[22px] pl-4 border-l border-white/10 mt-1 space-y-0.5 overflow-hidden transition-all duration-300"
+                                        style={{ maxHeight: isExpanded ? section.submenu.length * 44 + 8 : 0, opacity: isExpanded ? 1 : 0 }}
+                                    >
                                         {section.submenu.map((sub) => {
                                             const SubIcon = sub.icon;
                                             const isSubActive = sub.path && sub.path.some(path => location.pathname === path);
@@ -190,16 +198,16 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
                                                     to={sub.path?.[0] || '#'}
                                                     onClick={closeMobileMenu}
                                                     className={`
-                                                        flex items-center gap-3 px-3 py-2 rounded-lg text-sm
+                                                        flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm
                                                         transition-all duration-200
                                                         ${isSubActive
-                                                            ? 'bg-indigo-600/20 text-indigo-300 border-l-2 border-indigo-400'
+                                                            ? 'bg-[var(--brand-blue-600)]/20 text-[var(--brand-blue-400)] font-medium'
                                                             : 'text-gray-400 hover:text-white hover:bg-white/5'
                                                         }
                                                     `}
                                                 >
                                                     <SubIcon size={14} />
-                                                    <span>{sub.title}</span>
+                                                    <span className="truncate">{sub.title}</span>
                                                 </NavLink>
                                             );
                                         })}
@@ -215,22 +223,29 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
                             to={section.path?.[0] || '#'}
                             onClick={closeMobileMenu}
                             className={({ isActive }) => `
-                                flex items-center gap-3 px-3 py-2.5 rounded-xl
+                                relative flex items-center gap-3 px-3 py-2.5 rounded-xl
                                 transition-all duration-200 group
                                 ${sidebarOpen ? 'justify-start' : 'justify-center'}
                                 ${isActive
-                                    ? `bg-gradient-to-r ${section.color} bg-opacity-20 text-white shadow-sm`
-                                    : 'text-gray-400 hover:text-white hover:bg-white/10'
+                                    ? `bg-gradient-to-r ${section.color} bg-opacity-20 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]`
+                                    : 'text-gray-400 hover:text-white hover:bg-white/[0.08]'
                                 }
                             `}
                         >
-                            <div className={`p-1 rounded-lg bg-gradient-to-r ${section.color} bg-opacity-20`}>
-                                <Icon size={18} className={`transition-colors ${isActive ? 'text-white' : 'group-hover:text-white'}`} />
-                            </div>
-                            {sidebarOpen && (
-                                <span className={`text-sm font-medium ${isActive ? 'text-white' : 'text-gray-300'}`}>
-                                    {section.title}
-                                </span>
+                            {({ isActive }) => (
+                                <>
+                                    {isActive && (
+                                        <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full bg-[var(--brand-amber-500)]" />
+                                    )}
+                                    <div className={`shrink-0 p-1.5 rounded-lg bg-gradient-to-r ${section.color} bg-opacity-20 shadow-sm`}>
+                                        <Icon size={17} className={`transition-colors ${isActive ? 'text-white' : 'group-hover:text-white'}`} />
+                                    </div>
+                                    {sidebarOpen && (
+                                        <span className={`text-sm font-medium truncate ${isActive ? 'text-white' : 'text-gray-300'}`}>
+                                            {section.title}
+                                        </span>
+                                    )}
+                                </>
                             )}
                         </NavLink>
                     );
@@ -238,25 +253,21 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
             </nav>
 
             {/* Bottom Section */}
-            <div className="p-4 border-t border-gray-700/50 space-y-2">
-
+            <div className="relative p-4 border-t border-white/10 space-y-2">
                 <button
                     onClick={handleLogout}
                     className={`
                         w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
-                        transition-all duration-200 group
+                        transition-all duration-200 group cursor-pointer
                         ${sidebarOpen ? 'justify-start' : 'justify-center'}
-                        hover:bg-red-500/20 text-red-400 hover:text-red-300
+                        hover:bg-red-500/15 text-red-400 hover:text-red-300
                     `}
                 >
-                    <LogOut size={20} />
+                    <LogOut size={19} />
                     {sidebarOpen && (
                         <span className="text-sm font-medium">Logout</span>
                     )}
                 </button>
-
-                {/* System Status */}
-
             </div>
         </div>
     );

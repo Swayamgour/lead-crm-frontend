@@ -776,7 +776,7 @@ const Banners = () => {
                 .header-title h1 {
                     font-size: 20px;
                     font-weight: 600;
-                    color: #1a1a2e;
+                    color: #0d1526;
                     margin: 0;
                 }
 
@@ -785,7 +785,7 @@ const Banners = () => {
                     align-items: center;
                     gap: 8px;
                     padding: 8px 20px;
-                    background: #4f46e5;
+                    background: #2653ef;
                     border: none;
                     border-radius: 8px;
                     color: white;
@@ -795,7 +795,7 @@ const Banners = () => {
                 }
 
                 .btn-add:hover {
-                    background: #4338ca;
+                    background: #1d40c9;
                     transform: translateY(-1px);
                 }
 
@@ -827,8 +827,8 @@ const Banners = () => {
                 }
 
                 .stat-icon.total {
-                    background: #eef2ff;
-                    color: #4f46e5;
+                    background: #eaf0ff;
+                    color: #2653ef;
                 }
 
                 .stat-icon.active {
@@ -957,12 +957,12 @@ const Banners = () => {
                 }
 
                 .position-btn.up:hover {
-                    background: #4f46e5;
+                    background: #2653ef;
                     color: white;
                 }
 
                 .position-btn.down:hover {
-                    background: #4f46e5;
+                    background: #2653ef;
                     color: white;
                 }
 
@@ -1096,12 +1096,12 @@ const Banners = () => {
                 }
 
                 .action-btn.edit {
-                    background: #eef2ff;
-                    color: #4f46e5;
+                    background: #eaf0ff;
+                    color: #2653ef;
                 }
 
                 .action-btn.edit:hover {
-                    background: #4f46e5;
+                    background: #2653ef;
                     color: white;
                 }
 
@@ -1174,7 +1174,7 @@ const Banners = () => {
                 .modal-header h2 {
                     font-size: 20px;
                     margin: 0;
-                    color: #1a1a2e;
+                    color: #0d1526;
                 }
 
                 .modal-close {
@@ -1201,7 +1201,7 @@ const Banners = () => {
                     font-size: 16px;
                     margin: 0 0 16px 0;
                     padding-bottom: 8px;
-                    border-bottom: 2px solid #4f46e5;
+                    border-bottom: 2px solid #2653ef;
                     display: inline-block;
                 }
 
@@ -1234,7 +1234,7 @@ const Banners = () => {
                 }
 
                 .form-group input:focus {
-                    border-color: #4f46e5;
+                    border-color: #2653ef;
                 }
 
                 .form-group small {
@@ -1275,8 +1275,8 @@ const Banners = () => {
                 }
 
                 .upload-box:hover {
-                    border-color: #4f46e5;
-                    background: #eef2ff;
+                    border-color: #2653ef;
+                    background: #eaf0ff;
                 }
 
                 .upload-box.small {
@@ -1348,7 +1348,7 @@ const Banners = () => {
                 }
 
                 .existing-badge {
-                    background: #4f46e5;
+                    background: #2653ef;
                     color: white;
                 }
 
@@ -1360,10 +1360,10 @@ const Banners = () => {
                 .change-image-btn {
                     margin-top: 8px;
                     padding: 6px 12px;
-                    background: #eef2ff;
+                    background: #eaf0ff;
                     border: none;
                     border-radius: 6px;
-                    color: #4f46e5;
+                    color: #2653ef;
                     cursor: pointer;
                     font-size: 12px;
                 }
@@ -1415,11 +1415,11 @@ const Banners = () => {
                     align-items: center;
                     gap: 10px;
                     padding: 12px;
-                    background: #eef2ff;
+                    background: #eaf0ff;
                     border-radius: 8px;
                     margin-top: 16px;
                     font-size: 13px;
-                    color: #4f46e5;
+                    color: #2653ef;
                 }
 
                 /* Spinner */
@@ -1458,7 +1458,7 @@ const Banners = () => {
                     align-items: center;
                     gap: 8px;
                     padding: 10px 20px;
-                    background: #4f46e5;
+                    background: #2653ef;
                     border: none;
                     border-radius: 8px;
                     color: white;
@@ -1466,7 +1466,7 @@ const Banners = () => {
                 }
 
                 .btn-save:hover {
-                    background: #4338ca;
+                    background: #1d40c9;
                 }
 
                 .btn-save:disabled {

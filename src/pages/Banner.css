@@ -26,7 +26,7 @@
   .header-title h1 {
       font-size: 20px;
       font-weight: 600;
-      color: #1a1a2e;
+      color: #0d1526;
       margin: 0;
   }
 
@@ -35,7 +35,7 @@
       align-items: center;
       gap: 8px;
       padding: 8px 20px;
-      background: #4f46e5;
+      background: #2653ef;
       border: none;
       border-radius: 8px;
       color: white;
@@ -45,7 +45,7 @@
   }
 
   .btn-add:hover {
-      background: #4338ca;
+      background: #1d40c9;
       transform: translateY(-1px);
   }
 
@@ -77,8 +77,8 @@
   }
 
   .stat-icon.total {
-      background: #eef2ff;
-      color: #4f46e5;
+      background: #eaf0ff;
+      color: #2653ef;
   }
 
   .stat-icon.active {
@@ -207,12 +207,12 @@
   }
 
   .position-btn.up:hover {
-      background: #4f46e5;
+      background: #2653ef;
       color: white;
   }
 
   .position-btn.down:hover {
-      background: #4f46e5;
+      background: #2653ef;
       color: white;
   }
 
@@ -346,12 +346,12 @@
   }
 
   .action-btn.edit {
-      background: #eef2ff;
-      color: #4f46e5;
+      background: #eaf0ff;
+      color: #2653ef;
   }
 
   .action-btn.edit:hover {
-      background: #4f46e5;
+      background: #2653ef;
       color: white;
   }
 
@@ -424,7 +424,7 @@
   .modal-header h2 {
       font-size: 20px;
       margin: 0;
-      color: #1a1a2e;
+      color: #0d1526;
   }
 
   .modal-close {
@@ -451,7 +451,7 @@
       font-size: 16px;
       margin: 0 0 16px 0;
       padding-bottom: 8px;
-      border-bottom: 2px solid #4f46e5;
+      border-bottom: 2px solid #2653ef;
       display: inline-block;
   }
 
@@ -484,7 +484,7 @@
   }
 
   .form-group input:focus {
-      border-color: #4f46e5;
+      border-color: #2653ef;
   }
 
   .form-group small {
@@ -525,8 +525,8 @@
   }
 
   .upload-box:hover {
-      border-color: #4f46e5;
-      background: #eef2ff;
+      border-color: #2653ef;
+      background: #eaf0ff;
   }
 
   .upload-box.small {
@@ -590,7 +590,7 @@
       width: 24px;
       height: 24px;
       border: 2px solid #e2e8f0;
-      border-top-color: #4f46e5;
+      border-top-color: #2653ef;
       border-radius: 50%;
       animation: spin 1s linear infinite;
   }
@@ -664,7 +664,7 @@
       align-items: center;
       gap: 8px;
       padding: 10px 20px;
-      background: #4f46e5;
+      background: #2653ef;
       border: none;
       border-radius: 8px;
       color: white;
@@ -672,7 +672,7 @@
   }
 
   .btn-save:hover {
-      background: #4338ca;
+      background: #1d40c9;
   }
 
   @media (max-width: 768px) {

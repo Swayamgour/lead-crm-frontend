@@ -380,8 +380,8 @@ const CategoryManager = () => {
     // Get level icon and color
     const getLevelStyle = (level) => {
         const styles = {
-            1: { icon: Folder, color: '#4f46e5', bg: '#eef2ff', text: '#4338ca' },
-            2: { icon: FolderOpen, color: '#8b5cf6', bg: '#f5f3ff', text: '#6d28d9' },
+            1: { icon: Folder, color: '#2653ef', bg: '#eaf0ff', text: '#1d40c9' },
+            2: { icon: FolderOpen, color: '#3c5480', bg: '#eef1f6', text: '#6d28d9' },
             3: { icon: FileText, color: '#10b981', bg: '#ecfdf5', text: '#047857' }
         };
         return styles[level] || styles[1];

@@ -56,6 +56,8 @@ function LeadView() {
     const { data: leadsData, isLoading, refetch: refetchLeads } = useGetLeadsQuery();
     const { data: Executive } = useGetUsersQuery();
     const { data: profile } = useGetProfileQuery();
+
+    // console.log()
     const [updateLead] = useUpdateLeadMutation();
     const [deleteLead] = useDeleteLeadMutation();
 
@@ -107,19 +109,6 @@ function LeadView() {
     const dropdownRef = useRef(null);
 
 
-    // useEffect(() => {
-    //     const handleClickOutside = (event) => {
-    //         if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-    //             setOpenId(null);
-    //         }
-    //     };
-
-    //     document.addEventListener("mousedown", handleClickOutside);
-
-    //     return () => {
-    //         document.removeEventListener("mousedown", handleClickOutside);
-    //     };
-    // }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -424,7 +413,7 @@ function LeadView() {
                 return 'bg-orange-500 text-white border-orange-600';
 
             default:
-                return 'bg-gray-200 text-gray-700 border-gray-300';
+                return 'bg-gray-200 text-gray-700 border-gray-200';
         }
     };
 
@@ -464,17 +453,20 @@ function LeadView() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen bg-transparent">
             <div className="max-w-7xl mx-auto p-6">
                 {/* Header Section with Stats Cards */}
                 <div className="mb-8">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 px-6 py-5 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#2653ef] to-[#f5a524]" />
                         <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent flex items-center gap-2">
-                                <Users className="text-[#4f46e5]" size={32} />
+                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+                                <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2653ef] to-[#1d40c9] flex items-center justify-center shadow-[0_6px_16px_rgba(38,83,239,0.3)]">
+                                    <Users className="text-white" size={22} />
+                                </span>
                                 Lead Management
                             </h1>
-                            <p className="text-gray-500 mt-1 text-sm">
+                            <p className="text-gray-500 mt-1 text-sm ml-14">
                                 Track and manage your sales pipeline effectively
                             </p>
                         </div>
@@ -493,7 +485,7 @@ function LeadView() {
                             {profile?.role === 'admin' && (
                                 <button
                                     onClick={() => navigate("/addLeads")}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-[#4f46e5] to-[#6366f1] text-white px-6 py-2.5 rounded-lg hover:shadow-lg transition-all text-sm font-semibold"
+                                    className="flex items-center gap-2 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] text-white px-6 py-2.5 rounded-xl hover:shadow-[0_8px_20px_rgba(38,83,239,0.35)] hover:-translate-y-0.5 transition-all duration-200 text-sm font-semibold"
                                 >
                                     <Plus size={18} />
                                     Add New Lead
@@ -510,13 +502,13 @@ function LeadView() {
                         {/* Won Leads Card */}
                         <div
                             // onClick={() => setActiveSideTab('won')}
-                            className={`cursor-pointer bg-white rounded-2xl shadow-sm p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'won'
+                            className={`cursor-pointer bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'won'
                                 ? 'border-emerald-500 bg-emerald-50/30 shadow-md'
                                 : 'border-gray-100 hover:border-emerald-200'
                                 }`}
                         >
                             <div className="flex items-center justify-between mb-3">
-                                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center">
                                     <Award size={24} className="text-emerald-600" />
                                 </div>
                                 <span className="text-3xl font-bold text-emerald-600">{wonLeads.length}</span>
@@ -528,13 +520,13 @@ function LeadView() {
                         {/* Active Leads Card */}
                         <div
                             // onClick={() => setActiveSideTab('active')}
-                            className={`cursor-pointer bg-white rounded-2xl shadow-sm p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'active'
+                            className={`cursor-pointer bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'active'
                                 ? 'border-blue-500 bg-blue-50/30 shadow-md'
                                 : 'border-gray-100 hover:border-blue-200'
                                 }`}
                         >
                             <div className="flex items-center justify-between mb-3">
-                                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center">
                                     <TrendingUp size={24} className="text-blue-600" />
                                 </div>
                                 <span className="text-3xl font-bold text-blue-600">{activeLeads.length}</span>
@@ -546,13 +538,13 @@ function LeadView() {
                         {/* Lost Leads Card */}
                         <div
                             // onClick={() => setActiveSideTab('lost')}
-                            className={`cursor-pointer bg-white rounded-2xl shadow-sm p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'lost'
+                            className={`cursor-pointer bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'lost'
                                 ? 'border-red-500 bg-red-50/30 shadow-md'
                                 : 'border-gray-100 hover:border-red-200'
                                 }`}
                         >
                             <div className="flex items-center justify-between mb-3">
-                                <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center">
                                     <X size={24} className="text-red-600" />
                                 </div>
                                 <span className="text-3xl font-bold text-red-600">{lostLeads.length}</span>
@@ -564,13 +556,13 @@ function LeadView() {
                         {/* Pending Leads Card */}
                         <div
                             // onClick={() => setActiveSideTab('pending')}
-                            className={`cursor-pointer bg-white rounded-2xl shadow-sm p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'pending'
+                            className={`cursor-pointer bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-5 border-2 transition-all hover:shadow-md ${activeSideTab === 'pending'
                                 ? 'border-yellow-500 bg-yellow-50/30 shadow-md'
                                 : 'border-gray-100 hover:border-yellow-200'
                                 }`}
                         >
                             <div className="flex items-center justify-between mb-3">
-                                <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-2xl bg-yellow-100 flex items-center justify-center">
                                     <Clock size={24} className="text-yellow-600" />
                                 </div>
                                 <span className="text-3xl font-bold text-yellow-600">{pendingLeads.length}</span>
@@ -581,7 +573,7 @@ function LeadView() {
                     </div>
 
                     {/* Filters Section */}
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                    <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-4 border border-gray-100">
                         <div className="flex flex-col lg:flex-row gap-4">
                             {/* Search */}
                             <div className="flex-1 relative">
@@ -590,7 +582,7 @@ function LeadView() {
                                     placeholder="Search leads by name, phone, email or product..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4f46e5] focus:border-transparent text-sm bg-gray-50"
+                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] focus:border-transparent text-sm bg-gray-50"
                                 />
                                 <User className="absolute left-3 top-3 text-gray-400" size={18} />
                             </div>
@@ -598,7 +590,7 @@ function LeadView() {
                             {/* Filter Toggle */}
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
-                                className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium text-gray-600"
+                                className="flex items-center gap-2 px-4 py-2.5 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-colors text-sm font-medium text-gray-600"
                             >
                                 <Filter size={18} />
                                 Filters
@@ -616,7 +608,7 @@ function LeadView() {
                                             type="date"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4f46e5] text-sm"
+                                            className="w-full pl-10 pr-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] text-sm"
                                             placeholder="Start Date"
                                         />
                                     </div>
@@ -626,14 +618,14 @@ function LeadView() {
                                             type="date"
                                             value={endDate}
                                             onChange={(e) => setEndDate(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4f46e5] text-sm"
+                                            className="w-full pl-10 pr-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] text-sm"
                                             placeholder="End Date"
                                         />
                                     </div>
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
-                                        className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4f46e5] text-sm"
+                                        className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] text-sm"
                                     >
                                         <option value="">All Status</option>
                                         {leadStatus?.map((status) => (
@@ -688,7 +680,7 @@ function LeadView() {
                     {activeSideTab !== 'all' && (
                         <button
                             onClick={() => setActiveSideTab('all')}
-                            className="text-xs text-[#4f46e5] hover:underline flex items-center gap-1"
+                            className="text-xs text-[#2653ef] hover:underline flex items-center gap-1"
                         >
                             <X size={12} />
                             Clear filter
@@ -697,7 +689,7 @@ function LeadView() {
                 </div>
 
                 {/* Leads Table */}
-                <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm">
+                <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
@@ -706,6 +698,7 @@ function LeadView() {
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Lead</th>
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Contact</th>
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Status</th>
+                                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Source</th>
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Assigned To</th>
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Next Follow Up</th>
                                     <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Remarks</th>
@@ -751,7 +744,7 @@ function LeadView() {
 
                                                 {/* Status Chip */}
                                                 <div
-                                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-semibold cursor-pointer shadow-sm
+                                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-semibold cursor-pointer shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]
                                                      ${getStatusColorStatus(lead.status)}`}
                                                 >
 
@@ -785,7 +778,9 @@ function LeadView() {
                                             </div>
                                         </td>
 
-
+                                        <td className="px-4 py-3">
+                                            <span className="text-xs text-gray-600">{lead.source || '—'}</span>
+                                        </td>
 
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
@@ -798,41 +793,42 @@ function LeadView() {
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-1 text-xs text-gray-600">
-                                                <Calendar size={12} className="text-gray-400" />
+                                                {/* <Calendar size={12} className="text-gray-400" /> */}
                                                 {formatDate(lead.followUpDate)}
                                             </div>
                                         </td>
                                         <td className="px-4 py-3 ">
                                             <div onClick={() => { setViewLead(lead); setActiveTab('history') }} className="flex items-center gap-1 cursor-pointer">
-                                                <MessageCircle size={12} className="text-gray-400" />
+                                                {/* <MessageCircle size={12} className="text-gray-400" /> */}
                                                 <span className="text-xs text-gray-600">
                                                     {lead.remarksCount || 0} remarks
                                                 </span>
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center justify-center gap-2">
                                                 <button
-                                                    onClick={() => setViewLead(lead)}
-                                                    className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-all"
+                                                    // onClick={() => setViewLead(lead)}
+                                                    onClick={() => navigate(`/lead/${lead._id}`)}
+                                                    className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-all"
                                                     title="View Details"
                                                 >
                                                     <Eye size={16} />
                                                 </button>
                                                 {/* <button
                                                     onClick={() => navigate(`/editLead/${lead._id}`)}
-                                                    className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-all"
+                                                    className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-all"
                                                     title="Edit Lead"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button> */}
-                                                <button
+                                                {/* <button
                                                     onClick={() => setDeleteConfirmId(lead._id)}
-                                                    className="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-all"
+                                                    className="w-8 h-8 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-all"
                                                     title="Delete Lead"
                                                 >
                                                     <Trash2 size={16} />
-                                                </button>
+                                                </button> */}
                                             </div>
                                         </td>
                                     </tr>
@@ -851,7 +847,7 @@ function LeadView() {
                                 {profile?.role === 'admin' && (
                                     <button
                                         onClick={() => navigate("/addLeads")}
-                                        className="inline-flex items-center gap-2 bg-gradient-to-r from-[#4f46e5] to-[#6366f1] text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition-all text-sm font-semibold"
+                                        className="inline-flex items-center gap-2 bg-gradient-to-r from-[#2653ef] to-[#3b6cf6] text-white px-6 py-2.5 rounded-2xl hover:shadow-lg transition-all text-sm font-semibold"
                                     >
                                         <Plus size={18} />
                                         Add New Lead
@@ -874,425 +870,7 @@ function LeadView() {
                 )}
 
                 {/* Lead Detail Modal - Keep existing modal code */}
-                {viewLead && (
-                    // ... (keep existing modal code)
-                    <div className="modal-overlay fixed inset-0 bg-black/45 backdrop-blur-sm z-9999 flex items-center justify-center p-5" onClick={() => {
-                        setViewLead(null);
-                        setShowAddRemark(false);
-                        setNewRemark('');
-                        setEditingRemark(null);
-                        setActiveTab('remarks');
-                    }}>
-                        <div className="modal-card bg-white rounded-xl w-full max-w-[600px] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
-                            {/* Header */}
-                            <div className="modal-header flex items-center justify-between p-6 pb-4 border-b border-[#f0f2f5]">
-                                <div className="modal-title-group flex items-center gap-3.5">
-                                    <div className="modal-lead-avatar w-11 h-11 rounded-xl bg-gradient-to-br from-[#6366f1] to-[#4f46e5] text-white text-lg font-bold flex items-center justify-center">
-                                        {viewLead.name?.[0]?.toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <h3 className="modal-lead-name text-base font-bold text-[#1a1a2e] mb-0.5">{viewLead.name}</h3>
-                                        <p className="modal-lead-sub text-xs text-[#9ca3af]">{viewLead.email || 'No email provided'}</p>
-                                    </div>
-                                </div>
-                                <button className="modal-close w-8 h-8 border-none bg-gray-100 rounded-lg cursor-pointer text-gray-500 hover:bg-red-100 hover:text-red-500 flex items-center justify-center transition-colors" onClick={() => {
-                                    setViewLead(null);
-                                    setShowAddRemark(false);
-                                    setNewRemark('');
-                                    setEditingRemark(null);
-                                }}>
-                                    <X size={18} />
-                                </button>
-                            </div>
 
-                            {/* Status Bar */}
-                            <div className="modal-status-bar flex items-center gap-3 px-6 py-3.5 bg-gray-50 border-b border-[#f0f2f5]">
-                                <span className="modal-status-label text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</span>
-                                <select
-                                    className={`status-select ${viewLead.status === 'closed-won'
-                                        ? 'bg-emerald-500 text-white border-emerald-600'
-                                        : getStatusColorStatus(viewLead.status)} border border-[#e5e7eb] rounded-full px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#4f46e5]`}
-                                    value={viewLead.status}
-                                    onChange={async e => {
-                                        const newStatus = e.target.value;
-                                        await handleStatusChange(viewLead._id, newStatus);
-                                        setViewLead(prev => ({ ...prev, status: newStatus }));
-                                    }}
-                                >
-                                    {leadStatus?.map((status) => (
-                                        <option key={status.value} value={status.value}>
-                                            {status.label || status.value}
-                                        </option>
-                                    ))}
-                                </select>
-                                {modalSaving && <span className="modal-saving-badge text-xs text-[#4f46e5] font-medium ml-2 animate-pulse">Saving…</span>}
-                            </div>
-
-                            {/* Tabs */}
-                            <div className="flex border-b border-[#f0f2f5] px-6">
-                                <button
-                                    className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'remarks'
-                                        ? 'border-[#4f46e5] text-[#4f46e5]'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-                                    onClick={() => setActiveTab('remarks')}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <MessageCircle size={16} />
-                                        Details
-                                    </div>
-                                </button>
-                                <button
-                                    className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'history'
-                                        ? 'border-[#4f46e5] text-[#4f46e5]'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-                                    onClick={() => setActiveTab('history')}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <History size={16} />
-
-                                        Remarks ({remarksData?.remarks?.length || 0})
-                                    </div>
-                                </button>
-                            </div>
-
-                            {/* Scrollable Body */}
-                            <div className="modal-body overflow-y-auto flex-1 pb-1">
-                                {/* Basic Info Grid - Always Visible */}
-                                {activeTab === 'remarks' &&
-                                    <>
-                                        <div className="modal-detail-grid grid grid-cols-2 gap-0 py-2">
-                                            <div className="modal-detail-item flex flex-col gap-1 p-4 border-b border-[#f9fafb] border-r border-[#f9fafb]">
-                                                <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
-                                                    <Phone size={12} />
-                                                    Phone
-                                                </span>
-                                                <span className="modal-detail-value text-sm font-medium text-[#1a1a2e]">{viewLead.phone}</span>
-                                            </div>
-                                            <div className="modal-detail-item flex flex-col gap-1 p-4 border-b border-[#f9fafb]">
-                                                <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
-                                                    <Tag size={12} />
-                                                    Source
-                                                </span>
-                                                <span className="modal-detail-value text-sm font-medium text-[#1a1a2e] capitalize">{viewLead.source || '—'}</span>
-                                            </div>
-                                            <div className="modal-detail-item flex flex-col gap-1 p-4 border-b border-[#f9fafb] border-r border-[#f9fafb]">
-                                                <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
-                                                    <Clock size={12} />
-                                                    Added On
-                                                </span>
-                                                <span className="modal-detail-value text-sm font-medium text-[#1a1a2e]">{formatDate(viewLead.createdAt)}</span>
-                                            </div>
-                                            <div className="modal-detail-item flex flex-col gap-1 p-4 border-b border-[#f9fafb]">
-                                                <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
-                                                    <Calendar size={12} />
-                                                    Follow Up
-                                                </span>
-                                                <span className="modal-detail-value text-sm font-medium text-[#1a1a2e]">{formatDate(viewLead.followUpDate)}</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Assigned To Section */}
-                                        <div className="modal-edit-section p-6 border-b border-[#f0f2f5] flex flex-col gap-2.5">
-                                            <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
-                                                <Users size={12} />
-                                                Assigned To
-                                            </span>
-
-                                            <div className="modal-edit-row flex items-center gap-3 flex-wrap w-full">
-                                                <select
-                                                    value={String(viewLead.assignedTo?._id || viewLead.assignedTo || '')}
-                                                    // onChange={(e) => {
-                                                    //     const selectedId = e.target.value;
-                                                    //     setSelectedExecutive(selectedId);
-                                                    //     setConfirmAssignId(selectedId);
-                                                    // }}
-
-                                                    onChange={async (e) => {
-                                                        const selectedId = e.target.value;
-
-                                                        setSelectedExecutive(selectedId);
-
-                                                        await handleModalFieldSave('assignedTo', selectedId);
-                                                    }}
-                                                    className="w-full p-3 border border-[#e5e7eb] rounded-lg bg-white text-sm 
-                                                      focus:outline-none focus:ring-2 focus:ring-[#4f46e5]"
-                                                >
-                                                    <option value="">Select Executive</option>
-
-                                                    {executives?.data?.map(exec => (
-                                                        <option key={exec._id} value={exec._id}>
-                                                            {exec.name.toUpperCase()} {exec.phone ? `(${exec.phone})` : ""}
-                                                        </option>
-                                                    ))}
-                                                </select>
-
-                                                {executives?.data?.length === 0 && (
-                                                    <p className="hint-text text-xs text-[#9ca3af] italic">
-                                                        No executives available.
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Follow Up Date Edit */}
-                                        <div className="modal-edit-section p-6 border-b border-[#f0f2f5] flex flex-col gap-2.5">
-                                            <span className="modal-detail-label flex items-center gap-1 text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">
-                                                <Calendar size={12} />
-                                                Update Follow Up Date
-                                            </span>
-                                            <div className="modal-edit-row flex items-center gap-3 flex-wrap">
-                                                <div className="input-wrapper modal-date-input flex items-center gap-2.5 border border-[#e5e7eb] rounded-lg px-3.5 bg-white h-10 max-w-[220px] focus-within:border-[#4f46e5] focus-within:ring-3 focus-within:ring-[#4f46e5]/20 transition-all">
-                                                    <Calendar size={15} className="text-[#9ca3af]" />
-                                                    <input
-                                                        type="date"
-                                                        value={
-                                                            viewLead.followUpDate
-                                                                ? new Date(viewLead.followUpDate).toISOString().split("T")[0]
-                                                                : ""
-                                                        }
-                                                        onChange={(e) => {
-                                                            if (e.target.value) {
-                                                                handleModalFieldSave("followUpDate", e.target.value);
-                                                            }
-                                                        }}
-                                                        className="flex-1 border-none outline-none text-sm text-[#1a1a2e] bg-transparent"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </>
-                                }
-
-                                {/* Tab Content */}
-
-                                {activeTab === 'history' && (
-                                    /* Remarks Tab */
-                                    <div ref={pdfRef} className="remarks-tab p-6">
-                                        {/* Add Remark Button */}
-                                        {!showAddRemark && !editingRemark && (
-                                            <button
-                                                className="btn-add-remark w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-[#c4b5fd] rounded-lg bg-[#f5f3ff] text-[#4f46e5] text-sm font-semibold cursor-pointer hover:bg-[#ede9fe] hover:border-[#a78bfa] transition-all mb-4"
-                                                onClick={() => setShowAddRemark(true)}
-                                            >
-                                                <Plus size={18} />
-                                                Add New Remark
-                                            </button>
-                                        )}
-
-                                        {/* Add Remark Form */}
-                                        {showAddRemark && (
-                                            <div className="modal-remark-form bg-gray-50 rounded-lg p-4 mb-4">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-xs font-semibold text-[#4f46e5] uppercase tracking-wider">New Remark</span>
-                                                    <button
-                                                        onClick={() => setShowAddRemark(false)}
-                                                        className="text-gray-400 hover:text-gray-600"
-                                                    >
-                                                        <X size={16} />
-                                                    </button>
-                                                </div>
-                                                <textarea
-                                                    className="w-full p-3 border border-[#e5e7eb] rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:ring-2 focus:ring-[#4f46e5] focus:border-transparent resize-none"
-                                                    placeholder="Write your remark..."
-                                                    value={newRemark}
-                                                    onChange={e => setNewRemark(e.target.value)}
-                                                    rows={3}
-                                                    autoFocus
-                                                />
-                                                <div className="flex justify-end gap-2 mt-2">
-                                                    <button
-                                                        className="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-200 rounded-md transition-colors"
-                                                        onClick={() => {
-                                                            setShowAddRemark(false);
-                                                            setNewRemark('');
-                                                        }}
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                    <button
-                                                        className="px-3 py-1.5 text-xs bg-[#4f46e5] text-white rounded-md hover:bg-[#4338ca] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                                                        onClick={handleAddRemark}
-                                                        disabled={modalSaving || !newRemark.trim()}
-                                                    >
-                                                        {modalSaving ? (
-                                                            <>
-                                                                <span className="spinner inline-block w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                                                                Saving...
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Check size={14} />
-                                                                Save Remark
-                                                            </>
-                                                        )}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Edit Remark Form */}
-                                        {editingRemark && (
-                                            <div className="modal-remark-form bg-yellow-50 rounded-lg p-4 mb-4 border border-yellow-200">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-xs font-semibold text-yellow-600 uppercase tracking-wider">Edit Remark</span>
-                                                    <button
-                                                        onClick={() => setEditingRemark(null)}
-                                                        className="text-gray-400 hover:text-gray-600"
-                                                    >
-                                                        <X size={16} />
-                                                    </button>
-                                                </div>
-                                                <textarea
-                                                    className="w-full p-3 border border-yellow-300 rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
-                                                    value={editRemarkText}
-                                                    onChange={e => setEditRemarkText(e.target.value)}
-                                                    rows={3}
-                                                    autoFocus
-                                                />
-                                                <div className="flex justify-end gap-2 mt-2">
-                                                    <button
-                                                        className="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-200 rounded-md transition-colors"
-                                                        onClick={() => setEditingRemark(null)}
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                    <button
-                                                        className="px-3 py-1.5 text-xs bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                                                        onClick={handleEditRemark}
-                                                        disabled={modalSaving || !editRemarkText.trim()}
-                                                    >
-                                                        {modalSaving ? (
-                                                            <>
-                                                                <span className="spinner inline-block w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                                                                Updating...
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Check size={14} />
-                                                                Update Remark
-                                                            </>
-                                                        )}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Remarks List */}
-                                        <div className="remarks-list space-y-3">
-                                            {remarksLoading ? (
-                                                // 🔄 Loading State
-                                                <div className="text-center py-8 text-sm text-gray-500">
-                                                    Loading remarks...
-                                                </div>
-                                            ) : remarksData?.remarks?.length > 0 ? (
-                                                // ✅ Data State
-                                                remarksData.remarks.map((remark) => (
-                                                    <div
-                                                        key={remark._id}
-                                                        className="remark-item bg-white border border-[#f0f2f5] rounded-lg p-4 hover:shadow-sm transition-shadow"
-                                                    >
-                                                        <div className="flex items-start justify-between gap-2">
-                                                            <div className="remark-content flex-1">
-                                                                <p className="text-sm text-[#1a1a2e] whitespace-pre-wrap">
-                                                                    {remark.text}
-                                                                </p>
-
-                                                                <div className="flex items-center gap-2 mt-2">
-                                                                    <span className="text-xs text-[#7a8394]">
-                                                                        By:{" "}
-                                                                        <span className="font-medium text-[#4f46e5]">
-                                                                            {remark.createdByName}
-                                                                        </span>
-                                                                    </span>
-
-                                                                    <span className="text-xs text-[#7a8394]">•</span>
-
-                                                                    <span className="text-xs text-[#7a8394]">
-                                                                        {formatDate(remark.createdAt)}
-                                                                    </span>
-
-                                                                    {remark.isEdited && (
-                                                                        <>
-                                                                            <span className="text-xs text-[#7a8394]">•</span>
-                                                                            <span className="text-xs text-yellow-600 flex items-center gap-1">
-                                                                                <Edit2 size={10} />
-                                                                                Edited
-                                                                            </span>
-                                                                        </>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="remark-actions flex items-center gap-1">
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setEditingRemark(remark);
-                                                                        setEditRemarkText(remark.text);
-                                                                        setShowAddRemark(false);
-                                                                    }}
-                                                                    className="p-1.5 text-gray-400 hover:text-[#4f46e5] hover:bg-[#ede9fe] rounded-md transition-colors"
-                                                                >
-                                                                    <Edit2 size={14} />
-                                                                </button>
-
-                                                                <button
-                                                                    onClick={() => handleDeleteRemark(remark._id)}
-                                                                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                                                >
-                                                                    <Trash2 size={14} />
-                                                                </button>
-
-                                                                <button
-                                                                    onClick={() => setSelectedRemarkForHistory(remark)}
-                                                                    className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-colors"
-                                                                >
-                                                                    <History size={14} />
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                // ❌ Empty State
-                                                <div className="empty-remarks text-center py-8">
-                                                    <MessageCircle size={32} className="text-[#9ca3af] mx-auto mb-2" />
-                                                    <p className="text-sm text-[#7a8394]">No remarks yet</p>
-                                                    <p className="text-xs text-[#9ca3af] mt-1">
-                                                        Click "Add New Remark" to add your first note
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
-
-
-                                        <div className="flex justify-end mb-4">
-                                            <button
-                                                onClick={handleDownloadPDF}
-                                                className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-red-600 transition-all"
-                                            >
-                                                📄 Download PDF
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                )}
-                            </div>
-
-                            {/* Footer */}
-                            {/* <div className="modal-footer p-6 border-t border-[#f0f2f5] flex justify-end">
-                                <button className="btn-reset px-5 py-2 border border-[#e5e7eb] rounded-lg text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-colors" onClick={() => {
-                                    setViewLead(null);
-                                    setShowAddRemark(false);
-                                    setNewRemark('');
-                                    setEditingRemark(null);
-                                    setActiveTab('remarks');
-                                }}>
-                                    Close
-                                </button>
-                            </div> */}
-                        </div>
-                    </div>
-                )}
 
                 {/* Reassign Confirmation Modal */}
                 {confirmAssignId && (
@@ -1312,9 +890,9 @@ function LeadView() {
 
                             <div className="p-6">
                                 <div className="space-y-4">
-                                    <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                                    <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm">
+                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm">
                                                 {viewLead?.name?.charAt(0).toUpperCase()}
                                             </div>
                                             <div>
@@ -1329,7 +907,7 @@ function LeadView() {
                                         <div className="text-center">
                                             <p className="text-xs text-gray-500 mb-1">Current</p>
                                             <div className="flex flex-col items-center">
-                                                <div className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center mb-1">
+                                                <div className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-100 flex items-center justify-center mb-1">
                                                     {viewLead?.assignedTo ? (
                                                         <span className="text-lg font-bold text-gray-600">
                                                             {viewLead.assignedTo.name?.charAt(0).toUpperCase()}
@@ -1365,7 +943,7 @@ function LeadView() {
                                         </div>
                                     </div>
 
-                                    <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                    <div className="bg-amber-50 rounded-xl p-3 border border-amber-200">
                                         <div className="flex gap-2">
                                             <AlertCircle size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
                                             <p className="text-xs text-amber-800">
@@ -1379,7 +957,7 @@ function LeadView() {
                                 <div className="flex gap-3 mt-6">
                                     <button
                                         onClick={() => setConfirmAssignId(null)}
-                                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+                                        className="flex-1 px-4 py-2.5 border border-gray-200 rounded-2xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all"
                                     >
                                         Cancel
                                     </button>
@@ -1387,7 +965,7 @@ function LeadView() {
                                         onClick={() => {
                                             handleModalFieldSave('assignedTo', confirmAssignId);
                                         }}
-                                        className="flex-1 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-semibold hover:from-amber-600 hover:to-orange-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                                        className="flex-1 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl text-sm font-semibold hover:from-amber-600 hover:to-orange-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                                     >
                                         <Check size={18} />
                                         Confirm Transfer
@@ -1409,10 +987,10 @@ function LeadView() {
                             onClick={() => setCurrentPage(1)}
                             disabled={!PaginatedLeads?.pagination.hasPrevPage || isFetching}
                             className={`
-                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-xl transition-all duration-200
                         ${!PaginatedLeads?.pagination.hasPrevPage || isFetching
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] hover:shadow'
                                 }
                     `}
                             title="First Page"
@@ -1427,10 +1005,10 @@ function LeadView() {
                             onClick={() => setCurrentPage(prev => prev - 1)}
                             disabled={!PaginatedLeads?.pagination.hasPrevPage || isFetching}
                             className={`
-                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200
                         ${!PaginatedLeads?.pagination.hasPrevPage || isFetching
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] hover:shadow'
                                 }
                     `}
                         >
@@ -1466,7 +1044,7 @@ function LeadView() {
                                                 <button
                                                     onClick={() => setCurrentPage(1)}
                                                     disabled={isFetching}
-                                                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                                                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-200 transition-all duration-200"
                                                 >
                                                     1
                                                 </button>
@@ -1483,10 +1061,10 @@ function LeadView() {
                                                 onClick={() => setCurrentPage(page)}
                                                 disabled={isFetching}
                                                 className={`
-                                            relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                                            relative px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200
                                             ${currentPage === page
                                                         ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md transform scale-105'
-                                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm'
+                                                        : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 hover:shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]'
                                                     }
                                             ${isFetching ? 'cursor-wait opacity-50' : 'cursor-pointer'}
                                         `}
@@ -1504,7 +1082,7 @@ function LeadView() {
                                                 <button
                                                     onClick={() => setCurrentPage(totalPages)}
                                                     disabled={isFetching}
-                                                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                                                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-200 transition-all duration-200"
                                                 >
                                                     {totalPages}
                                                 </button>
@@ -1520,10 +1098,10 @@ function LeadView() {
                             onClick={() => setCurrentPage(prev => prev + 1)}
                             disabled={!PaginatedLeads?.pagination.hasNextPage || isFetching}
                             className={`
-                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200
                         ${!PaginatedLeads?.pagination.hasNextPage || isFetching
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] hover:shadow'
                                 }
                     `}
                         >
@@ -1538,10 +1116,10 @@ function LeadView() {
                             onClick={() => setCurrentPage(PaginatedLeads?.pagination.totalPages)}
                             disabled={!PaginatedLeads?.pagination.hasNextPage || isFetching}
                             className={`
-                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                        relative inline-flex items-center px-2 py-2 text-sm font-medium rounded-xl transition-all duration-200
                         ${!PaginatedLeads?.pagination.hasNextPage || isFetching
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
+                                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-200 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] hover:shadow'
                                 }
                     `}
                             title="Last Page"
@@ -1554,36 +1132,8 @@ function LeadView() {
                 </div>
             </div>
 
-            {/* Add animations */}
-            <style>{`
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                    }
-                    to {
-                        opacity: 1;
-                    }
-                }
 
-                @keyframes slideUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
 
-                .animate-fadeIn {
-                    animation: fadeIn 0.2s ease-out forwards;
-                }
-
-                .animate-slideUp {
-                    animation: slideUp 0.3s ease-out forwards;
-                }
-            `}</style>
         </div>
     );
 }

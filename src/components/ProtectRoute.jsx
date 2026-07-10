@@ -1,11 +1,14 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { useGetProfileQuery } from "../redux/api";
+import { selectCurrentToken, logout } from "../redux/slices/authSlice";
 import Loading from "./Loading";
 
 function ProtectRoute() {
 
-    const token = localStorage.getItem("token");
+    const token = useSelector(selectCurrentToken);
+    const dispatch = useDispatch();
 
     // Skip API if no token
     const {
@@ -35,8 +38,7 @@ function ProtectRoute() {
         !data
     ) {
 
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        dispatch(logout());
 
         return <Navigate to="/login" replace />;
     }

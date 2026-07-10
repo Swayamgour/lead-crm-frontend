@@ -358,7 +358,7 @@ function AddEditExecutive() {
         if (isValid) {
             return "border-green-300 focus:ring-green-200 bg-green-50";
         }
-        return "border-gray-200 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-300";
+        return "border-gray-100 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-200";
     };
 
     if (isEditMode && isLoadingExecutive) {
@@ -381,7 +381,7 @@ function AddEditExecutive() {
                         onClick={() => navigate(-1)}
                         className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors group"
                     >
-                        <div className="p-2 rounded-lg bg-white shadow-sm group-hover:shadow group-hover:bg-gray-50 transition-all">
+                        <div className="p-2 rounded-xl bg-white shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] group-hover:shadow group-hover:bg-gray-50 transition-all">
                             <ArrowLeft size={18} />
                         </div>
                         <span>Back to Executives</span>
@@ -390,7 +390,7 @@ function AddEditExecutive() {
 
                 {/* Success Message */}
                 {showSuccess && (
-                    <div className="mb-6 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3 animate-slideDown shadow-lg">
+                    <div className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3 animate-slideDown shadow-lg">
                         <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                             <CheckCircle className="text-green-600" size={18} />
                         </div>
@@ -405,7 +405,7 @@ function AddEditExecutive() {
 
                 {/* Error Message */}
                 {errors.submit && (
-                    <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                    <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
                         <AlertCircle className="text-red-600" size={18} />
                         <p className="text-red-800">{errors.submit}</p>
                     </div>
@@ -416,7 +416,7 @@ function AddEditExecutive() {
                     {/* Header with Gradient */}
                     <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 md:px-8 py-6">
                         <div className="flex items-center gap-4">
-                            <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                            <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
                                 {isEditMode ? <Edit3 className="text-white" size={28} /> : <User className="text-white" size={28} />}
                             </div>
                             <div>
@@ -436,7 +436,7 @@ function AddEditExecutive() {
                     <div className="px-6 md:px-8 py-6 border-b border-gray-100 bg-gray-50/50">
                         <div className="flex items-center gap-6">
                             <div className="relative">
-                                <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-3xl shadow-lg overflow-hidden">
+                                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-3xl shadow-lg overflow-hidden">
                                     {profileImage ? (
                                         <img
                                             src={typeof profileImage === 'string' ? profileImage : URL.createObjectURL(profileImage)}
@@ -469,7 +469,7 @@ function AddEditExecutive() {
                                 <h3 className="font-semibold text-gray-800">Profile Photo</h3>
                                 <p className="text-sm text-gray-500 mt-1">Upload a profile picture (JPG, PNG, GIF) - Max 2MB</p>
                                 <div className="mt-3 flex gap-2">
-                                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer transition-colors shadow-sm">
+                                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-100 rounded-xl text-sm text-gray-600 hover:bg-gray-50 cursor-pointer transition-colors shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]">
                                         <Upload size={14} />
                                         Upload Photo
                                         <input
@@ -482,7 +482,7 @@ function AddEditExecutive() {
                                     {profileImage && (
                                         <button
                                             onClick={() => setProfileImage(null)}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors shadow-sm"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-100 rounded-xl text-sm text-red-600 hover:bg-red-50 transition-colors shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]"
                                         >
                                             <X size={14} />
                                             Remove
@@ -504,7 +504,7 @@ function AddEditExecutive() {
                         <div className="space-y-6">
                             {/* Info Message for Edit Mode */}
                             {isEditMode && (
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+                                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
                                     <AlertCircle className="text-blue-600 flex-shrink-0 mt-0.5" size={16} />
                                     <p className="text-sm text-blue-700">
                                         Leave password fields empty if you don't want to change the password.
@@ -533,7 +533,7 @@ function AddEditExecutive() {
                                                 onChange={handleChange}
                                                 onBlur={() => handleBlur('name')}
                                                 placeholder="Enter executive's full name"
-                                                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('name')}`}
+                                                className={`w-full pl-10 pr-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${getInputClassName('name')}`}
                                             />
                                         </div>
 
@@ -574,7 +574,7 @@ function AddEditExecutive() {
                                                 onBlur={() => handleBlur('phone')}
                                                 placeholder="10-digit mobile number"
                                                 maxLength="10"
-                                                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 ${getInputClassName('phone')}`}
+                                                className={`w-full pl-10 pr-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 ${getInputClassName('phone')}`}
                                             />
                                         </div>
 
@@ -614,7 +614,7 @@ function AddEditExecutive() {
                                                 onChange={handleChange}
                                                 onBlur={() => handleBlur('email')}
                                                 placeholder="executive@company.com"
-                                                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 ${getInputClassName('email')}`}
+                                                className={`w-full pl-10 pr-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 ${getInputClassName('email')}`}
                                             />
                                         </div>
 
@@ -654,7 +654,7 @@ function AddEditExecutive() {
                                                 onChange={handleChange}
                                                 onBlur={() => handleBlur('password')}
                                                 placeholder="Create password"
-                                                className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 ${getInputClassName('password')}`}
+                                                className={`w-full pl-10 pr-12 py-3 border rounded-2xl focus:outline-none focus:ring-2 ${getInputClassName('password')}`}
                                             />
 
                                             <button
@@ -696,7 +696,7 @@ function AddEditExecutive() {
                                                 onChange={handleChange}
                                                 onBlur={() => handleBlur('confirmPassword')}
                                                 placeholder="Confirm password"
-                                                className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 ${getInputClassName('confirmPassword')}`}
+                                                className={`w-full pl-10 pr-12 py-3 border rounded-2xl focus:outline-none focus:ring-2 ${getInputClassName('confirmPassword')}`}
                                             />
 
                                             <button
@@ -727,7 +727,7 @@ function AddEditExecutive() {
                             <button
                                 type="button"
                                 onClick={handleReset}
-                                className="w-full sm:w-auto px-6 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-700 flex items-center justify-center gap-2 font-medium"
+                                className="w-full sm:w-auto px-6 py-3 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-colors text-gray-700 flex items-center justify-center gap-2 font-medium"
                             >
                                 <RotateCcw size={16} />
                                 Reset
@@ -736,7 +736,7 @@ function AddEditExecutive() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting || Object.keys(errors).some(key => errors[key] && key !== 'submit')}
-                                className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isSubmitting ? (
                                     <>

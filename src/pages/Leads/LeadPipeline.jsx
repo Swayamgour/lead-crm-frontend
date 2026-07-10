@@ -145,7 +145,7 @@ function LeadPipeline() {
                     <p className="text-gray-500 mb-4">Failed to load pipeline data</p>
                     <button
                         onClick={refetch}
-                        className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all"
+                        className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl hover:shadow-lg transition-all"
                     >
                         Try Again
                     </button>
@@ -162,7 +162,7 @@ function LeadPipeline() {
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                                <div className="w-10 h-10 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
                                     <TrendingUp size={20} className="text-white" />
                                 </div>
                                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
@@ -176,7 +176,7 @@ function LeadPipeline() {
 
                         <button
                             onClick={refetch}
-                            className="p-2.5 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all group"
+                            className="p-2.5 bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 hover:shadow-md transition-all group"
                         >
                             <RefreshCw size={18} className="text-gray-600 group-hover:rotate-180 transition-transform duration-300" />
                         </button>
@@ -227,14 +227,14 @@ function LeadPipeline() {
                     </div>
 
                     {/* Filters Section */}
-                    <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                    <div className="mt-6 bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 p-4">
                         <div className="flex flex-col lg:flex-row gap-4">
                             <div className="flex-1 relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                                 <input
                                     type="text"
                                     placeholder="Search leads by name, phone or email..."
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 hover:bg-white"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 hover:bg-white"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -244,7 +244,7 @@ function LeadPipeline() {
                                 <select
                                     value={filterStatus}
                                     onChange={(e) => setFilterStatus(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
                                 >
                                     <option value="all">All Status</option>
                                     <option value="incoming">Incoming</option>
@@ -286,7 +286,7 @@ function LeadPipeline() {
                                 {/* Leads List */}
                                 <div className="flex-1 space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto pr-1">
                                     {leads.length === 0 ? (
-                                        <div className="bg-white rounded-xl p-6 text-center border border-gray-100 shadow-sm">
+                                        <div className="bg-white rounded-2xl p-6 text-center border border-gray-100 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]">
                                             <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
                                                 <Target size={20} className="text-gray-400" />
                                             </div>
@@ -317,13 +317,13 @@ function LeadPipeline() {
    STAT CARD COMPONENT
 ====================== */
 const StatCard = ({ title, value, icon, bgColor, textColor, gradient }) => (
-    <div className="bg-white rounded-2xl shadow-sm p-5 hover:shadow-lg transition-all duration-300 border border-gray-100 group">
+    <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-5 hover:shadow-lg transition-all duration-300 border border-gray-100 group">
         <div className="flex items-center justify-between">
             <div className="flex-1">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{title}</p>
                 <p className="text-3xl font-bold text-gray-900">{value}</p>
             </div>
-            <div className={`w-12 h-12 ${bgColor} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+            <div className={`w-12 h-12 ${bgColor} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                 <div className={textColor}>{icon}</div>
             </div>
         </div>
@@ -338,7 +338,7 @@ const LeadCard = ({ lead, index, getStatusColor, formatCurrency }) => {
 
     return (
         <div
-            className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 animate-fadeIn"
+            className="bg-white rounded-2xl border border-gray-100 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] hover:shadow-md transition-all duration-300 animate-fadeIn"
             style={{ animationDelay: `${index * 50}ms` }}
         >
             <div className="p-3">
@@ -379,7 +379,7 @@ const LeadCard = ({ lead, index, getStatusColor, formatCurrency }) => {
 
                     {/* Status Badge */}
                     <div className="flex items-center gap-1.5 mt-2">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-medium ${getStatusColor(lead.status)}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-xl text-[10px] font-medium ${getStatusColor(lead.status)}`}>
                             {lead.status?.replace('-', ' ') || 'New'}
                         </span>
                     </div>

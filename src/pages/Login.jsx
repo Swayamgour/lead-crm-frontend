@@ -1,41 +1,38 @@
 // Login.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
     Mail,
     Lock,
     Eye,
     EyeOff,
-    LogIn,
     ArrowRight,
-    MessageSquare,
     Users,
-    BarChart3,
-    Shield,
-    CheckCircle,
-    Facebook,
-    Mail as MailIcon,
-    Chrome
+    GitBranch,
+    Activity,
+    Loader2
 } from 'lucide-react';
-import { useGetProductsQuery, useLoginMutation } from '../redux/api';
+import { useLoginMutation } from '../redux/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCredentials, selectCurrentToken, selectCurrentUser } from '../redux/slices/authSlice';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 import logo from "../assets/logo.png";
 import toast from 'react-hot-toast';
 
-
+// Stages of a lead's journey — mirrors the CRM's own pipeline,
+// used as the signature visual on the brand panel.
+const PIPELINE_STAGES = [
+    { label: 'New Lead', icon: Users },
+    { label: 'In Pipeline', icon: GitBranch },
+    { label: 'Converted', icon: Activity },
+];
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [rememberMe, setRememberMe] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({});
-
-
-
-
-    
 
     const validateForm = () => {
         const newErrors = {};
@@ -52,9 +49,9 @@ const Login = () => {
         return newErrors;
     };
 
-    const [login] = useLoginMutation()
-
-    const navigate = useNavigate()
+    const [login] = useLoginMutation();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -62,55 +59,38 @@ const Login = () => {
         const newErrors = validateForm();
 
         if (Object.keys(newErrors).length === 0) {
-
             setIsLoading(true);
 
             try {
-
-                const body = {
-                    email: email,
-                    password: password
-                };
-
-                // const res = await login(body);
+                const body = { email, password };
                 const res = await login(body).unwrap();
 
-                console.log(res);
-
                 if (res?.token) {
-
-                    localStorage.setItem("token", res.token);
-
-                    console.log("user data", res?.token)
-
-                    // ✅ ADD THIS
-                    localStorage.setItem("user", JSON.stringify(res.user?.role));
+                    // Store credentials in Redux (slice also persists to localStorage
+                    // so the session survives a page refresh).
+                    dispatch(setCredentials({ user: res.user, token: res.token }));
 
                     if (res?.user?.role === "admin") {
                         navigate('/');
                     } else {
                         navigate('/Leads');
                     }
-
                 } else {
-                    toast.error(res?.error?.data?.message)
+                    toast.error(res?.error?.data?.message || 'Login failed');
                 }
-
             } catch (error) {
                 console.log("Login error:", error);
+                toast.error(error?.data?.message || 'Invalid email or password');
             }
 
             setIsLoading(false);
-
         } else {
             setErrors(newErrors);
         }
     };
 
-
-
-    const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user"));
+    const token = useSelector(selectCurrentToken);
+    const user = useSelector(selectCurrentUser);
 
     if (token && user) {
         if (user.role === "admin") {
@@ -121,131 +101,163 @@ const Login = () => {
     }
 
     return (
-        <div className="min-h-screen  bg-gradient-to-br from-blue-600 to-purple-700">
-            <div className="flex min-h-screen items-center justify-center">
-                {/* Left Side - Login Form */}
-                <div className="w-full  flex items-center justify-center p-8">
-                    <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl">
-                        {/* Logo */}
-                        <div className="text-center mb-8">
-                            <div className="flex items-center justify-center space-x-2 mb-4">
-                                {/* y */}
-                                {/* <img src='/assets/logo.png' alt='dayro Logo' /> */}
-                                <img src={logo} alt="Logo" width={200} />
-                            </div>
-                            <h2 className="text-3xl font-bold text-gray-900 mb-2">Log in </h2>
-                            <p className="text-gray-600">Sign in to manage your leads and chatbot</p>
-                        </div>
+        <div className="min-h-screen flex bg-[var(--brand-slate-50)]">
 
-                        {/* Login Form */}
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Email Field */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Email Address
-                                </label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => {
-                                            setEmail(e.target.value);
-                                            setErrors({ ...errors, email: '' });
-                                        }}
-                                        className={`w-full pl-10 pr-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'
-                                            } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
-                                        placeholder="Enter your email"
-                                    />
-                                </div>
-                                {errors.email && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                                )}
-                            </div>
+            {/* Left — Brand / Pipeline panel */}
+            <div className="hidden lg:flex lg:w-[46%] relative flex-col justify-between overflow-hidden bg-[var(--brand-navy-950)] px-12 py-12">
 
-                            {/* Password Field */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Password
-                                </label>
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        value={password}
-                                        onChange={(e) => {
-                                            setPassword(e.target.value);
-                                            setErrors({ ...errors, password: '' });
-                                        }}
-                                        className={`w-full pl-10 pr-12 py-3 border ${errors.password ? 'border-red-500' : 'border-gray-300'
-                                            } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
-                                        placeholder="Enter your password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                    >
-                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                    </button>
-                                </div>
-                                {errors.password && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-                                )}
-                            </div>
+                {/* ambient glow */}
+                <div className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 rounded-full bg-[var(--brand-blue-600)] opacity-20 blur-3xl" />
+                <div className="pointer-events-none absolute bottom-0 right-0 w-80 h-80 rounded-full bg-[var(--brand-amber-500)] opacity-10 blur-3xl" />
 
+                <div className="relative z-10 flex items-center">
+                    <img src={logo} alt="Logo" width={140} className="brightness-0 invert" />
+                </div>
 
+                <div className="relative z-10 max-w-sm">
+                    <h1 className="font-[var(--font-display)] text-4xl font-bold text-white leading-tight mb-4">
+                        Every lead,<br />on a clear path.
+                    </h1>
+                    <p className="text-slate-400 text-base leading-relaxed mb-10">
+                        Track leads from first contact to closed deal — one pipeline, one source of truth.
+                    </p>
 
-                            {/* Login Button */}
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Signing in...
-                                    </>
-                                ) : (
-                                    <>
-                                        <LogIn size={20} className="mr-2" />
-                                        Sign In
-                                    </>
-                                )}
-                            </button>
-
-
-
-                        </form>
+                    {/* Signature element: pipeline flow */}
+                    <div className="flex items-center gap-2">
+                        {PIPELINE_STAGES.map((stage, i) => {
+                            const Icon = stage.icon;
+                            return (
+                                <React.Fragment key={stage.label}>
+                                    <div className="flex flex-col items-center gap-2">
+                                        <div
+                                            className="w-11 h-11 rounded-xl flex items-center justify-center border border-white/10"
+                                            style={{
+                                                background: i === 2
+                                                    ? 'linear-gradient(135deg, var(--brand-amber-500), var(--brand-amber-400))'
+                                                    : 'rgba(255,255,255,0.06)',
+                                                animation: `pulse-slow ${3 + i}s ease-in-out infinite`,
+                                            }}
+                                        >
+                                            <Icon size={18} className={i === 2 ? 'text-[var(--brand-navy-950)]' : 'text-[var(--brand-blue-400)]'} />
+                                        </div>
+                                        <span className="text-[11px] text-slate-500 whitespace-nowrap">{stage.label}</span>
+                                    </div>
+                                    {i < PIPELINE_STAGES.length - 1 && (
+                                        <div className="flex-1 h-px mb-5" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02))' }} />
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
                     </div>
                 </div>
 
-                {/* Right Side - Hero Section */}
-
+                <p className="relative z-10 text-xs text-slate-600">
+                    © {new Date().getFullYear()} — Internal CRM
+                </p>
             </div>
 
-            {/* Custom CSS for animations */}
-            <style>{`
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
+            {/* Right — Form panel */}
+            <div className="flex-1 flex items-center justify-center px-6 py-12">
+                <div className="w-full max-w-sm">
+
+                    <div className="lg:hidden flex justify-center mb-8">
+                        <img src={logo} alt="Logo" width={150} />
+                    </div>
+
+                    <div className="mb-8">
+                        <h2 className="font-[var(--font-display)] text-2xl font-bold text-slate-900 mb-1.5">Welcome back</h2>
+                        <p className="text-sm text-slate-500">Sign in to manage your leads and pipeline</p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                        {/* Email */}
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
+                                Email address
+                            </label>
+                            <div className="relative">
+                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                <input
+                                    id="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    value={email}
+                                    onChange={(e) => {
+                                        setEmail(e.target.value);
+                                        setErrors({ ...errors, email: '' });
+                                    }}
+                                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 transition-all outline-none
+                                        ${errors.email
+                                            ? 'border-red-400 focus:ring-2 focus:ring-red-100'
+                                            : 'border-slate-200 focus:border-[var(--brand-blue-500)] focus:ring-2 focus:ring-blue-100'
+                                        }`}
+                                    placeholder="you@company.com"
+                                />
+                            </div>
+                            {errors.email && (
+                                <p className="mt-1.5 text-xs text-red-600">{errors.email}</p>
+                            )}
+                        </div>
+
+                        {/* Password */}
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">
+                                Password
+                            </label>
+                            <div className="relative">
+                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                <input
+                                    id="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    autoComplete="current-password"
+                                    value={password}
+                                    onChange={(e) => {
+                                        setPassword(e.target.value);
+                                        setErrors({ ...errors, password: '' });
+                                    }}
+                                    className={`w-full pl-10 pr-11 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 transition-all outline-none
+                                        ${errors.password
+                                            ? 'border-red-400 focus:ring-2 focus:ring-red-100'
+                                            : 'border-slate-200 focus:border-[var(--brand-blue-500)] focus:ring-2 focus:ring-blue-100'
+                                        }`}
+                                    placeholder="Enter your password"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                    tabIndex={-1}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                            {errors.password && (
+                                <p className="mt-1.5 text-xs text-red-600">{errors.password}</p>
+                            )}
+                        </div>
+
+                        {/* Submit */}
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium text-sm text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-110 active:scale-[0.99]"
+                            style={{ background: 'linear-gradient(135deg, var(--brand-blue-600), var(--brand-navy-800))' }}
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2 size={18} className="animate-spin" />
+                                    Signing in...
+                                </>
+                            ) : (
+                                <>
+                                    Sign in
+                                    <ArrowRight size={16} />
+                                </>
+                            )}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 };

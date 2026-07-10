@@ -252,7 +252,7 @@ function LeadTimelineDetail() {
                 {/* Back Button */}
                 {/* <button
                     onClick={() => navigate('/leads')}
-                    className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-md hover:shadow-lg transition-all group"
+                    className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-white rounded-2xl shadow-md hover:shadow-lg transition-all group"
                 >
                     <ArrowLeft size={18} className="group-hover:-translate-x-1 transition" />
                     <span>Back to All Leads</span>
@@ -332,7 +332,7 @@ function LeadTimelineDetail() {
                 </div>
 
                 {/* Engagement Score */}
-                <div className="bg-white rounded-xl shadow-sm p-5 mb-6">
+                <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-5 mb-6">
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                             <TrendingUp size={18} className="text-indigo-600" />
@@ -352,14 +352,14 @@ function LeadTimelineDetail() {
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+                <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-4 mb-6">
                     <div className="flex flex-col gap-3">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                             <input
                                 type="text"
                                 placeholder="Search activities..."
-                                className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 text-sm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -379,7 +379,7 @@ function LeadTimelineDetail() {
                                 <button
                                     key={type.value}
                                     onClick={() => setFilterType(type.value)}
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize ${filterType === type.value
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all capitalize ${filterType === type.value
                                         ? 'bg-indigo-600 text-white shadow-md'
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
@@ -395,7 +395,7 @@ function LeadTimelineDetail() {
                                     <button
                                         key={range}
                                         onClick={() => setSelectedDateRange(range)}
-                                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-all capitalize ${selectedDateRange === range
+                                        className={`px-3 py-1 rounded-xl text-xs font-medium transition-all capitalize ${selectedDateRange === range
                                             ? 'bg-indigo-600 text-white'
                                             : 'bg-gray-100 text-gray-600'
                                             }`}
@@ -428,7 +428,7 @@ function LeadTimelineDetail() {
                             return (
                                 <div key={dateKey} className="relative">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
                                             <Calendar size={16} className="text-white" />
                                         </div>
                                         <h3 className="font-bold text-gray-800 text-lg">{dateLabel}</h3>
@@ -462,13 +462,13 @@ function LeadTimelineDetail() {
 
 // Stat Card Component
 const StatCard = ({ title, value, icon, gradient }) => (
-    <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-all group">
+    <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-4 hover:shadow-md transition-all group">
         <div className="flex items-center justify-between">
             <div>
                 <p className="text-xs text-gray-500">{title}</p>
                 <p className="text-2xl font-bold text-gray-800 mt-1">{value}</p>
             </div>
-            <div className={`w-10 h-10 bg-gradient-to-r ${gradient} rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+            <div className={`w-10 h-10 bg-gradient-to-r ${gradient} rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
                 <div className="text-white">
                     {icon}
                 </div>
@@ -497,11 +497,11 @@ const TimelineActivityCard = ({
     const isLongDescription = description?.length > 120;
 
     return (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden group">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] hover:shadow-md transition-all overflow-hidden group">
             <div className={`h-1 bg-gradient-to-r ${gradient}`}></div>
             <div className="p-4">
                 <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${gradient} flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform`}>
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${gradient} flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform`}>
                         {getActivityIcon(item.type)}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -533,7 +533,7 @@ const TimelineActivityCard = ({
                                 )}
                             </div>
                             <div className="flex flex-col items-end gap-1">
-                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-lg whitespace-nowrap">
+                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-xl whitespace-nowrap">
                                     {time}
                                 </span>
                                 <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
@@ -547,7 +547,7 @@ const TimelineActivityCard = ({
                                 {item.createdByName || item.createdBy?.split(' ')[0] || "System"}
                             </span>
                             {item.metadata?.updatedFields && (
-                                <span className="inline-flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg">
+                                <span className="inline-flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-xl">
                                     <Edit3 size={10} />
                                     Updated: {item.metadata.updatedFields.join(', ')}
                                 </span>
@@ -562,7 +562,7 @@ const TimelineActivityCard = ({
 
 // Empty Timeline State
 const EmptyTimelineState = () => (
-    <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+    <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-12 text-center">
         <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
             <Activity size={32} className="text-gray-400" />
         </div>

@@ -19,6 +19,7 @@ import ProtectRoute from "./components/ProtectRoute";
 import ReportPage from "./pages/ReportPage";
 import LeadTimelineDetail from "./pages/Leads/LeadTimelineDetail";
 // import { useGetProfileQuery } from "./redux/api";
+import LeadDetails from './pages/Leads/LeadDetails';
 
 
 function App() {
@@ -48,6 +49,10 @@ function App() {
             <Route path="/" element={<ViewExecutives />} />
 
             <Route path="/Leads" element={<LeadView />} />
+
+
+
+            <Route path="/lead/:id" element={<LeadDetails />} />
             <Route path="/addLeads" element={<AddLead />} />
             <Route path="/editLead/:id" element={<AddLead />} />
 

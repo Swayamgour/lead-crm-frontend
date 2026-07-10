@@ -8,7 +8,7 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: #f0f2f5;
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 /* ===== LAYOUT ===== */
@@ -41,7 +41,7 @@ body {
 .logo-icon {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  background: linear-gradient(135deg, #1b2740, #2653ef);
   border-radius: 8px;
   color: #fff;
   font-weight: 700;
@@ -54,7 +54,7 @@ body {
 .logo-text {
   font-size: 18px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0d1526;
   letter-spacing: 0.5px;
 }
 
@@ -69,7 +69,7 @@ body {
 .user-avatar-sidebar {
   width: 38px;
   height: 38px;
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  background: linear-gradient(135deg, #1b2740, #2653ef);
   border-radius: 10px;
   color: #fff;
   font-weight: 700;
@@ -89,7 +89,7 @@ body {
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #0d1526;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -127,7 +127,7 @@ body {
 
 .bell-btn:hover {
   background: #f0f2f5;
-  color: #4f46e5;
+  color: #2653ef;
 }
 
 .sidebar-nav {
@@ -157,13 +157,13 @@ body {
 }
 
 .nav-item:hover {
-  background: #f5f3ff;
-  color: #4f46e5;
+  background: #eef1f6;
+  color: #2653ef;
 }
 
 .nav-item.active {
-  background: #ede9fe;
-  color: #4f46e5;
+  background: #d7deea;
+  color: #2653ef;
   font-weight: 600;
 }
 
@@ -211,7 +211,7 @@ body {
 .header-left h1 {
   font-size: 20px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 .header-avatar {
@@ -281,7 +281,7 @@ body {
 .stat-value {
   font-size: 26px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 /* ===== CONTENT GRID ===== */
@@ -308,14 +308,14 @@ body {
 .card-header h3 {
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 .btn-secondary {
   font-size: 12px;
   font-weight: 500;
-  color: #4f46e5;
-  background: #ede9fe;
+  color: #2653ef;
+  background: #d7deea;
   border: none;
   border-radius: 6px;
   padding: 5px 12px;
@@ -384,7 +384,7 @@ body {
 
 .value {
   font-weight: 600;
-  color: #1a1a2e !important;
+  color: #0d1526 !important;
 }
 
 /* ===== ACTIVITY ===== */
@@ -411,7 +411,7 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #4f46e5;
+  background: #2653ef;
   margin-top: 5px;
   flex-shrink: 0;
 }
@@ -419,7 +419,7 @@ body {
 .activity-action {
   font-size: 13.5px;
   font-weight: 500;
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 .activity-meta {
@@ -444,7 +444,7 @@ body {
 .crm-page-header h2 {
   font-size: 18px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 /* ===== BUTTONS ===== */
@@ -452,7 +452,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #4f46e5;
+  background: #2653ef;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -464,7 +464,7 @@ body {
 }
 
 .btn-primary:hover {
-  background: #4338ca;
+  background: #1d40c9;
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
@@ -499,7 +499,7 @@ body {
 
 .crm-form-topbar {
   height: 6px;
-  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  background: linear-gradient(90deg, #2653ef, #1b2740);
 }
 
 .crm-form-body {
@@ -526,7 +526,7 @@ body {
 .avatar-placeholder {
   width: 90px;
   height: 90px;
-  background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+  background: linear-gradient(135deg, #3c5480, #2653ef);
   border-radius: 18px;
   color: #fff;
   font-size: 22px;
@@ -550,7 +550,7 @@ body {
   right: -5px;
   width: 28px;
   height: 28px;
-  background: #4f46e5;
+  background: #2653ef;
   border: 2px solid #fff;
   border-radius: 50%;
   color: #fff;
@@ -562,13 +562,13 @@ body {
 }
 
 .camera-btn:hover {
-  background: #4338ca;
+  background: #1d40c9;
 }
 
 .profile-photo-info h4 {
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #0d1526;
   margin-bottom: 4px;
 }
 
@@ -582,7 +582,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #4f46e5;
+  color: #2653ef;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -591,7 +591,7 @@ body {
 }
 
 .upload-link:hover {
-  color: #4338ca;
+  color: #1d40c9;
   text-decoration: underline;
 }
 
@@ -641,7 +641,7 @@ body {
 }
 
 .input-wrapper:focus-within {
-  border-color: #4f46e5;
+  border-color: #2653ef;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
 }
 
@@ -662,7 +662,7 @@ body {
   border: none;
   outline: none;
   font-size: 13.5px;
-  color: #1a1a2e;
+  color: #0d1526;
   background: transparent;
   font-family: inherit;
   min-width: 0;
@@ -685,7 +685,7 @@ body {
 }
 
 .eye-btn:hover {
-  color: #4f46e5;
+  color: #2653ef;
 }
 
 /* ===== SELECT ===== */
@@ -698,7 +698,7 @@ body {
   border: none;
   outline: none;
   font-size: 13.5px;
-  color: #1a1a2e;
+  color: #0d1526;
   background: transparent;
   font-family: inherit;
   appearance: none;
@@ -707,7 +707,7 @@ body {
 }
 
 .select-wrapper select option {
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 .select-arrow {
@@ -737,19 +737,19 @@ body {
 }
 
 .assignee-card:hover {
-  border-color: #4f46e5;
-  background: #f5f3ff;
+  border-color: #2653ef;
+  background: #eef1f6;
 }
 
 .assignee-card.selected {
-  border-color: #4f46e5;
-  background: #ede9fe;
+  border-color: #2653ef;
+  background: #d7deea;
 }
 
 .assignee-name {
   font-size: 13px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0d1526;
   letter-spacing: 0.3px;
 }
 
@@ -768,7 +768,7 @@ body {
 }
 
 .rich-text-editor:focus-within {
-  border-color: #4f46e5;
+  border-color: #2653ef;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
 }
 
@@ -797,13 +797,13 @@ body {
 }
 
 .toolbar-btn:hover {
-  background: #ede9fe;
-  color: #4f46e5;
+  background: #d7deea;
+  color: #2653ef;
 }
 
 .toolbar-btn.active {
-  background: #ede9fe;
-  color: #4f46e5;
+  background: #d7deea;
+  color: #2653ef;
 }
 
 .toolbar-divider {
@@ -821,7 +821,7 @@ body {
   outline: none;
   font-size: 13.5px;
   font-family: inherit;
-  color: #1a1a2e;
+  color: #0d1526;
   resize: vertical;
   background: #fff;
 }
@@ -947,7 +947,7 @@ input[type="date"] {
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+  background: linear-gradient(135deg, #3c5480, #2653ef);
   color: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -993,11 +993,11 @@ input[type="date"] {
 }
 
 .status-select:focus {
-  border-color: #4f46e5;
+  border-color: #2653ef;
 }
 
 .status-select.status-new          { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-.status-select.status-contacted    { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.status-select.status-contacted    { background: #eef1f6; color: #6d28d9; border-color: #ddd6fe; }
 .status-select.status-qualified    { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
 .status-select.status-proposal     { background: #fffbeb; color: #92400e; border-color: #fde68a; }
 .status-select.status-negotiation  { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
@@ -1006,7 +1006,7 @@ input[type="date"] {
 
 /* ── Status badge colors for overview table ──────────────────────────────────── */
 .status-badge.status-new          { background: #eff6ff; color: #1d4ed8; }
-.status-badge.status-contacted    { background: #f5f3ff; color: #6d28d9; }
+.status-badge.status-contacted    { background: #eef1f6; color: #6d28d9; }
 .status-badge.status-qualified    { background: #ecfdf5; color: #047857; }
 .status-badge.status-proposal     { background: #fffbeb; color: #92400e; }
 .status-badge.status-negotiation  { background: #fff7ed; color: #c2410c; }
@@ -1078,7 +1078,7 @@ input[type="date"] {
 
 .lead-name-cell {
   font-weight: 600;
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 /* ── Modal overlay ───────────────────────────────────────────────────────────── */
@@ -1135,7 +1135,7 @@ input[type="date"] {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: linear-gradient(135deg, #3b6cf6, #2653ef);
   color: #fff;
   font-size: 18px;
   font-weight: 700;
@@ -1148,7 +1148,7 @@ input[type="date"] {
 .modal-lead-name {
   font-size: 16px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0d1526;
   margin-bottom: 2px;
 }
 
@@ -1229,7 +1229,7 @@ input[type="date"] {
 .modal-detail-value {
   font-size: 13.5px;
   font-weight: 500;
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 /* ── Modal remarks ───────────────────────────────────────────────────────────── */
@@ -1322,7 +1322,7 @@ input[type="date"] {
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+  background: linear-gradient(135deg, #3c5480, #2653ef);
   color: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -1368,11 +1368,11 @@ input[type="date"] {
 }
 
 .status-select:focus {
-  border-color: #4f46e5;
+  border-color: #2653ef;
 }
 
 .status-select.status-new          { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-.status-select.status-contacted    { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.status-select.status-contacted    { background: #eef1f6; color: #6d28d9; border-color: #ddd6fe; }
 .status-select.status-qualified    { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
 .status-select.status-proposal     { background: #fffbeb; color: #92400e; border-color: #fde68a; }
 .status-select.status-negotiation  { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
@@ -1381,7 +1381,7 @@ input[type="date"] {
 
 /* ── Status badge colors for overview table ──────────────────────────────────── */
 .status-badge.status-new          { background: #eff6ff; color: #1d4ed8; }
-.status-badge.status-contacted    { background: #f5f3ff; color: #6d28d9; }
+.status-badge.status-contacted    { background: #eef1f6; color: #6d28d9; }
 .status-badge.status-qualified    { background: #ecfdf5; color: #047857; }
 .status-badge.status-proposal     { background: #fffbeb; color: #92400e; }
 .status-badge.status-negotiation  { background: #fff7ed; color: #c2410c; }
@@ -1453,7 +1453,7 @@ input[type="date"] {
 
 .lead-name-cell {
   font-weight: 600;
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 /* ── Modal overlay ───────────────────────────────────────────────────────────── */
@@ -1510,7 +1510,7 @@ input[type="date"] {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: linear-gradient(135deg, #3b6cf6, #2653ef);
   color: #fff;
   font-size: 18px;
   font-weight: 700;
@@ -1523,7 +1523,7 @@ input[type="date"] {
 .modal-lead-name {
   font-size: 16px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0d1526;
   margin-bottom: 2px;
 }
 
@@ -1604,7 +1604,7 @@ input[type="date"] {
 .modal-detail-value {
   font-size: 13.5px;
   font-weight: 500;
-  color: #1a1a2e;
+  color: #0d1526;
 }
 
 /* ── Modal remarks ───────────────────────────────────────────────────────────── */
@@ -1688,7 +1688,7 @@ input[type="date"] {
 /* ── Saving badge ────────────────────────────────────────────────────────────── */
 .modal-saving-badge {
   font-size: 11.5px;
-  color: #4f46e5;
+  color: #2653ef;
   font-weight: 500;
   margin-left: 8px;
   animation: pulse 1s ease-in-out infinite;
@@ -1714,10 +1714,10 @@ input[type="date"] {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border: 1.5px dashed #c4b5fd;
+  border: 1.5px dashed #8497bb;
   border-radius: 8px;
-  background: #f5f3ff;
-  color: #4f46e5;
+  background: #eef1f6;
+  color: #2653ef;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -1726,8 +1726,8 @@ input[type="date"] {
 }
 
 .btn-add-remark:hover {
-  background: #ede9fe;
-  border-color: #a78bfa;
+  background: #d7deea;
+  border-color: #5c729e;
 }
 
 /* ── Modal remark form ───────────────────────────────────────────────────────── */
