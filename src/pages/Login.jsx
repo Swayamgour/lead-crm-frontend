@@ -152,7 +152,7 @@ const Login = () => {
                 </div>
 
                 <p className="relative z-10 text-xs text-slate-600">
-                    © {new Date().getFullYear()} — Internal CRM
+                    © {new Date().getFullYear()} — daryoo CRM
                 </p>
             </div>
 
