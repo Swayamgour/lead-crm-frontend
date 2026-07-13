@@ -25,6 +25,7 @@ import {
 import { useGetLeadsQuery } from "../../redux/api";
 import Loading from "../../components/Loading";
 import { format } from "date-fns";
+import DateQuickFilter, { isWithinRange } from "../../components/DateQuickFilter";
 
 // Pipeline stages with colors
 const PIPELINE_STAGES = [
@@ -40,6 +41,7 @@ function LeadPipeline() {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
     const [expandedLead, setExpandedLead] = useState(null);
+    const [dateFilter, setDateFilter] = useState({ preset: "all", startDate: "", endDate: "" });
 
 
     // Map backend → UI stages
@@ -94,12 +96,16 @@ function LeadPipeline() {
                 const matchesStatus =
                     filterStatus === "all" || lead.status === filterStatus;
 
-                return matchesSearch && matchesStatus;
+                const matchesDate =
+                    dateFilter.preset === "all" ||
+                    isWithinRange(lead.createdAt, dateFilter.startDate, dateFilter.endDate);
+
+                return matchesSearch && matchesStatus && matchesDate;
             });
         });
 
         return filtered;
-    }, [pipelineData, searchTerm, filterStatus]);
+    }, [pipelineData, searchTerm, filterStatus, dateFilter]);
 
     const totalLeads = leadsData?.length || 0;
     const wonLeads = pipelineData.Won?.length || 0;
@@ -136,7 +142,7 @@ function LeadPipeline() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+            <div className="min-h-screen bg-transparent flex items-center justify-center">
                 <div className="text-center bg-white rounded-2xl p-8 shadow-lg">
                     <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <AlertCircle size={32} className="text-red-500" />
@@ -145,7 +151,7 @@ function LeadPipeline() {
                     <p className="text-gray-500 mb-4">Failed to load pipeline data</p>
                     <button
                         onClick={refetch}
-                        className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl hover:shadow-lg transition-all"
+                        className="px-6 py-2 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] text-white rounded-2xl hover:shadow-lg transition-all"
                     >
                         Try Again
                     </button>
@@ -155,7 +161,7 @@ function LeadPipeline() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen bg-transparent">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header Section */}
                 <div className="mb-8">
@@ -234,7 +240,7 @@ function LeadPipeline() {
                                 <input
                                     type="text"
                                     placeholder="Search leads by name, phone or email..."
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 hover:bg-white"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 focus:ring-2 focus:ring-[#2653ef] focus:border-[#2653ef] transition-all bg-gray-50 hover:bg-white"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -244,7 +250,7 @@ function LeadPipeline() {
                                 <select
                                     value={filterStatus}
                                     onChange={(e) => setFilterStatus(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-[#2653ef] focus:border-[#2653ef] transition-all cursor-pointer"
                                 >
                                     <option value="all">All Status</option>
                                     <option value="incoming">Incoming</option>
@@ -258,6 +264,11 @@ function LeadPipeline() {
                                 </select>
                             </div>
 
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                            <label className="text-xs font-medium text-gray-500 mb-2 block">Date Added</label>
+                            <DateQuickFilter value={dateFilter} onChange={setDateFilter} compact />
                         </div>
                     </div>
                 </div>

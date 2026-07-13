@@ -330,7 +330,7 @@ function ViewExecutives() {
 
 
                     {/* Search and Filters */}
-                    <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                    <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 p-6 mt-6 mb-6">
                         <div className="flex flex-col lg:flex-row gap-4">
                             <div className="flex-1 relative">
                                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -339,7 +339,7 @@ function ViewExecutives() {
                                     placeholder="Search by name, email or phone..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 hover:bg-white transition-colors"
+                                    className="w-full pl-12 pr-4 py-3 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] bg-gray-50 hover:bg-white transition-colors"
                                 />
                             </div>
 
@@ -347,7 +347,7 @@ function ViewExecutives() {
                                 <select
                                     value={filterStatus}
                                     onChange={(e) => setFilterStatus(e.target.value)}
-                                    className="px-4 py-3 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 hover:bg-white transition-colors"
+                                    className="px-4 py-3 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] bg-gray-50 hover:bg-white transition-colors"
                                 >
                                     <option value="all">All Status</option>
                                     <option value="active">Active</option>
@@ -357,7 +357,7 @@ function ViewExecutives() {
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value)}
-                                    className="px-4 py-3 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 hover:bg-white transition-colors"
+                                    className="px-4 py-3 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] bg-gray-50 hover:bg-white transition-colors"
                                 >
                                     <option value="name">Sort by: Name</option>
                                     <option value="leads">Sort by: Total Leads</option>
@@ -375,25 +375,25 @@ function ViewExecutives() {
                         {showFilters && (
                             <div className="mt-4 pt-4 border-t border-gray-100">
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef]">
                                         <option>Min Accuracy: Any</option>
                                         <option>Min Accuracy: 80%+</option>
                                         <option>Min Accuracy: 50%+</option>
                                         <option>Min Accuracy: Below 50%</option>
                                     </select>
-                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef]">
                                         <option>Min Leads: Any</option>
                                         <option>Min Leads: 5+</option>
                                         <option>Min Leads: 10+</option>
                                         <option>Min Leads: 20+</option>
                                     </select>
-                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef]">
                                         <option>Team: All Teams</option>
                                         <option>Team A</option>
                                         <option>Team B</option>
                                         <option>Team C</option>
                                     </select>
-                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef]">
                                         <option>Location: All</option>
                                         <option>North</option>
                                         <option>South</option>
@@ -466,7 +466,7 @@ function ViewExecutives() {
                                                 {/* <td className="px-6 py-4">
                                                 <input
                                                     type="checkbox"
-                                                    className="rounded border-gray-200 text-blue-600 focus:ring-blue-500"
+                                                    className="rounded border-gray-200 text-blue-600 focus:ring-[#2653ef]"
                                                     checked={selectedExecutives.includes(exec._id)}
                                                     onChange={() => toggleSelectExecutive(exec._id)}
                                                 />
@@ -540,7 +540,7 @@ function ViewExecutives() {
                                                             // onClick={() => handleStatusToggle(exec)}
                                                             // onClick={() => setDeleteConfirmStatus(exec?._id)}
                                                             onClick={() => setDeleteConfirmStatus(exec)}
-                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2653ef]
                                                                 ${exec.isActive ? "bg-green-500" : "bg-gray-300"}`}
                                                         >
                                                             <span
@@ -603,7 +603,7 @@ function ViewExecutives() {
                     {showPerformanceModal && selectedExecutive && (
                         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-1500 flex items-center justify-center p-4" onClick={() => setShowPerformanceModal(false)}>
                             <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
+                                <div className="bg-gradient-to-r from-[#2653ef] to-[#1d40c9] p-6">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
                                             <div className={`w-16 h-16 bg-gradient-to-br ${getRandomColor(selectedExecutive.name)} rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg`}>
@@ -745,7 +745,7 @@ function ViewExecutives() {
                             <p className="text-gray-500 mb-6">Try adjusting your search or add a new executive</p>
                             <button
                                 onClick={() => navigate("/addExecutive")}
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] text-white rounded-2xl hover:from-[#1d40c9] hover:to-[#131d33] transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                             >
                                 <Plus size={18} />
                                 Add Executive

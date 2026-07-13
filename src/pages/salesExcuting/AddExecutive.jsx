@@ -358,14 +358,14 @@ function AddEditExecutive() {
         if (isValid) {
             return "border-green-300 focus:ring-green-200 bg-green-50";
         }
-        return "border-gray-100 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-200";
+        return "border-gray-100 focus:ring-[#2653ef]/20 focus:border-[#2653ef] hover:border-gray-200";
     };
 
     if (isEditMode && isLoadingExecutive) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6 flex items-center justify-center">
+            <div className="min-h-screen bg-transparent p-4 md:p-6 flex items-center justify-center">
                 <div className="text-center">
-                    <Loader className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+                    <Loader className="w-12 h-12 text-[#2653ef] animate-spin mx-auto mb-4" />
                     <p className="text-gray-600">Loading executive details...</p>
                 </div>
             </div>
@@ -373,24 +373,38 @@ function AddEditExecutive() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
-            <div className="max-w-3xl mx-auto">
-                {/* Header with Back Button */}
-                <div className="mb-6 flex items-center justify-between">
+        <div className="min-h-screen bg-transparent">
+            <div className="max-w-3xl mx-auto p-6">
+                {/* Page Header */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 px-6 py-5 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#2653ef] to-[#f5a524]" />
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+                            <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2653ef] to-[#1d40c9] flex items-center justify-center shadow-[0_6px_16px_rgba(38,83,239,0.3)]">
+                                {isEditMode ? <Edit3 className="text-white" size={22} /> : <User className="text-white" size={22} />}
+                            </span>
+                            {isEditMode ? "Edit Sales Executive" : "Add Sales Executive"}
+                        </h1>
+                        <p className="text-gray-500 mt-1 text-sm ml-14">
+                            {isEditMode
+                                ? "Update sales team member profile information"
+                                : "Create a new sales team member profile"}
+                        </p>
+                    </div>
                     <button
                         onClick={() => navigate(-1)}
                         className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors group"
                     >
-                        <div className="p-2 rounded-xl bg-white shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] group-hover:shadow group-hover:bg-gray-50 transition-all">
+                        <div className="p-2 rounded-xl bg-gray-50 border border-gray-100 group-hover:bg-gray-100 transition-all">
                             <ArrowLeft size={18} />
                         </div>
-                        <span>Back to Executives</span>
+                        <span className="text-sm font-medium">Back to Executives</span>
                     </button>
                 </div>
 
                 {/* Success Message */}
                 {showSuccess && (
-                    <div className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3 animate-slideDown shadow-lg">
+                    <div className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3 animate-slideDown shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]">
                         <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                             <CheckCircle className="text-green-600" size={18} />
                         </div>
@@ -412,31 +426,12 @@ function AddEditExecutive() {
                 )}
 
                 {/* Main Form Card */}
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                    {/* Header with Gradient */}
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 md:px-8 py-6">
-                        <div className="flex items-center gap-4">
-                            <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
-                                {isEditMode ? <Edit3 className="text-white" size={28} /> : <User className="text-white" size={28} />}
-                            </div>
-                            <div>
-                                <h1 className="text-2xl font-bold text-white">
-                                    {isEditMode ? "Edit Sales Executive" : "Add Sales Executive"}
-                                </h1>
-                                <p className="text-blue-100 mt-1">
-                                    {isEditMode
-                                        ? "Update sales team member profile information"
-                                        : "Create a new sales team member profile"}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
+                <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 overflow-hidden">
                     {/* Profile Image Upload */}
-                    <div className="px-6 md:px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                    {/* <div className="px-6 md:px-8 py-6 border-b border-gray-100 bg-gray-50/50">
                         <div className="flex items-center gap-6">
                             <div className="relative">
-                                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-3xl shadow-lg overflow-hidden">
+                                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#2653ef] to-[#1d40c9] flex items-center justify-center text-white font-bold text-3xl shadow-lg overflow-hidden">
                                     {profileImage ? (
                                         <img
                                             src={typeof profileImage === 'string' ? profileImage : URL.createObjectURL(profileImage)}
@@ -447,7 +442,7 @@ function AddEditExecutive() {
                                         getInitials(executive.name)
                                     )}
                                 </div>
-                                <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors shadow-lg border-2 border-white">
+                                <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-[#2653ef] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#1d40c9] transition-colors shadow-lg border-2 border-white">
                                     <Camera size={14} className="text-white" />
                                     <input
                                         type="file"
@@ -497,7 +492,7 @@ function AddEditExecutive() {
                                 )}
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Form Body */}
                     <form onSubmit={handleSubmit} className="p-6 md:p-8">
@@ -522,7 +517,7 @@ function AddEditExecutive() {
 
                                     <div className="group">
                                         <div className="relative">
-                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2653ef] transition-colors">
                                                 <User size={18} />
                                             </div>
 
@@ -562,7 +557,7 @@ function AddEditExecutive() {
 
                                     <div className="group">
                                         <div className="relative">
-                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2653ef]">
                                                 <Phone size={18} />
                                             </div>
 
@@ -603,7 +598,7 @@ function AddEditExecutive() {
 
                                     <div className="group">
                                         <div className="relative">
-                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2653ef]">
                                                 <Mail size={18} />
                                             </div>
 
@@ -736,7 +731,7 @@ function AddEditExecutive() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting || Object.keys(errors).some(key => errors[key] && key !== 'submit')}
-                                className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] text-white rounded-2xl hover:from-[#1d40c9] hover:to-[#131d33] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isSubmitting ? (
                                     <>

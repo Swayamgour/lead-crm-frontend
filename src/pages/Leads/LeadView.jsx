@@ -43,6 +43,7 @@ import {
 import toast from "react-hot-toast";
 import { leadStatus } from "../../components/data";
 import Loading from "../../components/Loading";
+import DateQuickFilter, { DATE_PRESETS } from "../../components/DateQuickFilter";
 
 import { useRef } from "react";
 import jsPDF from "jspdf";
@@ -53,6 +54,8 @@ import ExcelButton from "../../components/ExcelButton";
 
 
 function LeadView() {
+    const DATE_PRESETS_LABEL = Object.fromEntries(DATE_PRESETS.map(p => [p.value, p.label]));
+
     const { data: leadsData, isLoading, refetch: refetchLeads } = useGetLeadsQuery();
     const { data: Executive } = useGetUsersQuery();
     const { data: profile } = useGetProfileQuery();
@@ -78,8 +81,7 @@ function LeadView() {
 
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState("");
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
+    const [dateFilter, setDateFilter] = useState({ preset: "all", startDate: "", endDate: "" });
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedLead, setSelectedLead] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
@@ -133,8 +135,8 @@ function LeadView() {
         limit: itemsPerPage,
         status: statusFilter || undefined,
         search: searchTerm || undefined,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined
+        startDate: dateFilter.startDate || undefined,
+        endDate: dateFilter.endDate || undefined
     });
 
     const leads = PaginatedLeads?.data || [];
@@ -601,31 +603,11 @@ function LeadView() {
                         {/* Advanced Filters */}
                         {showFilters && (
                             <div className="mt-4 pt-4 border-t border-gray-100">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                                        <input
-                                            type="date"
-                                            value={startDate}
-                                            onChange={(e) => setStartDate(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] text-sm"
-                                            placeholder="Start Date"
-                                        />
-                                    </div>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                                        <input
-                                            type="date"
-                                            value={endDate}
-                                            onChange={(e) => setEndDate(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] text-sm"
-                                            placeholder="End Date"
-                                        />
-                                    </div>
+                                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
-                                        className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] text-sm"
+                                        className="px-4 py-2 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef] text-sm bg-gray-50"
                                     >
                                         <option value="">All Status</option>
                                         {leadStatus?.map((status) => (
@@ -634,11 +616,15 @@ function LeadView() {
                                             </option>
                                         ))}
                                     </select>
+
+                                    <div className="flex-1">
+                                        <DateQuickFilter value={dateFilter} onChange={setDateFilter} compact />
+                                    </div>
                                 </div>
 
                                 {/* Active Filters */}
-                                {(statusFilter || startDate || endDate) && (
-                                    <div className="mt-3 flex items-center gap-2">
+                                {(statusFilter || dateFilter.preset !== "all") && (
+                                    <div className="mt-3 flex items-center gap-2 flex-wrap">
                                         <span className="text-xs text-gray-500">Active filters:</span>
                                         {statusFilter && (
                                             <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
@@ -646,16 +632,12 @@ function LeadView() {
                                                 <X size={12} className="cursor-pointer" onClick={() => setStatusFilter("")} />
                                             </span>
                                         )}
-                                        {startDate && (
+                                        {dateFilter.preset !== "all" && (
                                             <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
-                                                From: {startDate}
-                                                <X size={12} className="cursor-pointer" onClick={() => setStartDate("")} />
-                                            </span>
-                                        )}
-                                        {endDate && (
-                                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
-                                                To: {endDate}
-                                                <X size={12} className="cursor-pointer" onClick={() => setEndDate("")} />
+                                                {dateFilter.preset === "custom"
+                                                    ? `${dateFilter.startDate || '…'} to ${dateFilter.endDate || '…'}`
+                                                    : DATE_PRESETS_LABEL[dateFilter.preset]}
+                                                <X size={12} className="cursor-pointer" onClick={() => setDateFilter({ preset: "all", startDate: "", endDate: "" })} />
                                             </span>
                                         )}
                                     </div>
@@ -822,13 +804,13 @@ function LeadView() {
                                                 >
                                                     <Edit2 size={16} />
                                                 </button> */}
-                                                {/* <button
+                                                <button
                                                     onClick={() => setDeleteConfirmId(lead._id)}
                                                     className="w-8 h-8 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-all"
                                                     title="Delete Lead"
                                                 >
                                                     <Trash2 size={16} />
-                                                </button> */}
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

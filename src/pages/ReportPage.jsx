@@ -33,15 +33,22 @@ import {
 import { useGetConversionReportQuery, useGetExecutiveSalesReportQuery, useGetLeadReportQuery, useGetSalesPerformanceQuery, useGetSalesReportQuery } from "../redux/api";
 import Loading from "../components/Loading";
 import { useNavigate } from "react-router-dom";
+import DateQuickFilter from "../components/DateQuickFilter";
 
 const ReportPage = () => {
 
 
-    const { data: leadReport, isLoading } = useGetLeadReportQuery();
-    const { data: salesReport } = useGetSalesReportQuery();
-    const { data: conversionReport } = useGetConversionReportQuery();
-    const { data: performanceReport } = useGetSalesPerformanceQuery();
-    const { data: executiveReport } = useGetExecutiveSalesReportQuery();
+    const [dateFilter, setDateFilter] = useState({ preset: "all", startDate: "", endDate: "" });
+
+    const reportParams = dateFilter.preset === "all"
+        ? undefined
+        : { startDate: dateFilter.startDate || undefined, endDate: dateFilter.endDate || undefined };
+
+    const { data: leadReport, isLoading } = useGetLeadReportQuery(reportParams);
+    const { data: salesReport } = useGetSalesReportQuery(reportParams);
+    const { data: conversionReport } = useGetConversionReportQuery(reportParams);
+    const { data: performanceReport } = useGetSalesPerformanceQuery(reportParams);
+    const { data: executiveReport } = useGetExecutiveSalesReportQuery(reportParams);
 
     const navigate = useNavigate()
 
@@ -75,28 +82,25 @@ const ReportPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+        <div className="min-h-screen bg-transparent">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
                 {/* Header Section */}
                 <div className="mb-8">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 px-6 py-5 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#2653ef] to-[#f5a524]" />
                         <div>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                                    <BarChart3 size={20} className="text-white" />
-                                </div>
-                                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                                    Report
-                                </h1>
-                                <Sparkles size={20} className="text-yellow-500 animate-pulse" />
-                            </div>
-                            {/* <p className="text-gray-500 mt-1 text-sm">
+                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+                                <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2653ef] to-[#1d40c9] flex items-center justify-center shadow-[0_6px_16px_rgba(38,83,239,0.3)]">
+                                    <BarChart3 className="text-white" size={22} />
+                                </span>
+                                Report
+                            </h1>
+                            <p className="text-gray-500 mt-1 text-sm ml-14">
                                 Comprehensive insights into your sales performance
-                            </p> */}
+                            </p>
                         </div>
-
-
+                        <DateQuickFilter value={dateFilter} onChange={setDateFilter} />
                     </div>
 
                     {/* Quick Stats Row */}

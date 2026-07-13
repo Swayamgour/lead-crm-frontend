@@ -52,6 +52,7 @@ import {
 import { Link } from "react-router-dom";
 import { useGetTimelineGroupedQuery } from "../../redux/api";
 import Loading from "../../components/Loading";
+import DateQuickFilter, { isWithinRange } from "../../components/DateQuickFilter";
 
 function LeadOverview() {
     const { data, isLoading, refetch } = useGetTimelineGroupedQuery();
@@ -64,7 +65,7 @@ function LeadOverview() {
     const [showFilters, setShowFilters] = useState(false);
     const [selectedLead, setSelectedLead] = useState(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [dateRange, setDateRange] = useState("all");
+    const [dateFilter, setDateFilter] = useState({ preset: "all", startDate: "", endDate: "" });
 
     // Process leads data with enhanced metrics
     const processedLeads = leadsTimeline.map(lead => {
@@ -116,19 +117,8 @@ function LeadOverview() {
             return true;
         })
         .filter(lead => {
-            if (dateRange === "all") return true;
-            if (dateRange === "today") {
-                return lead.latestActivity && new Date(lead.latestActivity).toDateString() === new Date().toDateString();
-            }
-            if (dateRange === "week") {
-                const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-                return lead.latestActivity && new Date(lead.latestActivity) >= weekAgo;
-            }
-            if (dateRange === "month") {
-                const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-                return lead.latestActivity && new Date(lead.latestActivity) >= monthAgo;
-            }
-            return true;
+            if (dateFilter.preset === "all") return true;
+            return isWithinRange(lead.latestActivity, dateFilter.startDate, dateFilter.endDate);
         })
         .sort((a, b) => {
             if (sortBy === "activity") return b.totalActivities - a.totalActivities;
@@ -173,7 +163,7 @@ function LeadOverview() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
+        <div className="min-h-screen bg-transparent">
             {/* Animated Background */}
             {/* <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
@@ -188,13 +178,13 @@ function LeadOverview() {
                         <div className="relative">
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur-lg opacity-50 animate-pulse"></div>
-                                    <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] rounded-2xl blur-lg opacity-50 animate-pulse"></div>
+                                    <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-r from-[#2653ef] to-[#1d40c9] flex items-center justify-center shadow-xl">
                                         <Users size={24} className="text-white" />
                                     </div>
                                 </div>
                                 <div>
-                                    <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-purple-800 bg-clip-text text-transparent">
+                                    <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-[#2653ef] to-[#1d40c9] bg-clip-text text-transparent">
                                         Lead Overview
                                     </h1>
                                     <p className="text-gray-500 mt-1 text-sm">
@@ -260,7 +250,7 @@ function LeadOverview() {
                                 <input
                                     type="text"
                                     placeholder="Search leads by name, phone, email or company..."
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 transition-all bg-gray-50/50 hover:bg-white"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 focus:ring-2 focus:ring-[#2653ef] transition-all bg-gray-50/50 hover:bg-white"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -277,13 +267,13 @@ function LeadOverview() {
                                 <div className="flex gap-1 bg-gray-100 rounded-2xl p-1">
                                     <button
                                         onClick={() => setViewMode("grid")}
-                                        className={`px-3 py-1.5 rounded-xl transition-all ${viewMode === "grid" ? "bg-white shadow-md text-indigo-600" : "text-gray-500"}`}
+                                        className={`px-3 py-1.5 rounded-xl transition-all ${viewMode === "grid" ? "bg-white shadow-md text-[#2653ef]" : "text-gray-500"}`}
                                     >
                                         <Grid size={18} />
                                     </button>
                                     <button
                                         onClick={() => setViewMode("list")}
-                                        className={`px-3 py-1.5 rounded-xl transition-all ${viewMode === "list" ? "bg-white shadow-md text-indigo-600" : "text-gray-500"}`}
+                                        className={`px-3 py-1.5 rounded-xl transition-all ${viewMode === "list" ? "bg-white shadow-md text-[#2653ef]" : "text-gray-500"}`}
                                     >
                                         <List size={18} />
                                     </button>
@@ -300,7 +290,7 @@ function LeadOverview() {
                                         <select
                                             value={filterStatus}
                                             onChange={(e) => setFilterStatus(e.target.value)}
-                                            className="w-full px-3 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                            className="w-full px-3 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-[#2653ef] text-sm"
                                         >
                                             <option value="all">All Leads</option>
                                             <option value="active">Active (8+ activities)</option>
@@ -313,7 +303,7 @@ function LeadOverview() {
                                         <select
                                             value={sortBy}
                                             onChange={(e) => setSortBy(e.target.value)}
-                                            className="w-full px-3 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                            className="w-full px-3 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-[#2653ef] text-sm"
                                         >
                                             <option value="activity">Most Active</option>
                                             <option value="recent">Recently Active</option>
@@ -321,18 +311,9 @@ function LeadOverview() {
                                             <option value="name">Name A-Z</option>
                                         </select>
                                     </div>
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 mb-1 block">Date Range</label>
-                                        <select
-                                            value={dateRange}
-                                            onChange={(e) => setDateRange(e.target.value)}
-                                            className="w-full px-3 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 text-sm"
-                                        >
-                                            <option value="all">All Time</option>
-                                            <option value="today">Today</option>
-                                            <option value="week">Last 7 Days</option>
-                                            <option value="month">Last 30 Days</option>
-                                        </select>
+                                    <div className="md:col-span-3">
+                                        <label className="text-xs font-medium text-gray-500 mb-1 block">Last Activity Date</label>
+                                        <DateQuickFilter value={dateFilter} onChange={setDateFilter} compact />
                                     </div>
                                 </div>
                             </div>
@@ -393,7 +374,7 @@ const MiniStatCard = ({ title, value, icon, color }) => {
         purple: "bg-purple-50 text-purple-600",
         green: "bg-green-50 text-green-600",
         orange: "bg-orange-50 text-orange-600",
-        indigo: "bg-indigo-50 text-indigo-600",
+        indigo: "bg-indigo-50 text-[#2653ef]",
     };
 
     return (
@@ -419,7 +400,7 @@ const EnhancedLeadCard = ({ lead, formatDate }) => {
         <Link to={`/lead-timeline/${lead._id}`} className="block group">
             <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1">
                 {/* Gradient Border */}
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" style={{ padding: '2px', margin: '-2px' }}>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" style={{ padding: '2px', margin: '-2px' }}>
                     <div className="absolute inset-0 bg-white rounded-2xl"></div>
                 </div>
 
@@ -428,13 +409,13 @@ const EnhancedLeadCard = ({ lead, formatDate }) => {
                     <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
                             <div className="relative">
-                                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                                <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] rounded-2xl blur opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2653ef] to-[#1d40c9] flex items-center justify-center shadow-md">
                                     <span className="text-white font-bold text-lg">{initials}</span>
                                 </div>
                             </div>
                             <div>
-                                <h3 className="font-semibold text-gray-800 text-base group-hover:text-indigo-600 transition-colors">
+                                <h3 className="font-semibold text-gray-800 text-base group-hover:text-[#2653ef] transition-colors">
                                     {lead.lead.name}
                                 </h3>
                                 <div className="flex items-center gap-1 mt-0.5">
@@ -472,7 +453,7 @@ const EnhancedLeadCard = ({ lead, formatDate }) => {
                             <Clock size={12} className="text-gray-400" />
                             <span className="text-xs text-gray-500">{formatDate(lead.lastInteraction)}</span>
                         </div>
-                        <div className="flex items-center gap-1 text-indigo-600 text-xs font-medium group-hover:gap-2 transition-all">
+                        <div className="flex items-center gap-1 text-[#2653ef] text-xs font-medium group-hover:gap-2 transition-all">
                             <span>View Timeline</span>
                             <ArrowRight size={12} className="group-hover:translate-x-1 transition" />
                         </div>
@@ -493,15 +474,15 @@ const EnhancedLeadListItem = ({ lead, formatDate }) => {
             <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-4 hover:bg-gradient-to-r hover:from-white hover:to-indigo-50/30">
                 <div className="flex items-center gap-4">
                     <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity"></div>
-                        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity"></div>
+                        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2653ef] to-[#1d40c9] flex items-center justify-center">
                             <span className="text-white font-bold text-lg">{initials}</span>
                         </div>
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between flex-wrap gap-2">
                             <div>
-                                <h3 className="font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">
+                                <h3 className="font-semibold text-gray-800 group-hover:text-[#2653ef] transition-colors">
                                     {lead.lead.name}
                                 </h3>
                                 <div className="flex items-center gap-3 mt-1 flex-wrap">
@@ -559,7 +540,7 @@ const EnhancedEmptyState = () => (
             <p className="text-gray-500 max-w-md mx-auto">
                 Try adjusting your search or filters to find leads. You can also add new leads from the CRM dashboard.
             </p>
-            <button className="mt-6 px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl hover:shadow-lg transition-all inline-flex items-center gap-2">
+            <button className="mt-6 px-6 py-2 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] text-white rounded-2xl hover:shadow-lg transition-all inline-flex items-center gap-2">
                 <Sparkles size={16} />
                 Clear Filters
             </button>

@@ -75,6 +75,7 @@ function NavSidebar({ sidebarOpen, setSidebarOpen, mobileMenuOpen, setMobileMenu
     const handleLogout = () => {
         dispatch(logout());
         navigate('/login');
+        window.location.reload();
     };
 
     // Check if a section is active

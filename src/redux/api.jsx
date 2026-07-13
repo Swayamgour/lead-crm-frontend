@@ -340,35 +340,35 @@ export const api = createApi({
         // report 
 
         getLeadReport: builder.query({
-            query: () => `/reports/leads`,
+            query: (params) => ({ url: `/reports/leads`, params }),
             providesTags: ["Leads"],
         }),
 
         // ================= SALES REPORT =================
 
         getSalesReport: builder.query({
-            query: () => `/reports/sales`,
+            query: (params) => ({ url: `/reports/sales`, params }),
             providesTags: ["Leads", "Timeline"],
         }),
 
         // ================= CONVERSION REPORT =================
 
         getConversionReport: builder.query({
-            query: () => `/reports/conversion`,
+            query: (params) => ({ url: `/reports/conversion`, params }),
             providesTags: ["Leads"],
         }),
 
         // ================= SALES PERFORMANCE =================
 
         getSalesPerformance: builder.query({
-            query: () => `/reports/sales-performance`,
+            query: (params) => ({ url: `/reports/sales-performance`, params }),
             providesTags: ["Leads", "Users"],
         }),
 
         // ================= EXECUTIVE SALES REPORT =================
 
         getExecutiveSalesReport: builder.query({
-            query: () => `/reports/executive-sales`,
+            query: (params) => ({ url: `/reports/executive-sales`, params }),
             providesTags: ["Leads", "Users"],
         }),
 

@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 import { useGetTimelineGroupedByIdQuery } from "../../redux/api";
 import Loading from "../../components/Loading";
+import DateQuickFilter, { isWithinRange } from "../../components/DateQuickFilter";
 
 function LeadTimelineDetail() {
     const { id } = useParams();
@@ -55,7 +56,7 @@ function LeadTimelineDetail() {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [filterType, setFilterType] = useState("all");
-    const [selectedDateRange, setSelectedDateRange] = useState("all");
+    const [dateFilter, setDateFilter] = useState({ preset: "all", startDate: "", endDate: "" });
     const [sortOrder, setSortOrder] = useState("desc");
     const [expandedActivity, setExpandedActivity] = useState(null);
 
@@ -170,16 +171,8 @@ function LeadTimelineDetail() {
 
     // Filter by date range
     const filterByDateRange = (date) => {
-        if (!date) return true;
-        const now = new Date();
-        const itemDate = new Date(date);
-
-        switch (selectedDateRange) {
-            case 'today': return itemDate.toDateString() === now.toDateString();
-            case 'week': return itemDate >= new Date(now.setDate(now.getDate() - 7));
-            case 'month': return itemDate >= new Date(now.setMonth(now.getMonth() - 1));
-            default: return true;
-        }
+        if (dateFilter.preset === "all") return true;
+        return isWithinRange(date, dateFilter.startDate, dateFilter.endDate);
     };
 
     // Get all timeline items
@@ -247,7 +240,7 @@ function LeadTimelineDetail() {
     const initials = leadInfo.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || "LD";
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
+        <div className="min-h-screen bg-transparent">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Back Button */}
                 {/* <button
@@ -260,25 +253,17 @@ function LeadTimelineDetail() {
 
                 {/* Lead Header Card */}
                 <div className="relative mb-8">
-                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl blur-xl opacity-30"></div>
-                    <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden">
-                        {/* <div className="relative h-32 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
-                            <div className="absolute inset-0 bg-black/20"></div>
-                            <div className="absolute -bottom-12 left-8">
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur-lg"></div>
-                                    <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl ring-4 ring-white">
-                                        <span className="text-white font-bold text-3xl">{initials}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div> */}
+                    <div className="relative bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 overflow-hidden">
+                        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#2653ef] to-[#f5a524]" />
 
                         {/* {console.log(data?.lead)} */}
                         <div className="pt-6 pb-6 px-8">
                             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                <div>
+                                <div className="flex items-center gap-3">
+                                    <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2653ef] to-[#1d40c9] flex items-center justify-center shadow-[0_6px_16px_rgba(38,83,239,0.3)] flex-shrink-0">
+                                        <span className="text-white font-bold text-sm">{initials}</span>
+                                    </span>
+                                    <div>
                                     <h1 className="text-2xl font-bold text-gray-800">{data?.lead?.name}</h1>
                                     <div className="flex flex-wrap items-center gap-3 mt-2">
                                         <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full">
@@ -295,6 +280,7 @@ function LeadTimelineDetail() {
                                             <Calendar size={14} className="text-gray-500" />
                                             <span className="text-sm text-gray-600">Joined {formatDateTime(data?.lead?.createdAt).date}</span>
                                         </div>
+                                    </div>
                                     </div>
                                 </div>
                                 
@@ -335,10 +321,10 @@ function LeadTimelineDetail() {
                 <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-5 mb-6">
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                            <TrendingUp size={18} className="text-indigo-600" />
+                            <TrendingUp size={18} className="text-[#2653ef]" />
                             <span className="font-semibold text-gray-700">Engagement Score</span>
                         </div>
-                        <span className="text-2xl font-bold text-indigo-600">{engagementScore}%</span>
+                        <span className="text-2xl font-bold text-[#2653ef]">{engagementScore}%</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div
@@ -359,7 +345,7 @@ function LeadTimelineDetail() {
                             <input
                                 type="text"
                                 placeholder="Search activities..."
-                                className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-100 focus:ring-2 focus:ring-[#2653ef] text-sm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -380,7 +366,7 @@ function LeadTimelineDetail() {
                                     key={type.value}
                                     onClick={() => setFilterType(type.value)}
                                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all capitalize ${filterType === type.value
-                                        ? 'bg-indigo-600 text-white shadow-md'
+                                        ? 'bg-gradient-to-r from-[#2653ef] to-[#1d40c9] text-white shadow-md'
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                 >
@@ -389,24 +375,11 @@ function LeadTimelineDetail() {
                                 </button>
                             ))}
                         </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex gap-2">
-                                {['today', 'week', 'month', 'all'].map((range) => (
-                                    <button
-                                        key={range}
-                                        onClick={() => setSelectedDateRange(range)}
-                                        className={`px-3 py-1 rounded-xl text-xs font-medium transition-all capitalize ${selectedDateRange === range
-                                            ? 'bg-indigo-600 text-white'
-                                            : 'bg-gray-100 text-gray-600'
-                                            }`}
-                                    >
-                                        {range === 'all' ? 'All Time' : range}
-                                    </button>
-                                ))}
-                            </div>
+                        <div className="flex flex-col md:flex-row justify-between md:items-center gap-3">
+                            <DateQuickFilter value={dateFilter} onChange={setDateFilter} compact />
                             <button
                                 onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
-                                className="flex items-center gap-1 text-xs text-gray-600 hover:text-indigo-600"
+                                className="flex items-center gap-1 text-xs text-gray-600 hover:text-[#2653ef] whitespace-nowrap"
                             >
                                 <Clock size={12} />
                                 {sortOrder === "desc" ? "Newest First" : "Oldest First"}
@@ -522,7 +495,7 @@ const TimelineActivityCard = ({
                                 {isLongDescription && (
                                     <button
                                         onClick={onToggle}
-                                        className="text-xs text-indigo-600 hover:text-indigo-700 mt-2 font-medium inline-flex items-center gap-1"
+                                        className="text-xs text-[#2653ef] hover:text-indigo-700 mt-2 font-medium inline-flex items-center gap-1"
                                     >
                                         {isExpanded ? (
                                             <>Show less <ChevronUp size={12} /></>

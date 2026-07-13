@@ -30,21 +30,24 @@ function AssignLeadView() {
 
     return (
 
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-transparent p-6">
 
             <div className="max-w-6xl mx-auto">
 
                 {/* Header */}
-                <div className="mb-6">
-
-                    <h1 className="text-2xl font-bold text-gray-800">
-                        Assigned Leads
-                    </h1>
-
-                    <p className="text-gray-500 text-sm">
-                        View all leads assigned to the executive
-                    </p>
-
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 px-6 py-5 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#2653ef] to-[#f5a524]" />
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+                            <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2653ef] to-[#1d40c9] flex items-center justify-center shadow-[0_6px_16px_rgba(38,83,239,0.3)]">
+                                <User className="text-white" size={22} />
+                            </span>
+                            Assigned Leads
+                        </h1>
+                        <p className="text-gray-500 mt-1 text-sm ml-14">
+                            View all leads assigned to the executive
+                        </p>
+                    </div>
                 </div>
 
                 {/* Lead Cards */}
@@ -54,7 +57,7 @@ function AssignLeadView() {
 
                         <div
                             key={lead._id}
-                            className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition"
+                            className="bg-white rounded-2xl border border-gray-100 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] p-5 hover:shadow-[0_10px_28px_rgba(15,23,42,0.1)] transition-all"
                         >
 
                             {/* Top */}
@@ -147,7 +150,7 @@ function AssignLeadView() {
 
                                 <a
                                     href={`mailto:${lead.email}`}
-                                    className="flex items-center gap-1 text-sm bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg"
+                                    className="flex items-center gap-1 text-sm bg-[#2653ef]/10 text-[#2653ef] px-3 py-1.5 rounded-lg"
                                 >
                                     <Mail size={14} />
                                     Email

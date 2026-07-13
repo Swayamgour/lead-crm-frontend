@@ -39,6 +39,7 @@ import { useGetFollowUpsQuery, useUpdateLeadMutation, useAddRemarkMutation, useG
 import Loading from "../../components/Loading";
 import toast from "react-hot-toast";
 import { leadStatus } from "../../components/data";
+import DateQuickFilter, { isWithinRange } from "../../components/DateQuickFilter";
 
 function FollowUps() {
     const { data, isLoading, refetch: refetchFollowups } = useGetFollowUpsQuery();
@@ -52,6 +53,7 @@ function FollowUps() {
     const [filterStatus, setFilterStatus] = useState("all");
     const [filterType, setFilterType] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
+    const [dateFilter, setDateFilter] = useState({ preset: "all", startDate: "", endDate: "" });
     const [viewMode, setViewMode] = useState("table");
 
     // Modal states for editing
@@ -290,7 +292,11 @@ function FollowUps() {
             filterType === "all" ||
             item.history.some(h => h.type === filterType);
 
-        return matchesSearch && matchesStatus && matchesType;
+        const matchesDate =
+            dateFilter.preset === "all" ||
+            item.history.some(h => isWithinRange(h.followUpDate, dateFilter.startDate, dateFilter.endDate));
+
+        return matchesSearch && matchesStatus && matchesType && matchesDate;
     });
 
     /* ---------------------------
@@ -315,7 +321,7 @@ function FollowUps() {
        MAIN RENDER
     ----------------------------*/
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50">
+        <div className="min-h-screen bg-transparent">
             <div className="max-w-7xl mx-auto p-6">
 
                 {/* HEADER SECTION */}
@@ -323,7 +329,7 @@ function FollowUps() {
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                                <div className="w-10 h-10 rounded-2xl bg-gradient-to-r from-[#2653ef] to-[#1d40c9] flex items-center justify-center shadow-lg">
                                     <CalendarClock size={20} className="text-white" />
                                 </div>
                                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
@@ -353,7 +359,7 @@ function FollowUps() {
                                 <input
                                     type="text"
                                     placeholder="Search by name, phone or email..."
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 hover:bg-white"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 focus:ring-2 focus:ring-[#2653ef] focus:border-[#2653ef] transition-all bg-gray-50 hover:bg-white"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -363,7 +369,7 @@ function FollowUps() {
                                 <select
                                     value={filterStatus}
                                     onChange={(e) => setFilterStatus(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-[#2653ef] focus:border-[#2653ef] transition-all cursor-pointer"
                                 >
                                     <option value="all">All Status</option>
                                     <option value="pending">Pending</option>
@@ -376,7 +382,7 @@ function FollowUps() {
                                 <select
                                     value={filterType}
                                     onChange={(e) => setFilterType(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-100 appearance-none bg-gray-50 hover:bg-white focus:ring-2 focus:ring-[#2653ef] focus:border-[#2653ef] transition-all cursor-pointer"
                                 >
                                     <option value="all">All Types</option>
                                     <option value="call">Call</option>
@@ -390,12 +396,18 @@ function FollowUps() {
                                     setSearchTerm("");
                                     setFilterStatus("all");
                                     setFilterType("all");
+                                    setDateFilter({ preset: "all", startDate: "", endDate: "" });
                                 }}
                                 className="px-4 py-2.5 rounded-2xl bg-gray-100 hover:bg-gray-200 transition-all text-gray-700 flex items-center gap-2 group"
                             >
                                 <RefreshCw size={16} className="group-hover:rotate-180 transition-transform duration-300" />
                                 <span className="text-sm font-medium">Reset</span>
                             </button>
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                            <label className="text-xs font-medium text-gray-500 mb-2 block">Follow-up Date</label>
+                            <DateQuickFilter value={dateFilter} onChange={setDateFilter} compact />
                         </div>
                     </div>
                 </div>
@@ -722,7 +734,7 @@ const EditLeadModal = ({
                                 <select
                                     value={editFormData.status}
                                     onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white"
+                                    className="w-full px-4 py-2.5 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-[#2653ef] focus:border-[#2653ef] transition-all bg-gray-50 focus:bg-white"
                                 >
                                     {leadStatus?.map((status) => (
                                         <option key={status.value} value={status.value}>
@@ -741,7 +753,7 @@ const EditLeadModal = ({
                                 <select
                                     value={editFormData.assignedTo}
                                     onChange={(e) => setEditFormData({ ...editFormData, assignedTo: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white"
+                                    className="w-full px-4 py-2.5 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-[#2653ef] focus:border-[#2653ef] transition-all bg-gray-50 focus:bg-white"
                                 >
                                     <option value="">Select Executive</option>
                                     {executives?.data?.map((exec) => (
@@ -760,7 +772,7 @@ const EditLeadModal = ({
                                     type="date"
                                     value={editFormData.followUpDate}
                                     onChange={(e) => setEditFormData({ ...editFormData, followUpDate: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white"
+                                    className="w-full px-4 py-2.5 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-[#2653ef] focus:border-[#2653ef] transition-all bg-gray-50 focus:bg-white"
                                 />
                             </div>
 

@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import {
     User, Phone, Mail, Tag, ClipboardList, Calendar,
     ChevronDown, AlertCircle, CheckCircle, RotateCcwIcon, SaveAll,
-    DollarSign, Calendar as CalendarIcon, Briefcase
+    DollarSign, Calendar as CalendarIcon, Briefcase,
+    ArrowLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import RemarkEditor from "../../components/RemarkEditor";
@@ -328,7 +329,7 @@ function AddLead() {
         if (isValid) {
             return "border-green-300 focus:ring-green-200 bg-green-50";
         }
-        return "border-gray-100 focus:ring-blue-200 focus:border-blue-400 hover:border-gray-200";
+        return "border-gray-100 focus:ring-[#2653ef]/20 focus:border-[#2653ef] hover:border-gray-200";
     };
 
     // Get status badge color
@@ -357,11 +358,37 @@ function AddLead() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
-            <div className="max-w-5xl mx-auto px-4">
+        <div className="min-h-screen bg-transparent">
+            <div className="max-w-5xl mx-auto p-6">
+                {/* Page Header */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 px-6 py-5 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#2653ef] to-[#f5a524]" />
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+                            <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2653ef] to-[#1d40c9] flex items-center justify-center shadow-[0_6px_16px_rgba(38,83,239,0.3)]">
+                                <ClipboardList className="text-white" size={22} />
+                            </span>
+                            Add New Lead
+                        </h1>
+                        <p className="text-gray-500 mt-1 text-sm ml-14">
+                            Fill lead details and assign to a sales executive
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors group"
+                    >
+                        <div className="p-2 rounded-xl bg-gray-50 border border-gray-100 group-hover:bg-gray-100 transition-all">
+                            <ArrowLeft size={18} />
+                        </div>
+                        <span className="text-sm font-medium">Back to Leads</span>
+                    </button>
+                </div>
+
                 {/* Success Message */}
                 {showSuccess && (
-                    <div className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3 animate-slideDown shadow-lg">
+                    <div className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3 animate-slideDown shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)]">
                         <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                             <CheckCircle className="text-green-600" size={18} />
                         </div>
@@ -381,23 +408,7 @@ function AddLead() {
                 )}
 
                 {/* Main Form Card */}
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                    {/* Form Header */}
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-6">
-                        <div className="flex items-center gap-4">
-                            <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
-                                <ClipboardList className="text-white" size={28} />
-                            </div>
-                            <div>
-                                <h1 className="text-2xl font-bold text-white">Add New Lead</h1>
-                                <p className="text-blue-100 mt-1">Fill lead details and assign to sales executive</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Form Body */}
-
-
+                <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.05),0_1px_10px_rgba(15,23,42,0.06)] border border-gray-100 overflow-hidden">
                     <form onSubmit={handleSubmit} className="p-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -409,7 +420,7 @@ function AddLead() {
 
                                 <div className="group">
                                     <div className="relative">
-                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500" size={18} />
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2653ef]" size={18} />
                                         <input
                                             type="text"
                                             name="name"
@@ -444,7 +455,7 @@ function AddLead() {
 
                                 <div className="group">
                                     <div className="relative">
-                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500" size={18} />
+                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2653ef]" size={18} />
                                         <input
                                             type="tel"
                                             name="phone"
@@ -480,7 +491,7 @@ function AddLead() {
 
                                 <div className="group">
                                     <div className="relative">
-                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500" size={18} />
+                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2653ef]" size={18} />
                                         <input
                                             type="email"
                                             name="email"
@@ -594,7 +605,7 @@ function AddLead() {
                                         name="assignedTo"
                                         value={lead.assignedTo || ""}
                                         onChange={handleChange}
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2653ef]"
                                     >
                                         <option value="">Select Sales Executive</option>
 
@@ -719,7 +730,7 @@ function AddLead() {
 
                             <button
                                 type="submit"
-                                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium"
+                                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#2653ef] to-[#1d40c9] text-white rounded-2xl hover:from-[#1d40c9] hover:to-[#131d33] transition-all shadow-md hover:shadow-lg font-medium"
                                 disabled={result?.isLoading}
                             >
                                 <SaveAll size={16} />

@@ -56,6 +56,7 @@ const MainLayout = () => {
     const [anchorEl, setAnchorEl] = useState(null);
 
     const { data: profile } = useGetProfileQuery();
+    // console.log(profile)
     const dispatch = useDispatch();
     const reduxUser = useSelector(selectCurrentUser);
 
@@ -99,6 +100,7 @@ const MainLayout = () => {
     const handleLogout = () => {
         dispatch(logout());
         navigate("/login", { replace: true });
+        window.location.reload();
     };
 
 
