@@ -20,6 +20,7 @@ import ReportPage from "./pages/ReportPage";
 import LeadTimelineDetail from "./pages/Leads/LeadTimelineDetail";
 // import { useGetProfileQuery } from "./redux/api";
 import LeadDetails from './pages/Leads/LeadDetails';
+import WhatsappTemplates from './pages/WhatsappTemplates';
 
 
 function App() {
@@ -68,6 +69,7 @@ function App() {
             <Route path="/Report" element={<ReportPage />} />
 
             <Route path="/LeadPipeline" element={<LeadPipeline />} />
+            <Route path="/WhatsappTemplates" element={<WhatsappTemplates />} />
             {/* <Route path="/Dashboard" element={<Dashboard />} /> */}
             {/* <Route path="/AssignLeadView/:id" element={<AssignLeadView />} /> */}
 

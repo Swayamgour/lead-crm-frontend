@@ -22,8 +22,11 @@ import {
     Upload,
     Shield,
     Bell,
-    HelpCircle
+    HelpCircle,
+    MessageCircleCheck
 } from "lucide-react";
+
+
 
 export const sidebarSections = [
     {
@@ -31,20 +34,20 @@ export const sidebarSections = [
         icon: Users,
         key: "salesExecutives",
         color: "from-green-500 to-emerald-600",
-        path: ["/executives", "/addExecutive", "/editExecutive"],
+        path: ["/viewExecutives", "/addExecutive", "/editExecutive"],
         role: ["admin"],
         submenu: [
             {
                 title: "All Executives",
                 icon: Users,
-                path: ["/ViewExecutives"]
+                path: ["/viewExecutives"],
             },
             {
                 title: "Add Executive",
                 icon: UserPlus,
-                path: ["/addExecutive"]
-            }
-        ]
+                path: ["/addExecutive"],
+            },
+        ],
     },
     {
         title: "Lead",
@@ -57,50 +60,57 @@ export const sidebarSections = [
             {
                 title: "All Leads",
                 icon: Database,
-                path: ["/leads"]
+                path: ["/leads"],
             },
             {
                 title: "Add Lead",
                 icon: UserPlus,
-                path: ["/addLeads"]
-            }
-        ]
+                path: ["/addLeads"],
+            },
+        ],
     },
     {
         title: "Follow Up",
         icon: PhoneCall,
         key: "followUps",
-        path: ["/followUps"],
         color: "from-yellow-500 to-amber-600",
-        role: ["admin", "executive"]
+        path: ["/followUps"],
+        role: ["admin", "executive"],
     },
     {
         title: "Lead Timeline",
         icon: Activity,
         key: "leadTimeline",
-        path: ["/LeadTimeline"],
         color: "from-indigo-500 to-indigo-600",
-        role: ["admin", "executive"]
+        path: ["/leadTimeline"],
+        role: ["admin", "executive"],
     },
     {
         title: "Lead Pipeline",
         icon: GitBranch,
         key: "leadPipeline",
-        path: ["/LeadPipeline"],
         color: "from-pink-500 to-rose-600",
-        role: ["admin", "executive"]
+        path: ["/leadPipeline"],
+        role: ["admin", "executive"],
     },
     {
-        title: "Report",
+        title: "Reports",
         icon: BarChart3,
         key: "reports",
-        path: ["/Report"],
-        color: "from-indigo-400 to-indigo-900",
+        color: "from-blue-500 to-indigo-600",
+        path: ["/reports"],
         role: ["admin", "executive"],
-        submenu: [
-           
-        ]
-    }
+        
+    },
+    {
+        title: "WhatsApp",
+        icon: MessageCircleCheck,
+        key: "whatsapp",
+        color: "from-green-500 to-emerald-600",
+        path: ["/WhatsappTemplates"],
+        role: ["admin"],
+      
+    },
 ];
 
 // Optional: Additional configuration for user roles

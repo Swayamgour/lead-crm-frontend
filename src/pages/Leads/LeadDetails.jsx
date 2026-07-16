@@ -50,6 +50,7 @@ import { leadStatus } from "../../components/data";
 import Loading from "../../components/Loading";
 import jsPDF from "jspdf";
 import ConfirmModal from "../../components/ConfirmModal";
+import WhatsAppSendModal from "../../components/WhatsAppSendModal";
 
 function LeadDetails() {
     const { id } = useParams();
@@ -82,6 +83,7 @@ function LeadDetails() {
     const [selectedExecutive, setSelectedExecutive] = useState("");
     const [isEditingFollowUp, setIsEditingFollowUp] = useState(false);
     const [followUpDate, setFollowUpDate] = useState("");
+    const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
 
     const lead = leadData;
     const executivesList = executives?.data || [];
@@ -301,16 +303,42 @@ function LeadDetails() {
         }
     };
 
-    // WhatsApp Message
-    const sendWhatsApp = () => {
-        const message = `Hi ${lead.name},%0A%0AThis is regarding your inquiry about ${lead.product || 'our products'}.%0A%0AWe would like to follow up on your requirement. Please let us know a convenient time to connect.%0A%0AThanks!`;
-        const phone = lead.phone?.replace(/[^0-9]/g, '');
-        if (phone) {
-            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-        } else {
-            toast.error("No phone number available");
+    // Helper function to extract details from message
+    const extractMessageDetails = (messageText) => {
+        if (!messageText) return {};
+
+        const details = {};
+
+        // Extract Subject/Requirement (first line)
+        const lines = messageText.split('\n').filter(line => line.trim());
+        if (lines.length > 0) {
+            details.requirement = lines[0].trim();
         }
+
+        // Extract Probable Order Value
+        const budgetMatch = messageText.match(/Probable Order Value:\s*([^\n]+?)(?=\s+Quantity:|$)/i);
+        details.budget = budgetMatch ? budgetMatch[1].trim() : "N/A";
+
+        // Extract Quantity
+        const quantityMatch = messageText.match(/Quantity:\s*([^\n]+?)(?=\s+Seating Capacity:|$)/i);
+        details.quantity = quantityMatch ? quantityMatch[1].trim() : "N/A";
+
+        // Extract Seating Capacity
+        const seatingMatch = messageText.match(/Seating Capacity:\s*([^\n]+?)(?=\s+Upholstery Material:|$)/i);
+        details.seatingCapacity = seatingMatch ? seatingMatch[1].trim() : "N/A";
+
+        // Extract Upholstery Material
+        const upholsteryMatch = messageText.match(/Upholstery Material:\s*([^\n]+?)(?=\s+Buyer Filled Details:|$)/i);
+        details.upholsteryMaterial = upholsteryMatch ? upholsteryMatch[1].trim() : "N/A";
+
+        // Extract Buyer Filled Details
+        const buyerDetailsMatch = messageText.match(/Buyer Filled Details:\s*(.+)$/i);
+        details.buyerFilledDetails = buyerDetailsMatch ? buyerDetailsMatch[1].trim() : "N/A";
+
+        return details;
     };
+
+    const messageDetails = extractMessageDetails(lead?.message || "");
 
     if (leadLoading) {
         return <Loading data="Lead Details" />;
@@ -395,7 +423,7 @@ function LeadDetails() {
 
                             {/* WhatsApp Button */}
                             <button
-                                onClick={sendWhatsApp}
+                                onClick={() => setShowWhatsAppModal(true)}
                                 className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-xl text-sm font-semibold hover:bg-green-600 transition-all duration-200 hover:shadow-lg"
                             >
                                 <Send size={16} />
@@ -477,7 +505,28 @@ function LeadDetails() {
                                                 <IndianRupee size={18} className="text-blue-500 mt-0.5" />
                                                 <div>
                                                     <p className="text-xs text-gray-500 font-medium">Price / Budget</p>
-                                                    <p className="text-sm font-semibold text-gray-900">{lead.price || "N/A"}</p>
+                                                    <p className="text-sm font-semibold text-gray-900">{messageDetails.budget || "N/A"}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                                                <Package size={18} className="text-blue-500 mt-0.5" />
+                                                <div>
+                                                    <p className="text-xs text-gray-500 font-medium">Quantity</p>
+                                                    <p className="text-sm font-semibold text-gray-900">{messageDetails.quantity || "N/A"}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                                                <Users size={18} className="text-blue-500 mt-0.5" />
+                                                <div>
+                                                    <p className="text-xs text-gray-500 font-medium">Seating Capacity</p>
+                                                    <p className="text-sm font-semibold text-gray-900">{messageDetails.seatingCapacity || "N/A"}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                                                <Tag size={18} className="text-blue-500 mt-0.5" />
+                                                <div>
+                                                    <p className="text-xs text-gray-500 font-medium">Upholstery Material</p>
+                                                    <p className="text-sm font-semibold text-gray-900">{messageDetails.upholsteryMaterial || "N/A"}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
@@ -512,17 +561,27 @@ function LeadDetails() {
                                             </div>
                                         </div>
 
-                                        {/* Message */}
+                                        {/* Full Message/Requirement */}
                                         {lead.message && (
                                             <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
                                                 <p className="text-xs text-blue-600 font-semibold uppercase tracking-wider mb-2">Customer Requirement</p>
-                                                <p className="text-sm text-gray-800">{lead.message}</p>
+                                                <div className="space-y-1 text-sm text-gray-800">
+                                                    {lead.message.split('\n').map((line, index) => (
+                                                        line.trim() && <p key={index} className={line.includes(':') ? 'font-medium' : ''}>{line}</p>
+                                                    ))}
+                                                </div>
                                             </div>
                                         )}
 
+                                        {/* Additional Details from Message */}
+                                        {messageDetails.buyerFilledDetails !== "N/A" && (
+                                            <div className="mt-4 p-4 bg-purple-50 rounded-xl border border-purple-100">
+                                                <p className="text-xs text-purple-600 font-semibold uppercase tracking-wider mb-2">Buyer Filled Details</p>
+                                                <p className="text-sm text-gray-800">{messageDetails.buyerFilledDetails}</p>
+                                            </div>
+                                        )}
 
                                         <div className="flex justify-between items-center p-3 mt-4">
-
                                             {/* Follow Up Date Section */}
                                             <div className=" border-t border-gray-100">
                                                 <div className="flex items-center justify-between">
@@ -834,7 +893,6 @@ function LeadDetails() {
                         {/* Quick Actions */}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                             <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                                {/* <Target size={18} className="text-blue-500" /> */}
                                 Quick Actions
                             </h3>
                             <div className="space-y-2">
@@ -846,7 +904,7 @@ function LeadDetails() {
                                     View All Remarks
                                 </button>
                                 <button
-                                    onClick={sendWhatsApp}
+                                    onClick={() => setShowWhatsAppModal(true)}
                                     className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-green-50 rounded-xl transition-all duration-200 text-sm text-gray-700 hover:text-green-600"
                                 >
                                     <Send size={18} className="text-green-500" />
@@ -940,6 +998,12 @@ function LeadDetails() {
                     </div>
                 </div>
             )}
+
+            <WhatsAppSendModal
+                lead={lead}
+                open={showWhatsAppModal}
+                onClose={() => setShowWhatsAppModal(false)}
+            />
         </div>
     );
 }

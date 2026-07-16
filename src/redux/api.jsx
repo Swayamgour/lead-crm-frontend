@@ -34,7 +34,9 @@ export const api = createApi({
         "Quotations",
         "Dashboard",
         "Timeline",
-        "Remarks"
+        "Remarks",
+        "WhatsappTemplates",
+        "WhatsappLogs"
     ],
 
     endpoints: (builder) => ({
@@ -437,6 +439,79 @@ export const api = createApi({
                 { type: "Remarks", id: leadId }
             ],
         }),
+
+        // ================= WHATSAPP TEMPLATES =================
+
+        getWhatsappTemplates: builder.query({
+            query: (params) => ({ url: "/whatsapp/templates", params }),
+            providesTags: ["WhatsappTemplates"],
+        }),
+
+        getWhatsappTemplateById: builder.query({
+            query: (id) => `/whatsapp/templates/${id}`,
+            providesTags: ["WhatsappTemplates"],
+        }),
+
+        createWhatsappTemplate: builder.mutation({
+            query: (data) => ({
+                url: "/whatsapp/templates",
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["WhatsappTemplates"],
+        }),
+
+        updateWhatsappTemplate: builder.mutation({
+            query: ({ id, ...data }) => ({
+                url: `/whatsapp/templates/${id}`,
+                method: "PUT",
+                body: data,
+            }),
+            invalidatesTags: ["WhatsappTemplates"],
+        }),
+
+        deleteWhatsappTemplate: builder.mutation({
+            query: (id) => ({
+                url: `/whatsapp/templates/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["WhatsappTemplates"],
+        }),
+
+        deleteWhatsappTemplateImage: builder.mutation({
+            query: ({ id, imageId }) => ({
+                url: `/whatsapp/templates/${id}/images/${imageId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["WhatsappTemplates"],
+        }),
+
+        // ================= WHATSAPP SEND =================
+
+        sendWhatsAppTemplate: builder.mutation({
+            query: ({ leadId, templateId }) => ({
+                url: "/whatsapp/send",
+                method: "POST",
+                body: { leadId, templateId },
+            }),
+            invalidatesTags: ["WhatsappLogs"],
+        }),
+
+        sendWhatsAppCustom: builder.mutation({
+            query: ({ leadId, message }) => ({
+                url: "/whatsapp/send-custom",
+                method: "POST",
+                body: { leadId, message },
+            }),
+            invalidatesTags: ["WhatsappLogs"],
+        }),
+
+        getWhatsappLogs: builder.query({
+            query: (leadId) => `/whatsapp/logs/${leadId}`,
+            providesTags: (result, error, leadId) => [
+                { type: "WhatsappLogs", id: leadId }
+            ],
+        }),
     }),
 });
 
@@ -512,6 +587,17 @@ export const {
     useAddRemarkMutation,
     useGetLeadRemarksQuery,
 
+    // WHATSAPP TEMPLATES
+    useGetWhatsappTemplatesQuery,
+    useGetWhatsappTemplateByIdQuery,
+    useCreateWhatsappTemplateMutation,
+    useUpdateWhatsappTemplateMutation,
+    useDeleteWhatsappTemplateMutation,
+    useDeleteWhatsappTemplateImageMutation,
 
+    // WHATSAPP SEND
+    useSendWhatsAppTemplateMutation,
+    useSendWhatsAppCustomMutation,
+    useGetWhatsappLogsQuery,
 
 } = api;
