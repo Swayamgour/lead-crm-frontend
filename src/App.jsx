@@ -66,7 +66,7 @@ function App() {
             <Route path="/LeadTimeline" element={<LeadTimeline />} />
 
 
-            <Route path="/Report" element={<ReportPage />} />
+            <Route path="/Reports" element={<ReportPage />} />
 
             <Route path="/LeadPipeline" element={<LeadPipeline />} />
             <Route path="/WhatsappTemplates" element={<WhatsappTemplates />} />

@@ -26,24 +26,22 @@ function ProtectRoute() {
         return <Navigate to="/login" replace />;
     }
 
-    // Loading
-    if (isLoading || isFetching) {
+    // Loading — only block the whole screen on the FIRST fetch.
+    // Background refetches (window focus, reconnect, etc.) shouldn't
+    // yank the user back to a loading screen every time.
+    if (isLoading || (isFetching && data === undefined)) {
         return <Loading data="Screen" />;
     }
 
-    // Invalid token
-    if (
-        isError ||
-        error?.status === 401 ||
-        !data
-    ) {
-
+    // Token actually invalid/expired (server explicitly rejected it) -> real logout case
+    if (error?.status === 401) {
         dispatch(logout());
-
         return <Navigate to="/login" replace />;
     }
 
-    // Authorized
+    // Any other failure (network glitch, server slow/down, timeout, CORS hiccup, etc.)
+    // is NOT proof the session is invalid — a valid token exists locally, so let the
+    // user through instead of bouncing them back to /login.
     return <Outlet />;
 }
 
